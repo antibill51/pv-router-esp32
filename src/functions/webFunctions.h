@@ -206,14 +206,13 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
     logging.start = "";
   });
 
-  // server.on("/reset", HTTP_ANY, [](AsyncWebServerRequest *request){
-  //   request->send_P(200, "text/plain","Restarting");
-  //   ESP.restart();
-  // });
+  server.on("/reset", HTTP_ANY, [](AsyncWebServerRequest *request){
+     request->send_P(200, "text/plain","Restarting");
+     ESP.restart();
+  });
 
   server.on("/reboot", HTTP_ANY, [](AsyncWebServerRequest *request){
-   // request->send_P(200, "text/plain","Restarting");
-    request->redirect("/");
+   request->redirect("/");
     config.restart = true;
   });
 

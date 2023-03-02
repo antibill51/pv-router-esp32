@@ -531,7 +531,6 @@ void connect_to_wifi() {
       #if WIFI_ACTIVE == true
       if ( strcmp(WIFI_PASSWORD,"xxx") == 0 ) { WiFi.begin(configwifi.SID, configwifi.passwd); }
       else { WiFi.begin(WIFI_NETWORK, WIFI_PASSWORD); }
-      
       int timeoutwifi=0;
       logging.init += "Start Wifi Network " + String(WIFI_NETWORK) +  "\r\n";
       while ( WiFi.status() != WL_CONNECTED ) {

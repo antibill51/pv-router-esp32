@@ -65,7 +65,7 @@ void loadConfiguration(const char *filename, Config &config) {
   config.facteur = doc["facteur"] | 37.85;
   config.delta = doc["delta"] | 50; 
   config.num_fuse = doc["fuse"] | 70;
-  config.deltaneg = doc["deltaneg"] | -100; 
+  config.deltaneg = doc["deltaneg"] | 0; 
   config.cosphi = doc["cosphi"] | 5; 
   config.readtime = doc["readtime"] | 555;
   config.cycle = doc["cycle"] | 72;
