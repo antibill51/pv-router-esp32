@@ -170,7 +170,7 @@ void init_HA_sensor(){
 
                 power_factor.Set_name("Facteur de puissance");
                 // power_factor.Set_object_id("PowerFactor");
-                power_factor.Set_unit_of_meas("");
+                power_factor.Set_unit_of_meas("%");
                 power_factor.Set_stat_cla("measurement");
                 power_factor.Set_dev_cla("power_factor");
                 power_factor.Set_entity_type("sensor");
