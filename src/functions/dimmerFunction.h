@@ -56,7 +56,7 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue) {
     else {*/
       #if WIFI_ACTIVE == true
       /// control dimmer 
-      if ( strcmp(config.dimmer,"none") != 0 ) {
+      if ( configmqtt.HTTP || AP) {
       String baseurl; 
         baseurl = "/?POWER=" + String(dimmervalue) ; 
         http.begin(dimmerurl,80,baseurl);   
