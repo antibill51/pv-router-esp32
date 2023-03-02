@@ -9,6 +9,16 @@
 #include <WiFi.h>
 #include "HTTPClient.h"
     
+    
+// // test
+// #include <WiFiClientSecure.h>
+// #include <MQTTClient.h>
+
+// WiFiClientSecure HA_net;
+// MQTTClient HA_mqtt(512);
+
+// //
+
 WiFiClient espClient;
 PubSubClient client(espClient);
 extern Config config;
