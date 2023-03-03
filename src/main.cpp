@@ -425,25 +425,25 @@ Dimmer_setup();
   }
     
 
-  #if HA_ENABLED == true
-    xTaskCreate(
-      HADiscovery,
-      "MQTT-HA Discovery",  // Task name
-      5000,                // Stack size (bytes)
-      NULL,                 // Parameter
-      5,                    // Task priority
-      NULL                  // Task handle
-    );
+  // #if HA_ENABLED == true
+  //   xTaskCreate(
+  //     HADiscovery,
+  //     "MQTT-HA Discovery",  // Task name
+  //     5000,                // Stack size (bytes)
+  //     NULL,                 // Parameter
+  //     5,                    // Task priority
+  //     NULL                  // Task handle
+  //   );
 
-    xTaskCreate(
-      keepHAConnectionAlive,
-      "MQTT-HA Connect",
-      5000,
-      NULL,
-      4,
-      NULL
-    );
-  #endif
+  //   xTaskCreate(
+  //     keepHAConnectionAlive,
+  //     "MQTT-HA Connect",
+  //     5000,
+  //     NULL,
+  //     4,
+  //     NULL
+  //   );
+  // #endif
 #endif
 
 #if WIFI_ACTIVE == true

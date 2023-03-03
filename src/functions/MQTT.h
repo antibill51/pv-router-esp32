@@ -154,7 +154,7 @@ void init_HA_sensor(){
         // device_alarm_temp.Set_retain_flag(true);
         // device_alarm_temp.Set_expire_after(true);
 
-        client.setBufferSize(1024);
+        client.setBufferSize(512); //1024 BUG MQTT?
         if (configmqtt.HA){
         device_routeur.HA_discovery();
         device_dimmer.HA_discovery();

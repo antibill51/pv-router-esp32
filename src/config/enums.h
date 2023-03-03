@@ -263,8 +263,8 @@ struct MQTT
             + expire_after
             + HA_device_declare() + 
             "}";
-      client.publish((topic+object_id+"/config").c_str() , device.c_str(), true); // déclaration autoconf PvRouter
-      Serial.println(device.c_str());
+      client.publish((String(topic+object_id+"/config")).c_str() , device.c_str(), true); // déclaration autoconf PvRouter
+      // Serial.println(device.c_str());
 
     }
 
@@ -277,7 +277,7 @@ struct MQTT
     public:void send(String value){
     String topic = "Xlyric/"+ node_id +"/sensors/";
     String message = "  { \""+object_id+"\" : \"" + value.c_str() + "\"  } ";
-    client.publish((topic + object_id + "/state").c_str() , message.c_str(), retain_flag);
+    client.publish((String(topic + object_id + "/state")).c_str() , message.c_str(), retain_flag);
   } 
 };
 
