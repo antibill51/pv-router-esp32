@@ -144,7 +144,7 @@ struct MQTT
     public:void Set_dev_cla(String setter) {dev_cla=setter; }
 
     private:String unit_of_meas; 
-    public:void Set_unit_of_meas(String setter) {unit_of_meas="\"unit_of_meas\": \""+unit_of_setter+"\","}
+    public:void Set_unit_of_meas(String setter) {unit_of_meas="\"unit_of_meas\": \""+setter+"\",";}
 
     private:String stat_cla; 
     public:void Set_stat_cla(String setter) {stat_cla=setter; }
