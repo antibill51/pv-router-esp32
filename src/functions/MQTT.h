@@ -154,7 +154,7 @@ void init_HA_sensor(){
         // device_alarm_temp.Set_retain_flag(true);
         // device_alarm_temp.Set_expire_after(true);
 
-        client.setBufferSize(512); //1024 BUG MQTT?
+        client.setBufferSize(1024);
         if (configmqtt.HA){
         device_routeur.HA_discovery();
         device_dimmer.HA_discovery();
@@ -170,7 +170,6 @@ void init_HA_sensor(){
 
                 power_factor.Set_name("Facteur de puissance");
                 // power_factor.Set_object_id("PowerFactor");
-                power_factor.Set_unit_of_meas("%");
                 power_factor.Set_stat_cla("measurement");
                 power_factor.Set_dev_cla("power_factor");
                 power_factor.Set_entity_type("sensor");

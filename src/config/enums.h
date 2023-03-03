@@ -144,7 +144,7 @@ struct MQTT
     public:void Set_dev_cla(String setter) {dev_cla=setter; }
 
     private:String unit_of_meas; 
-    public:void Set_unit_of_meas(String setter) {unit_of_meas=setter; }
+    public:void Set_unit_of_meas(String setter) {unit_of_meas="\"unit_of_meas\": \""+unit_of_setter+"\","}
 
     private:String stat_cla; 
     public:void Set_stat_cla(String setter) {stat_cla=setter; }
@@ -189,7 +189,6 @@ struct MQTT
       String info;
       if (entity_type == "sensor") {
               info =         "\"dev_cla\": \""+dev_cla+"\","
-            "\"unit_of_meas\": \""+unit_of_meas+"\","
             "\"stat_cla\": \""+stat_cla+"\"," 
             "\"value_template\": \"{{ value_json."+ object_id +" }}\","; 
       }
@@ -258,6 +257,7 @@ struct MQTT
             "\"stat_t\": \""+ topic_Xlyric + "sensors/" + object_id +"/state\"," 
             "\"avty_t\": \""+ topic_Xlyric + "status\","
             + HA_sensor_type()
+            + unit_of_meas
             + icon
             + retain
             + expire_after
