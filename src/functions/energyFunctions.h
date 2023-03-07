@@ -240,35 +240,12 @@
 
   #else
     void frontmod(){
-      int Watchdog = 0;
-          int temp_value0 = analogRead(ADC_MIDDLE);  //Mean value. Should be at 3.3v/2
-          value0 = value0 + PHASECAL * (temp_value0 - value0); // Lissage des valeurs
+   // plus besoin ! 
+      int temp_value0 = analogRead(ADC_MIDDLE);  //Mean value. Should be at 3.3v/2
+      value0 = value0 + PHASECAL * (temp_value0 - value0); // Lissage des valeurs
 
-          startV = analogRead(ADC_PORTEUSE);
+      gDisplayValues.porteuse = true; 
 
-      while ( startV< (value0*0.95 )) { 
-          delayMicroseconds (5);
-          startV = analogRead(ADC_PORTEUSE);
-          Watchdog++;
-          if ( Watchdog > 2000  ) {  Serial.print("Attention pas de porteuse, alimentation 12v AC ou pont redresseur débranché ? "); gDisplayValues.porteuse = false; break; } 
-
-        }
-        startMillis = micros();   // 0ms 
-        while(1)                                   //the while loop...
-        {
-          // if ((startV < (ADC_COUNTS*0.50)) && (startV > (ADC_COUNTS*0.45))) 
-          if ((startV < value0) && (startV > (value0*0.95))) 
-
-          {
-        //   logging.start +="porteuse OK \r\n" ;
-
-            gDisplayValues.porteuse = true; 
-            break;  //check its within range
-          }
-          startV = analogRead(ADC_PORTEUSE);                    //using the voltage waveform
-
-          if ((millis()-startMillis)>timeout) {Serial.print("Attention pas milieu trouvé, alimentation 12v AC ou pont redresseur débranché ? ");  break;}
-        }
     }
 
     void injection3(){ 

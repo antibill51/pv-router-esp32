@@ -107,8 +107,14 @@ void updateDisplay(void* parameter) {
                 }
 
               } else {
-                drawtext16TTGO(120, 70, affiche, TFT_GREEN);
-              }       
+                if (gDisplayValues.watt < -999)
+                /// correction dépassement de ligne pour les injections < -1000
+                {
+                  drawtext16TTGO(100, 70, affiche, TFT_GREEN);
+                } else {
+                  drawtext16TTGO(120, 70, affiche, TFT_GREEN);
+                }  
+              }     
           #endif
         }
 

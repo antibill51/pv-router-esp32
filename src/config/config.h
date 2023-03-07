@@ -196,6 +196,8 @@ bool AP=true;
 #define RELAY1 13
 #define RELAY2 15
 
+#define LOG_MAX_STRING_LENGTH 254 // taille max des logs stockées
+
 
 #endif
 

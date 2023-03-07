@@ -7,8 +7,10 @@ void client_loop(void * parameter)
 {
   for(;;){
     client.loop();
-    // logging.start += "client.loop\r\n";
-    vTaskDelay(1500 / portTICK_PERIOD_MS);
+    // logging.start += "client.loop\r\n";S
+    // vTaskDelay(1500 / portTICK_PERIOD_MS);
+    vTaskDelay(pdMS_TO_TICKS(100)); //TEST FIX MQTT socket error
+
   }
 }
 #endif

@@ -267,11 +267,11 @@ Dimmer_setup();
 
 #if WIFI_ACTIVE == true
   #if WEBSSERVER == true
-  //***********************************
-	//************* Setup -  demarrage du webserver et affichage de l'oled
-	//***********************************
-   Serial.println("start Web server");
-   call_pages();
+    //***********************************
+    //************* Setup -  demarrage du webserver et affichage de l'oled
+    //***********************************
+    Serial.println("start Web server");
+    call_pages();
   #endif
 
   // ----------------------------------------------------------------
@@ -481,6 +481,10 @@ logging.power=true; logging.sct=true; logging.sinus=true;
 
 void loop()
 {
+  if (logging.init.length() > LOG_MAX_STRING_LENGTH ) { 
+    logging.init="197}11}1";
+  }
+
   if (config.restart) {
     delay(5000);
     Serial.print("Restarting PV ROUTER");
