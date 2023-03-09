@@ -48,6 +48,7 @@ void reconnect() {
       client.publish(String(topic_Xlyric +"status").c_str(), "online", true);         // Once connected, publish online to the availability topic
       client.subscribe(command_switch.c_str());
     //  client.loop();
+      yield();
 
       Serial.println("MQTT reconnect : connected");
     } else {
@@ -86,6 +87,7 @@ void Mqtt_send_DOMOTICZ ( String idx, String value, String otherpub = "" ) {
     if (otherpub == "" ) {
       if (client.publish(config.Publish, String(message).c_str(), true)) {
      //   Serial.println("MQTT_send : MQTT sent to domoticz");
+      yield();
       }
 
       else {
