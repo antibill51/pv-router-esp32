@@ -204,8 +204,8 @@
 
 
 
-    //positive = ( positive / ( config.facteur * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
-    positive = ( ( positive * config.voltage ) / ( config.facteur * nombre_cycle * 230 ) ) + config.offset ; 
+    //positive = ( positive / ( FACTEURPUISSANCE  * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
+    positive = ( ( positive * config.voltage ) / ( FACTEURPUISSANCE  * nombre_cycle * 230 ) ) + config.offset ; 
 
 
     if ( zero > 75 ) { 
