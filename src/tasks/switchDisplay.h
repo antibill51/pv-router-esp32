@@ -25,14 +25,16 @@ void switchDisplay(void * parameter){
 
     if (digitalRead(SWITCH)==LOW || gDisplayValues.screenstate == HIGH ){ // if right button is pressed or HTTP call 
         if (digitalRead(TFT_PIN)==HIGH) {             // and the status flag is LOW
-          gDisplayValues.screenstate = LOW ;   
+          gDisplayValues.screenstate = LOW ;  
+          logging.start += loguptime(); 
           logging.start += "Oled Off\r\n";   
           digitalWrite(TFT_PIN,LOW);     // and turn Off the OLED
           }                           // 
         else {                        // otherwise...      
           Serial.println("button left/bottom pressed");
           gDisplayValues.screenstate = LOW ;
-          logging.start += "Oled On\r\n";   
+          logging.start += loguptime(); 
+          logging.start += +"Oled On\r\n";   
           digitalWrite(TFT_PIN,HIGH);      // and turn On  the OLED
           if (config.ScreenTime !=0 ) {
             timer = millis();
@@ -41,15 +43,19 @@ void switchDisplay(void * parameter){
       }
 
     if ( (digitalRead(BUTTON_LEFT)==LOW) ) {
-        gDisplayValues.page++;
+        //// changement, pour les démos, c'est plus pratique que d'inverser la sonde
+      config.polarity = !config.polarity;
+       /* gDisplayValues.page++;
         if (gDisplayValues.page == NB_PAGES+1) {
           gDisplayValues.page=1;
         }
         
         Serial.println("button left/up pressed");
+        logging.start += loguptime(); 
         logging.start += "Page changed nb:" + String(gDisplayValues.page) +" \r\n";
         Serial.print("mode=");
         Serial.println(gDisplayValues.page);
+        */
       }
 
       vTaskDelay(500 / portTICK_PERIOD_MS);  

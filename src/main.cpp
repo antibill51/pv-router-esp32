@@ -30,6 +30,8 @@
   #include "tasks/Dimmer.h"
   #include "tasks/gettemp.h"
 
+  #include "tasks/Serial_task.h"
+
   //#include "functions/otaFunctions.h"
   #include "functions/spiffsFunctions.h"
   #include "functions/Mqtt_http_Functions.h"
@@ -40,6 +42,7 @@
   #include "functions/WifiFunctions.h"
   #include "functions/MQTT.h"
 
+  #include "uptime.h"
 
 #if DALLAS
 // Dallas 18b20
@@ -80,6 +83,7 @@ Config config;
 Configwifi configwifi; 
 Configmodule configmodule; 
 
+
 /// declare logs 
 Logs logging;
 /// declare MQTT 
@@ -103,6 +107,8 @@ unsigned char measureIndex = 0;
 #if DALLAS
 Dallas dallas; 
 #endif
+String loguptime();
+#ifndef LIGHT_FIRMWARE
 
 
 
@@ -123,6 +129,7 @@ MQTT device_alarm_temp;
   MQTT power_irms;
   MQTT power_apparent;
 #endif
+#endif
 
 /***************************
  *  Dimmer init
@@ -140,6 +147,7 @@ void setup()
   logging.init += "#################  Starting System  ###############\r\n";
   //démarrage file system
   Serial.println("start SPIFFS");
+  logging.init += loguptime();
   logging.init += "Start Filesystem\r\n";
   SPIFFS.begin();
 
@@ -152,8 +160,13 @@ void setup()
   loadConfiguration(filename_conf, config);
 
   ///define if AP mode or load configuration
-  if (loadwifi(wifi_conf, configwifi)) {
+  /*if (loadwifi(wifi_conf, configwifi)) {
     AP=false; 
+  }*/
+  if (configwifi.recup_wifi()){
+     logging.init += loguptime();
+     logging.init += "Wifi config \r\n"; 
+       AP=false; 
   }
 
    loadmqtt(mqtt_conf ,configmqtt);
@@ -218,15 +231,6 @@ void setup()
         display.setCursor(0, 0, 2);
         display.setTextColor(TFT_WHITE,TFT_BLACK);  display.setTextSize(1);
         display.println(BOOTING);
-          if  (strcmp(WIFI_PASSWORD,"xxx") == 0) { 
-            if  (strcmp(configwifi.SID,"xxx") == 0) {
-            display.println(WIFINO); 
-            }
-          else { 
-            display.println(WIFICONNECT + String(configwifi.SID));
-          }
-        } 
-        else display.println(WIFICONNECT WIFI_NETWORK);
     #endif
 #endif
 
@@ -238,29 +242,17 @@ Dimmer_setup();
 
 
    // vérification de la présence d'index.html
-  if(!SPIFFS.exists("/index.html")){
+  if(!SPIFFS.exists("/index.html.gz")){
     Serial.println(SPIFFSNO);  
-    logging.init += "SPIFFS not uploaded!!\r\n";
+    logging.init += loguptime();
+    logging.init += SPIFFSNO ;
   }
 
   if(!SPIFFS.exists(filename_conf)){
     Serial.println(CONFNO);  
-    logging.init += "config file not exist, taking default value\r\n";
+    logging.init += loguptime();
+    logging.init += CONFNO;
   }
-
-
-
-  // Create configuration file
-  //Serial.println(F("Saving configuration..."));
-  //saveConfiguration(filename_conf, config);
-
-  
-
-
-
-
-  // Initialize emon library
-  //emon1.current(ADC_INPUT, 30);
 
   // Initialize Dimmer State 
   gDisplayValues.dimmer = 0;
@@ -293,16 +285,15 @@ Dimmer_setup();
   // ----------------------------------------------------------------
   // TASK: Connect to AWS & keep the connection alive.
   // ----------------------------------------------------------------
-  #if AWS_ENABLED == true
     xTaskCreate(
-      keepAWSConnectionAlive,
-      "MQTT-AWS",      // Task name
-      5000,            // Stack size (bytes)
+      serial_read_task,
+      "Serial Read",      // Task name
+      2000,            // Stack size (bytes)
       NULL,             // Parameter
-      5,                // Task priority
+      0,                // Task priority
       NULL              // Task handle
     );
-  #endif
+
 
   // ----------------------------------------------------------------
   // TASK: Update the display every second
@@ -315,7 +306,7 @@ Dimmer_setup();
     "UpdateDisplay",  // Task name
     10000,            // Stack size (bytes)
     NULL,             // Parameter
-    4,                // Task priority
+    1,                // Task priority
     NULL,             // Task handle
     ARDUINO_RUNNING_CORE
   );
@@ -453,6 +444,7 @@ Dimmer_setup();
         AsyncElegantOTA.begin(&server);
         server.begin(); 
       #endif
+#ifndef LIGHT_FIRMWARE
 
 if (!AP) {
     if (config.mqtt) {
@@ -461,6 +453,7 @@ if (!AP) {
     // HA autoconf
      if (configmqtt.HA) init_HA_sensor();}
 }
+#endif
 
   //if ( config.autonome == true ) {
     gDisplayValues.dimmer = 0; 
@@ -481,15 +474,20 @@ logging.power=true; logging.sct=true; logging.sinus=true;
 
 void loop()
 {
-  if (logging.init.length() > LOG_MAX_STRING_LENGTH ) { 
-    logging.init="197}11}1";
-  }
 
+/// redémarrage sur demande
   if (config.restart) {
     delay(5000);
-    Serial.print("Restarting PV ROUTER");
+    Serial.print(PV_RESTART);
     ESP.restart();
   }
+
+/// vérification du buffer log 
+  if (logging.start.length() > LOG_MAX_STRING_LENGTH ) { 
+    logging.start = "";
+  }
+
+  
 
 //serial_println(F("loop")); 
 
@@ -510,48 +508,59 @@ void loop()
 
     }
   }
-  if (!AP) {
-    #if WIFI_ACTIVE == true
-        if (config.mqtt) {
-          if (!client.connected()) { reconnect(); }
-         // client.loop();
-        }
+#ifndef LIGHT_FIRMWARE
+    if (!AP) {
+      #if WIFI_ACTIVE == true
+          if (config.mqtt) {
+            if (!client.connected()) { reconnect(); }
+          // client.loop();
+          }
 
-    #endif
-  }
+      #endif
+    }
+#endif
   vTaskDelay(10000 / portTICK_PERIOD_MS);
 }
 
 void connect_to_wifi() {
   ///// AP WIFI INIT 
-  if (AP) {
-    APConnect(); 
+  if (AP || strcmp(configwifi.SID,"AP") == 0 ) {
+      AP=true; 
+      APConnect(); 
       gDisplayValues.currentState = UP;
       gDisplayValues.IP = String(WiFi.softAPIP().toString());
       btStop();
+      return; 
   }
-
   else {
       #if WIFI_ACTIVE == true
-      if ( strcmp(WIFI_PASSWORD,"xxx") == 0 ) { WiFi.begin(configwifi.SID, configwifi.passwd); }
-      else { WiFi.begin(WIFI_NETWORK, WIFI_PASSWORD); }
+      WiFi.mode(WIFI_STA);
+      //Esp_wifi_set_ps (WIFI_PS_NONE);
+      WiFi.setSleep(false);
+      WiFi.begin(configwifi.SID, configwifi.passwd); 
       int timeoutwifi=0;
-      logging.init += "Start Wifi Network " + String(WIFI_NETWORK) +  "\r\n";
+      logging.init += loguptime();
+      logging.init += "Start Wifi Network " + String(configwifi.SID) +  "\r\n";
       while ( WiFi.status() != WL_CONNECTED ) {
         delay(500);
         Serial.print(".");
         timeoutwifi++; 
 
         if (timeoutwifi > 20 ) {
+              logging.init += loguptime();
               logging.init += "timeout, go to AP mode \r\n" ;  
+              logging.init += loguptime();
               logging.init += "Wifi State :";
+              logging.init += loguptime();
               
               switch (WiFi.status()) {
                   case 1:
-                      logging.init +="SSID is not available" ; 
+
+                      logging.init += "SSID is not available" ; 
                       break;
                   case 4:
-                      logging.init +="The connection fails for all the attempts"  ;
+
+                      logging.init += "The connection fails for all the attempts"  ;
                       break;
                   case 5:
                       logging.init +="The connection is lost" ; 
@@ -562,12 +571,12 @@ void connect_to_wifi() {
                   default:
                       logging.init +="I have no idea ?! " ; 
                       break;
-              }
           
               
               logging.init += "\r\n";
               break;}
       }
+
 
         //// timeout --> AP MODE 
         if ( timeoutwifi > 20 ) {
@@ -576,19 +585,29 @@ void connect_to_wifi() {
               serial_println("timeout, go to AP mode ");
               
               gDisplayValues.currentState = UP;
-              gDisplayValues.IP = String(WiFi.softAPIP().toString());
+             // gDisplayValues.IP = String(WiFi.softAPIP().toString());
               APConnect(); 
-              btStop();
         }
+    }
 
       serial_println("WiFi connected");
+      logging.init += loguptime();
       logging.init += "Wifi connected\r\n";
       serial_println("IP address: ");
       serial_println(WiFi.localIP());
-      
+        serial_print("force du signal:");
+        serial_print(WiFi.RSSI());
+        serial_print("dBm");
       gDisplayValues.currentState = UP;
       gDisplayValues.IP = String(WiFi.localIP().toString());
       btStop();
       #endif
   }
+}
+
+String loguptime() {
+  String uptime_stamp;
+  uptime::calculateUptime();
+  uptime_stamp = String(uptime::getDays())+":"+String(uptime::getHours())+":"+String(uptime::getMinutes())+":"+String(uptime::getSeconds())+ "\t";
+  return uptime_stamp;
 }

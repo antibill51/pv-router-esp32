@@ -2,10 +2,13 @@
 #define ENUMS
 
 #include <Arduino.h>
-#include <PubSubClient.h>
-// #include "WiFi.h"
-// #include "functions/WifiFunctions.h"
-extern PubSubClient client;
+#ifndef LIGHT_FIRMWARE
+  #include <PubSubClient.h>
+  extern PubSubClient client;
+#endif
+
+#include <Preferences.h> 
+
 // The state in which the device can be. This mainly affects what
 // is drawn on the display.
 enum DEVICE_STATE {
@@ -77,8 +80,31 @@ struct Config {
 };
 
 struct Configwifi {
+  
+  Preferences preferences;
+
   char SID[32];
   char passwd[64];
+
+  public:bool sauve_wifi() {
+  preferences.begin("credentials", false);
+  preferences.putString("ssid",SID);
+  preferences.putString("password",passwd);
+  preferences.end();
+  return true; 
+  }
+
+  public:bool recup_wifi() {
+  preferences.begin("credentials", false);
+  String tmp; 
+  tmp = preferences.getString("ssid", "");
+  tmp.toCharArray(SID,32);
+  tmp = preferences.getString("password", "");
+  tmp.toCharArray(passwd,64);
+  preferences.end();
+  if (strcmp(SID,"") == 0) { return false; }
+  return true;
+  }
 };
 
 struct Mqtt {
@@ -105,6 +131,7 @@ struct Logs {
   bool sct;
   bool sinus;
   bool power;
+  bool serial=false; 
 };
 
 #if DEBUG == true
@@ -126,9 +153,11 @@ struct Dallas{
   bool detect = false; 
 };
 
+
 //***********************
 //****    MQTT 
 //***********************
+  #ifndef LIGHT_FIRMWARE
 struct MQTT
 {
     private:int MQTT_INTERVAL = 60;
@@ -140,14 +169,14 @@ struct MQTT
     private:String object_id; 
     public:void Set_object_id(String setter) {object_id=setter; }
 
-    private:String dev_cla; 
-    public:void Set_dev_cla(String setter) {dev_cla=setter; }
+          private:String dev_cla; 
+          public:void Set_dev_cla(String setter) {dev_cla=setter; }
 
     private:String unit_of_meas; 
     public:void Set_unit_of_meas(String setter) {unit_of_meas="\"unit_of_meas\": \""+setter+"\",";}
 
-    private:String stat_cla; 
-    public:void Set_stat_cla(String setter) {stat_cla=setter; }
+          private:String stat_cla; 
+          public:void Set_stat_cla(String setter) {stat_cla=setter; }
 
     private:String entity_category; 
     public:void Set_entity_category(String setter) {entity_category=setter; }
@@ -155,8 +184,8 @@ struct MQTT
     private:String entity_type; 
     public:void Set_entity_type(String setter) {entity_type=setter; }
 
-    private:String icon; 
-    public:void Set_icon(String setter) {icon="\"ic\": \""+ setter +"\", "; }
+          private:String icon; 
+          public:void Set_icon(String setter) {icon="\"ic\": \""+ setter +"\", "; }
 
     private:String min; 
     public:void Set_entity_valuemin(String setter) {min=setter; }
@@ -265,7 +294,6 @@ struct MQTT
             "}";
       client.publish((String(topic+object_id+"/config")).c_str() , device.c_str(), true); // déclaration autoconf PvRouter
       // Serial.println(device.c_str());
-      yield();
 
 
     }
@@ -280,9 +308,8 @@ struct MQTT
     String topic = "Xlyric/"+ node_id +"/sensors/";
     String message = "  { \""+object_id+"\" : \"" + value.c_str() + "\"  } ";
     client.publish((String(topic + object_id + "/state")).c_str() , message.c_str(), retain_flag);
-    yield();
   } 
 };
 
-
+#endif
 #endif

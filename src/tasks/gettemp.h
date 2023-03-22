@@ -28,8 +28,10 @@ if ( !dallas.detect) {
 
 //  read request return
   if (httpResponseCode>0) {
+    if (logging.serial){
     Serial.print("gettemp HTTP Response code: ");
     Serial.println(httpResponseCode);
+    }
     dimmerstate = httpdimmer.getString();
   }
   else {
@@ -48,8 +50,9 @@ int lasttemp = dimmerstate.indexOf(";");
 dimmerstate = dimmerstate.substring(0,lasttemp);
 
 gDisplayValues.temperature = dimmerstate; 
- Serial.println("temperature " + dimmerstate);
-
+  if (logging.serial){
+  Serial.println("temperature " + dimmerstate);
+  }
 }
 
 // refresh every GETTEMPREFRESH seconds 

@@ -15,18 +15,21 @@
 extern DisplayValues gDisplayValues;
 extern Configmodule configmodule; 
 extern Logs Logging;
-extern MQTT device_routeur; 
-extern MQTT device_grid; 
-extern MQTT device_inject; 
-extern MQTT compteur_inject;
-extern MQTT compteur_grid;
-extern MQTT temperature;
-extern MQTT device_alarm_temp;
-#ifdef HARDWARE_MOD
-      extern MQTT power_factor;
-      extern MQTT power_vrms;
-      extern MQTT power_irms;
-      extern MQTT power_apparent;
+
+#ifndef LIGHT_FIRMWARE
+      extern MQTT device_routeur; 
+      extern MQTT device_grid; 
+      extern MQTT device_inject; 
+      extern MQTT compteur_inject;
+      extern MQTT compteur_grid;
+      extern MQTT temperature;
+      extern MQTT device_alarm_temp;
+      #ifdef HARDWARE_MOD
+            extern MQTT power_factor;
+                  extern MQTT power_vrms;
+                  extern MQTT power_irms;
+                  extern MQTT power_apparent;
+      #endif
 #endif
 
 int slowlog = TEMPOLOG - 1 ; 
@@ -54,10 +57,12 @@ void measureElectricity(void * parameter)
             if ( gDisplayValues.porteuse == false ) {
                   gDisplayValues.watt =0 ; 
                   slowlog ++; 
-                  if (slowlog == TEMPOLOG) { logging.start += "--> No sinus, check 12AC power \r\n"; slowlog =0 ; }
+                  if (slowlog == TEMPOLOG) {     logging.start  += loguptime(); logging.start +=  String("--> No sinus, check 12AC power \r\n"); slowlog =0 ; }
 
             }
+            if (logging.serial){
             serial_println(int(gDisplayValues.watt)) ;
+            }
 
       }
       else{
@@ -81,11 +86,12 @@ if (!AP) {
             }           
 
 
-            #if WIFI_ACTIVE == true
+      #if WIFI_ACTIVE == true
                   Pow_mqtt_send ++ ;
                   if ( Pow_mqtt_send >= 5 ) {
                   long timemesure = start-beforetime;
                   float wattheure = (timemesure * abs(gDisplayValues.watt) / timemilli) ;  
+            #ifndef LIGHT_FIRMWARE
 
                   if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDX), String(int(gDisplayValues.watt)));  }
                   if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {
@@ -97,6 +103,7 @@ if (!AP) {
                               power_factor.send(String(PowerFactor));
                         #endif
                   }
+
                   // send if injection
                   if (gDisplayValues.watt < 0 ){
                         if (configmqtt.DOMOTICZ) {
@@ -138,6 +145,8 @@ if (!AP) {
                   }
                               
             #endif
+      #endif
+
 }
 
 long end = millis();

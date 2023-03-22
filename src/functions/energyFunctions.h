@@ -4,9 +4,11 @@
   #include "../config/enums.h"
   #include "../config/config.h"
 
-  extern DisplayValues gDisplayValues;
-  extern Config config; 
-  extern Logs logging;
+extern DisplayValues gDisplayValues;
+extern Config config; 
+extern Logs logging;
+
+extern String loguptime(); 
 
   // ***********************************
   // ** recherche du point 0. temps 20 ms max ... 
@@ -40,31 +42,102 @@
     while ( analogRead(ADC_PORTEUSE) > margin  ) { 
       delayMicroseconds (3);
       Watchdog++;
-      if ( Watchdog > 2500  ) {  Serial.print("Attention pas de porteuse, alimentation 12v AC ou pont redresseur débranché ? "); gDisplayValues.porteuse = false; break; } 
+      if ( Watchdog > 2500  ) {  Serial.print(NO_SYNC); gDisplayValues.porteuse = false; break; } 
 
     }
 
-    Watchdog=0 ; 
-    // recherche d'un 0
+  Watchdog=0 ; 
+  // recherche d'un 0
+  
+  while ( analogRead(ADC_PORTEUSE) == margin  ) {
+  delayMicroseconds (3);  
+    Watchdog++;
+    if ( Watchdog > 2500  ) {  Serial.print(NO_SYNC); gDisplayValues.porteuse = false ; break;}  
+	}
     
-    while ( analogRead(ADC_PORTEUSE) == margin  ) {
-    delayMicroseconds (3);  
-      Watchdog++;
-      if ( Watchdog > 2500  ) {  Serial.print("Attention pas de porteuse, alimentation 12v AC ou pont redresseur débranché ou inversée ? "); gDisplayValues.porteuse = false ; break;}  
+}
+
+
+// ***********************************
+// recherche d'un niveau d'injection
+// ***********************************
+int middle = 0;
+int middle_count = 0; 
+int start = 0 ;
+#ifdef OLD
+void injection(){
+  //int tableau[144][144]; 
+  int injection = 0; 
+  //int margin = 1893;
+  int temp_read , temp_porteuse ;
+  int sigma_read = 0 ; 
+  String porteuse = "" ;
+  double zero =0; 
+  double positive = 0 ; 
+  int zero_count = 0; 
+  int loop = 0; 
+  int freqmesure = 144;  // 18 mesure pour la 1/2 ondulation
+  int wait_time = 277 ; //  --> 1/50Hz -> /2 -> 10ms --> 18 mesures --> 555 us 
+  unsigned long startMillis;
+  
+  front();  ///synchro porteuse.
+  
+  startMillis = micros();   //temps debut de la boucle
+
+  while (loop < freqmesure ) {
+    temp_read =  analogRead(ADC_INPUT);
+    temp_porteuse =  analogRead(ADC_PORTEUSE);
+    sigma_read += temp_read; 
+    
+    if (temp_porteuse == 0 ) {
+      zero += temp_read * temp_read ; 
+      zero_count ++; 
+      injection = 1 ;
     }
-      
+    else {
+      if ( injection == 1 ) { injection =2 ; break ; }
+      positive += temp_read * temp_read ;
+
+    }
+
+
+
+    //porteuse += String(temp_porteuse) + " " +  String(temp_read) + "-"; 
+ 
+      //filtre bruit de fond 
+   /* if ( temp_read > middle + BRUIT || temp_read < middle - BRUIT ) {
+      if ( temp_read > middle )  { margin += ( temp_read - middle ) ; } 
+      if ( temp_read < middle )  { margin += ( middle - temp_read ) ; }
+    }*/ 
+    
+
+    ///detection injection 
+   /* if ( temp_tension == 0 )  {  
+     injection += temp - middle ;
+    }*/
+   if ( injection == 2  || loop > 500) { break ; }  
+   loop ++; 
+ 
+   rt_loop( startMillis, wait_time*loop ) ; // attent le prochain top temps de mesure ( 277us * loop )
   }
 
+  zero = sqrt(zero / float(zero_count)); 
+  positive = sqrt(positive / float( loop - zero_count )) ; 
+  //serial_print(positive) ; serial_print("  ") ; serial_print (zero) ; serial_print("  ") ; serial_println ( (zero + positive) /2  ) ;
+  gDisplayValues.watt = int(( positive - zero)*3.2) ; 
+  if ( config.polarity == true ) { gDisplayValues.watt = - gDisplayValues.watt ; }
+  
+
+  //injection = sigma_read / (loop  ); 
+  //if (injection >= ADC_MIDDLE ) 
+  //if (positive >= zero ) {gDisplayValues.injection = false ; }
+  //else {gDisplayValues.injection = true ;  serial_print(porteuse) ; serial_print("  ") ; serial_print (injection) ; serial_print("  ") ; serial_println (loop) ;}
+ 
+  
 
 
-
-    // ***********************************
-    // recherche d'un niveau d'injection
-    // ***********************************
-    // int middle = 0;
-    // int middle_count = 0; 
-    int start = 0 ;
-
+}
+#endif
 
     const int nbmesure = 72 ; /// nombre de mesure par ondulation
     const int nombre_cycle  = 4 ; /// nombre de cycle pour affiner la mesure
@@ -208,10 +281,10 @@
     positive = ( ( positive * config.voltage ) / ( FACTEURPUISSANCE  * nombre_cycle * 230 ) ) + config.offset ; 
 
 
-    if ( zero > 75 ) { 
-      if (logging.sct) { logging.start += "--> SCT013 Prob not connected  ?\r\n" ; logging.sct = false; }
-    }
-    //logging.start += "zero detected : " + String(zero) +   "\r\n" ;
+if ( zero > 75 ) { 
+  if (logging.sct) {     logging.start  += loguptime(); logging.start += "--> SCT013 Prob not connected  ?\r\n" ; logging.sct = false; }
+}
+//logging.start += "zero detected : " + String(zero) +   "\r\n" ;
 
 
     bool nolog =false; 

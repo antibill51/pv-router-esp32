@@ -5,50 +5,38 @@
 #include "../config/config.h"
 #include "../config/enums.h"
 #include "functions/spiffsFunctions.h"
-#include <PubSubClient.h>
 #include <WiFi.h>
 #include "HTTPClient.h"
     
-
 WiFiClient espClient;
-PubSubClient client(espClient);
+#ifndef LIGHT_FIRMWARE
+  PubSubClient client(espClient);
+#endif
 extern Config config;
 extern DisplayValues gDisplayValues;
 extern Mqtt configmqtt;
 
+#ifndef LIGHT_FIRMWARE
 
-String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-// String node_ids = WiFi.macAddress().substring(0,2)+ WiFi.macAddress().substring(4,6)+ WiFi.macAddress().substring(8,10) + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-String node_id = String("PvRouter-") + node_mac; 
-String topic = "homeassistant/sensor/"+ node_id +"/status";  
-String topic_Xlyric = "Xlyric/"+ node_id +"/";
-
-String command_switch = String(topic_Xlyric + "switch/command");
-// String command_number = String(topic_Xlyric + "number/command");
-// String command_select = String(topic_Xlyric + "select/command");
-// String command_button = String(topic_Xlyric + "button/command");
-
-void callback(char* Subscribedtopic, byte* message, unsigned int length);
 // void Mqtt_HA_hello(); // non utilisé maintenant 
 void reconnect();
 /***
  *  reconnexion au serveur MQTT
  */
 
-void reconnect() {
-  String pvname = String("PvRouter-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
-  String topic = "homeassistant/sensor/"+ pvname +"/status";
-  // Loop until we're reconnected
-  while (!client.connected()) {
-    Serial.println("-----------------------------");
-    Serial.println("Attempting MQTT reconnection...");
-    // Attempt to connect
+    void reconnect() {
+      String pvname = String("PvRouter-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
+      String topic = "homeassistant/sensor/"+ pvname +"/status";
+      // Loop until we're reconnected
+      while (!client.connected()) {
+        Serial.println("-----------------------------");
+        Serial.println("Attempting MQTT reconnection...");
+        // Attempt to connect
 
     if (client.connect(node_id.c_str(), configmqtt.username, configmqtt.password, String(topic_Xlyric +"status").c_str(), 2, true, "offline", false)) {       //Connect to MQTT server
       client.publish(String(topic_Xlyric +"status").c_str(), "online", true);         // Once connected, publish online to the availability topic
       client.subscribe(command_switch.c_str());
     //  client.loop();
-      yield();
 
       Serial.println("MQTT reconnect : connected");
     } else {
@@ -182,6 +170,6 @@ void Mqtt_init() {
 // //if (client.publish(topic.c_str(), String(message).c_str(), true))  {  Serial.println("HELLO");}
 // }
 
-
+#endif
 
 #endif

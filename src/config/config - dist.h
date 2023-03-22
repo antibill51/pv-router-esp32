@@ -17,8 +17,8 @@
 #define WIFI_ACTIVE  true
 //#define MQTT_CLIENT true --> option in the web menu
 
-#define WIFI_NETWORK "xxx"
-#define WIFI_PASSWORD "xxx"
+//#define WIFI_NETWORK "xxx"
+//#define WIFI_PASSWORD "xxx"
 
 
 /**
@@ -194,10 +194,10 @@ bool discovery_temp = false;
 #if CONFIG_FREERTOS_UNICORE
 #define ARDUINO_RUNNING_CORE 0
 #else
-#define ARDUINO_RUNNING_CORE 1
+//#define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define VERSION "version 3.20230214"
+#define VERSION "version 20230321"
 
 #define EnvoyR "/api/v1/production"
 #define EnvoyS "/production.json"
@@ -211,5 +211,7 @@ bool AP=true;
 #define RELAY1 13
 #define RELAY2 15
 
+/// taille max des logs stockée
+#define LOG_MAX_STRING_LENGTH 254
 
 #endif
