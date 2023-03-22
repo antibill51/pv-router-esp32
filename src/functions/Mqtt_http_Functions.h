@@ -17,7 +17,16 @@ extern DisplayValues gDisplayValues;
 extern Mqtt configmqtt;
 
 #ifndef LIGHT_FIRMWARE
+String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
+// String node_ids = WiFi.macAddress().substring(0,2)+ WiFi.macAddress().substring(4,6)+ WiFi.macAddress().substring(8,10) + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
+String node_id = String("PvRouter-") + node_mac; 
+String topic = "homeassistant/sensor/"+ node_id +"/status";  
+String topic_Xlyric = "Xlyric/"+ node_id +"/";
 
+String command_switch = String(topic_Xlyric + "switch/command");
+// String command_number = String(topic_Xlyric + "number/command");
+// String command_select = String(topic_Xlyric + "select/command");
+// String command_button = String(topic_Xlyric + "button/command");
 // void Mqtt_HA_hello(); // non utilisé maintenant 
 void reconnect();
 /***
@@ -75,7 +84,6 @@ void Mqtt_send_DOMOTICZ ( String idx, String value, String otherpub = "" ) {
     if (otherpub == "" ) {
       if (client.publish(config.Publish, String(message).c_str(), true)) {
      //   Serial.println("MQTT_send : MQTT sent to domoticz");
-      yield();
       }
 
       else {

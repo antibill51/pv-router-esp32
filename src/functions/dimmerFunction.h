@@ -36,7 +36,7 @@
     extern dimmerLamp dimmer_hard; 
     extern Logs logging;
   #ifndef LIGHT_FIRMWARE
-    extern HA device_dimmer; 
+    extern MQTT device_dimmer; 
   #endif
 
 
