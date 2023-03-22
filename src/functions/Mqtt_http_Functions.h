@@ -115,6 +115,7 @@ void callback(char* Subscribedtopic, byte* message, unsigned int length) {
         int relay = doc2["Switch1"]; 
         if ( relay == 0) { digitalWrite(RELAY1 , LOW); }
         else { digitalWrite(RELAY1 , HIGH); } 
+        logging.start += loguptime();
         logging.start += "RELAY1 at " + String(relay) + "\r\n"; 
         switch_1.send(String(relay));
     }
@@ -122,6 +123,7 @@ void callback(char* Subscribedtopic, byte* message, unsigned int length) {
         int relay = doc2["Switch2"]; 
         if ( relay == 0) { digitalWrite(RELAY2 , LOW); }
         else { digitalWrite(RELAY2 , HIGH); } 
+        logging.start += loguptime();
         logging.start += "RELAY2 at " + String(relay) + "\r\n"; 
         switch_2.send(String(relay));
     }
