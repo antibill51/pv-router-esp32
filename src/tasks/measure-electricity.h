@@ -140,11 +140,10 @@ if (!AP) {
                                     device_alarm_temp.send(stringboolMQTT(security));
                               }
                         }
+            #endif
                   beforetime = start; 
                   Pow_mqtt_send = 0 ;
-                  }
-                              
-            #endif
+                  }                   
       #endif
 
 }

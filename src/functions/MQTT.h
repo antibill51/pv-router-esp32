@@ -2,6 +2,7 @@
 #define MQTT_SENSORS
 
 #include <Arduino.h>
+#ifndef LIGHT_FIRMWARE
 #include <PubSubClient.h>
 
 extern Mqtt configmqtt; 
@@ -125,7 +126,7 @@ void init_HA_sensor(){
         compteur_inject.Set_entity_type("sensor");
         // compteur_inject.Set_retain_flag(true);
         // compteur_inject.Set_expire_after(true);
-            
+        
         temperature.Set_name("Température");
         // temperature.Set_object_id("temperature");
         temperature.Set_dev_cla("temperature"); 
@@ -214,10 +215,11 @@ void init_HA_sensor(){
         #endif
 
 }
- String stringboolMQTT(bool mybool){
-  String truefalse = "true";
-  if (mybool == false ) {truefalse = "false";}
-  return String(truefalse);
-  }
+String stringboolMQTT(bool mybool){
+String truefalse = "true";
+if (mybool == false ) {truefalse = "false";}
+return String(truefalse);
+}
 
+#endif
 #endif

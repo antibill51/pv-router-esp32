@@ -157,7 +157,7 @@ struct Dallas{
 //***********************
 //****    MQTT 
 //***********************
-  #ifndef LIGHT_FIRMWARE
+#ifndef LIGHT_FIRMWARE
 struct MQTT
 {
     private:int MQTT_INTERVAL = 60;

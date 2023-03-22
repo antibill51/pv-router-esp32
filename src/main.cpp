@@ -57,8 +57,9 @@
 #include "functions/dimmerFunction.h"
 #endif
 
+#ifndef LIGHT_FIRMWARE
 #include "tasks/client_loop.h"
-
+#endif
 
 //***********************************
 //************* Afficheur Oled
@@ -112,23 +113,23 @@ String loguptime();
 
 
 
-MQTT device_dimmer;
-MQTT device_routeur; 
-MQTT device_grid;
-MQTT device_inject;
-MQTT compteur_inject;
-MQTT compteur_grid;
-MQTT switch_1;
-MQTT switch_2;
-MQTT temperature;
-MQTT device_alarm_temp;
+  MQTT device_dimmer;
+  MQTT device_routeur; 
+  MQTT device_grid;
+  MQTT device_inject;
+  MQTT compteur_inject;
+  MQTT compteur_grid;
+  MQTT switch_1;
+  MQTT switch_2;
+  MQTT temperature;
+  MQTT device_alarm_temp;
 
-#ifdef HARDWARE_MOD
-  MQTT power_factor;
-  MQTT power_vrms;
-  MQTT power_irms;
-  MQTT power_apparent;
-#endif
+  #ifdef HARDWARE_MOD
+    MQTT power_factor;
+    MQTT power_vrms;
+    MQTT power_irms;
+    MQTT power_apparent;
+  #endif
 #endif
 
 /***************************
@@ -403,16 +404,19 @@ Dimmer_setup();
         );
       #endif
     #endif
-    if (config.mqtt) {
-        xTaskCreate(
-          client_loop,
-          "Update network data",
-          5000,            // Stack size (bytes)
-          NULL,             // Parameter
-          4,                // Task priority
-          NULL              // Task handle
-        );
-    }
+    #ifndef LIGHT_FIRMWARE
+      if (config.mqtt) {
+          xTaskCreate(
+            client_loop,
+            "Update network data",
+            5000,            // Stack size (bytes)
+            NULL,             // Parameter
+            4,                // Task priority
+            NULL              // Task handle
+          );
+      }
+    #endif
+
   }
     
 

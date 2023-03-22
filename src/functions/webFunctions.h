@@ -344,14 +344,18 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
         if ( relay == 0 ) { digitalWrite(RELAY1 , LOW); }
         else if ( relay == 1 ) { digitalWrite(RELAY1 , HIGH); } 
         else digitalWrite(RELAY1, !digitalRead(RELAY1));
-        switch_1.send(String(relay));
+        #ifndef LIGHT_FIRMWARE
+          switch_1.send(String(relay));
+        #endif
 
     }
     if (request->hasParam("relay2")) { int relay = request->getParam("relay2")->value().toInt(); 
         if ( relay == 0) { digitalWrite(RELAY2 , LOW); }
         else if ( relay == 1 ) { digitalWrite(RELAY2 , HIGH); } 
         else digitalWrite(RELAY2, !digitalRead(RELAY2));
-        switch_2.send(String(relay));
+        #ifndef LIGHT_FIRMWARE
+          switch_2.send(String(relay));
+        #endif
 
     }
     if (request->hasParam("relaystart")) { config.relayon = request->getParam("relaystart")->value().toInt();}
