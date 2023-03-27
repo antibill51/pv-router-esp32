@@ -169,14 +169,14 @@ struct MQTT
     private:String object_id; 
     public:void Set_object_id(String setter) {object_id=setter; }
 
-          private:String dev_cla; 
-          public:void Set_dev_cla(String setter) {dev_cla=setter; }
+    private:String dev_cla; 
+    public:void Set_dev_cla(String setter) {dev_cla=setter; }
 
     private:String unit_of_meas; 
     public:void Set_unit_of_meas(String setter) {unit_of_meas="\"unit_of_meas\": \""+setter+"\",";}
 
-          private:String stat_cla; 
-          public:void Set_stat_cla(String setter) {stat_cla=setter; }
+    private:String stat_cla; 
+    public:void Set_stat_cla(String setter) {stat_cla=setter; }
 
     private:String entity_category; 
     public:void Set_entity_category(String setter) {entity_category=setter; }
@@ -184,8 +184,8 @@ struct MQTT
     private:String entity_type; 
     public:void Set_entity_type(String setter) {entity_type=setter; }
 
-          private:String icon; 
-          public:void Set_icon(String setter) {icon="\"ic\": \""+ setter +"\", "; }
+    private:String icon; 
+    public:void Set_icon(String setter) {icon="\"ic\": \""+ setter +"\", "; }
 
     private:String min; 
     public:void Set_entity_valuemin(String setter) {min=setter; }
