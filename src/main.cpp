@@ -13,6 +13,7 @@
   #endif
 
 #include <AsyncElegantOTA.h>
+//#include <WebSerial.h>
 
 // File System
 #include <FS.h>
@@ -43,7 +44,7 @@
   #include "functions/MQTT.h"
 
   #include "uptime.h"
-
+  #include <driver/adc.h>
 #if DALLAS
 // Dallas 18b20
 #include <OneWire.h>
@@ -93,6 +94,7 @@ Mqtt configmqtt;
 
 int retry_wifi = 0;
 void connect_to_wifi();
+void handler_before_reset();
 #if  NTP
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, NTP_SERVER, NTP_OFFSET_SECONDS, NTP_UPDATE_INTERVAL_MS);
@@ -145,12 +147,24 @@ void setup()
     Serial.begin(115200);
   #endif 
   logging.init="197}11}1";
-  logging.init += "#################  Starting System  ###############\r\n";
+  logging.init += "#################  Restart reason  ###############\r\n";
+  esp_reset_reason_t reason = esp_reset_reason();
+  logging.init += reason ; 
+  logging.init += "\r\n#################  Starting System  ###############\r\n";
   //démarrage file system
   Serial.println("start SPIFFS");
   logging.init += loguptime();
   logging.init += "Start Filesystem\r\n";
   SPIFFS.begin();
+
+/// test ACD 
+
+    adc1_config_width(ADC_WIDTH_BIT_12);
+    adc1_config_channel_atten(ADC1_CHANNEL_0,ADC_ATTEN_DB_11);
+    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
+    adc1_config_channel_atten(ADC1_CHANNEL_4, ADC_ATTEN_DB_11);
+    adc1_config_channel_atten(ADC1_CHANNEL_5, ADC_ATTEN_DB_11);
+   
 
     //***********************************
     //************* Setup -  récupération du fichier de configuration
@@ -235,7 +249,10 @@ void setup()
     #endif
 #endif
 
-
+//Jotta
+  ledcSetup(0, GRIDFREQ , 8);
+  ledcAttachPin(JOTTA, 0);
+  ledcWrite(0, 0);
 
 #if DIMMERLOCAL 
 Dimmer_setup();
@@ -279,8 +296,8 @@ Dimmer_setup();
       5,                // Task priority
       NULL          // Task handle
       
-    );
-    }
+    );  //pdMS_TO_TICKS(30000)
+    } 
   #endif
 
   // ----------------------------------------------------------------
@@ -289,11 +306,11 @@ Dimmer_setup();
     xTaskCreate(
       serial_read_task,
       "Serial Read",      // Task name
-      2000,            // Stack size (bytes)
+      3000,            // Stack size (bytes)
       NULL,             // Parameter
-      0,                // Task priority
+      1,                // Task priority
       NULL              // Task handle
-    );
+    );  //pdMS_TO_TICKS(5000)
 
 
   // ----------------------------------------------------------------
@@ -307,10 +324,10 @@ Dimmer_setup();
     "UpdateDisplay",  // Task name
     10000,            // Stack size (bytes)
     NULL,             // Parameter
-    1,                // Task priority
+    2,                // Task priority
     NULL,             // Task handle
     ARDUINO_RUNNING_CORE
-  );
+  );  //pdMS_TO_TICKS(5000)
   #endif
 
 #if DALLAS
@@ -320,26 +337,26 @@ Dimmer_setup();
   xTaskCreate(
     dallasread,
     "Dallas temp",  // Task name
-    1000,                  // Stack size (bytes)
+    2000,                  // Stack size (bytes)
     NULL,                   // Parameter
     2,                      // Task priority
     NULL                    // Task handle
-  );
+  );  //pdMS_TO_TICKS(10000)
 #endif
 
 #ifdef  TTGO
   // ----------------------------------------------------------------
   // Task: Update Dimmer power
   // ----------------------------------------------------------------
-  xTaskCreate(
+  xTaskCreate( 
     switchDisplay,
     "Swith Oled",  // Task name
     1000,                  // Stack size (bytes)
     NULL,                   // Parameter
     2,                      // Task priority
     NULL                    // Task handle
-  );
- #endif
+  );  // pdMS_TO_TICKS(1000)
+  #endif
 
 
 
@@ -349,12 +366,12 @@ Dimmer_setup();
   xTaskCreate(
     measureElectricity,
     "Measure electricity",  // Task name
-    5000,                  // Stack size (bytes)
+    15000,                  // Stack size (bytes)
     NULL,                   // Parameter
-    25,                      // Task priority
+    7,                      // Task priority
     NULL                    // Task handle
   
-  );
+  );  // pdMS_TO_TICKS(2000)
 
 #if WIFI_ACTIVE == true
   #if DIMMER == true
@@ -368,7 +385,7 @@ Dimmer_setup();
     NULL,                   // Parameter
     4,                      // Task priority
     NULL                    // Task handle
-  );
+  ); //pdMS_TO_TICKS(4000)
   
   // ----------------------------------------------------------------
   // Task: Get Dimmer temp
@@ -381,7 +398,7 @@ Dimmer_setup();
     NULL,                   // Parameter
     4,                      // Task priority
     NULL                    // Task handle
-  );
+  );  //pdMS_TO_TICKS(15000)
   #endif
 
 #endif
@@ -472,8 +489,14 @@ if (!AP) {
     #endif
   #endif
 
+esp_register_shutdown_handler( handler_before_reset );
 
 logging.power=true; logging.sct=true; logging.sinus=true; 
+
+//WebSerial.begin(&server);
+//WebSerial.msgCallback(recvMsg);
+
+
 }
 
 void loop()
@@ -481,7 +504,7 @@ void loop()
 
 /// redémarrage sur demande
   if (config.restart) {
-    delay(5000);
+    //delay(5000);
     Serial.print(PV_RESTART);
     ESP.restart();
   }
@@ -523,7 +546,7 @@ void loop()
       #endif
     }
 #endif
-  vTaskDelay(10000 / portTICK_PERIOD_MS);
+  vTaskDelay(pdMS_TO_TICKS(10000));
 }
 
 void connect_to_wifi() {
@@ -614,4 +637,10 @@ String loguptime() {
   uptime::calculateUptime();
   uptime_stamp = String(uptime::getDays())+":"+String(uptime::getHours())+":"+String(uptime::getMinutes())+":"+String(uptime::getSeconds())+ "\t";
   return uptime_stamp;
+}
+
+void handler_before_reset() {
+  #ifndef LIGHT_FIRMWARE
+  client.publish("panic", "gonna die !! argh") ;
+  #endif
 }

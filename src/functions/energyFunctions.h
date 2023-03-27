@@ -39,7 +39,7 @@ extern String loguptime();
     gDisplayValues.porteuse = true; 
     int margin = 0; /// 0 marge de bruit de fond  en lecture ( si pb ) 
     // recherche demi ondulation
-    while ( analogRead(ADC_PORTEUSE) > margin  ) { 
+    while ( adc1_get_raw((adc1_channel_t)5) > margin  ) { 
       delayMicroseconds (3);
       Watchdog++;
       if ( Watchdog > 2500  ) {  Serial.print(NO_SYNC); gDisplayValues.porteuse = false; break; } 
@@ -49,7 +49,7 @@ extern String loguptime();
   Watchdog=0 ; 
   // recherche d'un 0
   
-  while ( analogRead(ADC_PORTEUSE) == margin  ) {
+  while ( adc1_get_raw((adc1_channel_t)5) == margin  ) {
   delayMicroseconds (3);  
     Watchdog++;
     if ( Watchdog > 2500  ) {  Serial.print(NO_SYNC); gDisplayValues.porteuse = false ; break;}  
@@ -85,8 +85,10 @@ void injection(){
   startMillis = micros();   //temps debut de la boucle
 
   while (loop < freqmesure ) {
-    temp_read =  analogRead(ADC_INPUT);
-    temp_porteuse =  analogRead(ADC_PORTEUSE);
+    // temp_read =  analogRead(ADC_INPUT);
+    // temp_porteuse =  analogRead(ADC_PORTEUSE);
+    temp_read =  adc1_get_raw((adc1_channel_t)4);
+    temp_tension = adc1_get_raw((adc1_channel_t)5);
     sigma_read += temp_read; 
     
     if (temp_porteuse == 0 ) {
@@ -171,8 +173,8 @@ void injection(){
 
     ///// construction du tableau de mesures  /////
     while (loop < freqmesure ) {
-        tableau[loop] =  analogRead(ADC_INPUT);
-        porteuse[loop] =  analogRead(ADC_PORTEUSE);
+        tableau[loop] =  adc1_get_raw((adc1_channel_t)4);
+        porteuse[loop] =  adc1_get_raw((adc1_channel_t)5);
         sigma_read += tableau[loop]; 
         // voltage += porteuse[loop]; // test de calcul de voltage
         
@@ -313,8 +315,8 @@ if ( zero > 75 ) {
 
   #else
     void frontmod(){
-   // plus besoin ! 
-      int temp_value0 = analogRead(ADC_MIDDLE);  //Mean value. Should be at 3.3v/2
+      // int temp_value0 = analogRead(ADC_MIDDLE);  //Mean value. Should be at 3.3v/2
+      int temp_value0 = adc1_get_raw((adc1_channel_t)5); //Mean value. Should be at 3.3v/2
       value0 = value0 + PHASECAL * (temp_value0 - value0); // Lissage des valeurs
 
       gDisplayValues.porteuse = true; 
@@ -347,8 +349,10 @@ if ( zero > 75 ) {
       numberOfSamples++;                       //Count number of times looped.
     ///// construction du tableau de mesures  /////
 
-        temp_read =  analogRead(ADC_INPUT) - value0;
-        temp_tension = analogRead(ADC_PORTEUSE) - value0;
+        // temp_read =  analogRead(ADC_INPUT) - value0;
+        // temp_tension = analogRead(ADC_PORTEUSE) - value0;
+        temp_read =  adc1_get_raw((adc1_channel_t)4) - value0;
+        temp_tension = adc1_get_raw((adc1_channel_t)5) - value0;
         
         if (crossCount>0) // On oublie volontairement le 1er cycle
         {

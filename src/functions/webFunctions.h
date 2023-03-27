@@ -259,15 +259,20 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
     logging.start = "";
   });
 
+/*
   server.on("/reset", HTTP_ANY, [](AsyncWebServerRequest *request){
      //request->send_P(200, "text/plain",PV_RESTART);
-     serveur_response(request,  PV_RESTART);
-       ESP.restart();
-  });
 
+     serveur_response(request,  PV_RESTART);
+     config.restart = true;
+  });
+*/
   server.on("/reboot", HTTP_ANY, [](AsyncWebServerRequest *request){
+   #ifndef LIGHT_FIRMWARE
+   client.publish("panic", "/reboot appelé") ;
+   #endif
    request->redirect("/");
-    config.restart = true;
+   config.restart = true;
   });
 
 server.onNotFound(notFound);

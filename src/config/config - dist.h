@@ -197,7 +197,7 @@ bool discovery_temp = false;
 //#define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define VERSION "version 20230321"
+#define VERSION "version 20230324"
 
 #define EnvoyR "/api/v1/production"
 #define EnvoyS "/production.json"
@@ -213,5 +213,9 @@ bool AP=true;
 
 /// taille max des logs stockée
 #define LOG_MAX_STRING_LENGTH 254
+
+//// JOTTA 
+#define JOTTA  2
+#define GRIDFREQ 90 ///PWM frequency
 
 #endif
