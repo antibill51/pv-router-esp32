@@ -51,7 +51,7 @@ def prepare_www_files(source, target, env):
 
 
     #add filetypes (extensions only) to be gzipped before uploading. Everything else will be copied directly
-    filetypes_to_gzip = ['js', 'html']
+    filetypes_to_gzip = ['js', 'html', 'css', 'woff2']
     source_file_prefix = '_'
 
 

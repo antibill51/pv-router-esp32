@@ -316,7 +316,7 @@ if ( zero > 75 ) {
   #else
     void frontmod(){
       // int temp_value0 = analogRead(ADC_MIDDLE);  //Mean value. Should be at 3.3v/2
-      int temp_value0 = adc1_get_raw((adc1_channel_t)5); //Mean value. Should be at 3.3v/2
+      int temp_value0 = adc1_get_raw((adc1_channel_t)3); //Mean value. Should be at 3.3v/2
       value0 = value0 + PHASECAL * (temp_value0 - value0); // Lissage des valeurs
 
       gDisplayValues.porteuse = true; 
