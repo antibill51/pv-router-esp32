@@ -171,41 +171,41 @@ void injection(){
     delay (15);
     startMillis = micros();   // 0ms 
 
-    ///// construction du tableau de mesures  /////
-    while (loop < freqmesure ) {
-        tableau[loop] =  adc1_get_raw((adc1_channel_t)4);
-        porteuse[loop] =  adc1_get_raw((adc1_channel_t)5);
-        sigma_read += tableau[loop]; 
-        // voltage += porteuse[loop]; // test de calcul de voltage
-        
-    /*    if (temp_porteuse == 0 ) { // 2eme 1/2 mesure  10ms 
-          zero += temp_read * temp_read ; 
-          zero_count ++; 
-          injection = 1 ;
-        }
-        else {  // 1ere 1/2 mesure  10ms 
-          if ( injection == 1 ) { injection =2 ; break ; }
-          positive += temp_read * temp_read ;
-          inter=loop;
-        }
-    */
-    /*  if ( loop < 37 ) {
-        positive += temp_read * temp_read ;
-        inter=loop;
-      }
-      else { 
-          zero += temp_read * temp_read ; 
-          zero_count ++; 
-      //   injection = 1 ;
-      }
-    */
+///// construction du tableau de mesures  /////
+while (loop < freqmesure ) {
+    tableau[loop] =  adc1_get_raw((adc1_channel_t)4);
+    porteuse[loop] =  adc1_get_raw((adc1_channel_t)5);
+    sigma_read += tableau[loop]; 
+    // voltage += porteuse[loop]; // test de calcul de voltage
     
-      loop ++; 
-    
-      rt_loop( startMillis, wait_time*loop ) ; // attend le prochain top temps de mesure ( 277us * loop )
-      
-      }
-      ///// fin  construction du tableau de mesures  /////
+/*    if (temp_porteuse == 0 ) { // 2eme 1/2 mesure  10ms 
+      zero += temp_read * temp_read ; 
+      zero_count ++; 
+      injection = 1 ;
+    }
+    else {  // 1ere 1/2 mesure  10ms 
+      if ( injection == 1 ) { injection =2 ; break ; }
+      positive += temp_read * temp_read ;
+      inter=loop;
+    }
+*/
+/*  if ( loop < 37 ) {
+     positive += temp_read * temp_read ;
+     inter=loop;
+  }
+  else { 
+       zero += temp_read * temp_read ; 
+      zero_count ++; 
+   //   injection = 1 ;
+  }
+*/
+ 
+   loop ++; 
+ 
+   rt_loop( startMillis, wait_time*loop ) ; // attend le prochain top temps de mesure ( 277us * loop )
+   
+  }
+  ///// fin  construction du tableau de mesures  /////
 
     // 20ms * nombre de cycles -> total 72 mesures * nb cycles
     stopMillis = micros();  

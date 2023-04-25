@@ -547,6 +547,9 @@ void loop()
       #endif
     }
 #endif
+#ifndef LIGHT_FIRMWARE
+  client.publish("memory", String(esp_get_free_heap_size()).c_str())   ;
+#endif
   vTaskDelay(pdMS_TO_TICKS(10000));
 }
 
@@ -642,6 +645,6 @@ String loguptime() {
 
 void handler_before_reset() {
   #ifndef LIGHT_FIRMWARE
-  client.publish("panic", "gonna die !! argh") ;
+  client.publish("panic", "ESP reboot" ) ;
   #endif
 }
