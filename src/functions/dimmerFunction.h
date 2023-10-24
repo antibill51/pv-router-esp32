@@ -6,10 +6,11 @@
 #include "../config/config.h"
 #include "../functions/spiffsFunctions.h"
 #include "../functions/Mqtt_http_Functions.h"
+#include "../functions/minuteur.h"
 #include <RBDdimmer.h>
 #include "HTTPClient.h"
 
-
+extern Programme programme; 
 
 #if DIMMERLOCAL 
 
@@ -37,14 +38,17 @@
     extern Logs logging;
   #ifndef LIGHT_FIRMWARE
     extern MQTT device_dimmer; 
+    extern MQTT surplus_routeur;
   #endif
 
 
 /*
 *   fonction d'envoie de commande au dimmer
 */
+#define FACTEUR_REGULATION 0.9 
+void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puissance_dispo) {
 
-void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue) {
+  puissance_dispo= int(puissance_dispo*FACTEUR_REGULATION);
     /// envoyer la commande avec la valeur gDisplayValues.dimmer vers le dimmer config.dimmer
   /*  if ( DIMMERLOCAL  ) {
       if ( dimmervalue <= config.num_fuse ){
@@ -59,7 +63,11 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue) {
       /// control dimmer 
       if ( configmqtt.HTTP || AP) {
       String baseurl; 
-        baseurl = "/?POWER=" + String(dimmervalue) ; 
+        #ifndef POURCENTAGE
+        baseurl = "/?POWER=" + String(dimmervalue) +"&puissance=" + String(puissance_dispo) ; 
+        #else
+        baseurl = "/?POWER=" + String(dimmervalue) ;
+        #endif
         http.begin(dimmerurl,80,baseurl);   
         http.GET();
         http.end(); 
@@ -73,8 +81,13 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue) {
         if (!AP) {
             if (config.mqtt)  {
             /// A vérifier que c'est necessaire ( envoie double ? )
-              if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue));}
-              if ((configmqtt.HA) || (configmqtt.JEEDOM)) {device_dimmer.send(String(dimmervalue));}
+            /// la valeur 0 doit quand meme être envoyé 
+              if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); }
+              // Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); 
+              if ((configmqtt.HA)|| (configmqtt.JEEDOM)) {
+                device_dimmer.send(String(gDisplayValues.puissance_route)); 
+                surplus_routeur.send(String(puissance_dispo));
+                } 
             }
         }
       #endif
@@ -92,6 +105,7 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue) {
 void dimmer(){
 gDisplayValues.change = 0; 
    
+   int puissance_dispo = 0; 
    /// pour éviter les erreurs sur le site (inversion delta et deltaneg)
    if (config.delta < config.deltaneg){
    int temp_error_delta; 
@@ -102,11 +116,13 @@ gDisplayValues.change = 0;
 
   // 0 -> linky ; 1-> injection  ; 2-> stabilisé
 
-  /// Linky 
+// puissance dispo 
+puissance_dispo = -(gDisplayValues.watt-((config.delta+config.deltaneg)/2));
 
 if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
     //Serial.println("dimmer:" + String(gDisplayValues.dimmer));
     gDisplayValues.dimmer += -abs((gDisplayValues.watt-((config.delta+config.deltaneg)/2))*COMPENSATION/config.resistance); 
+    
     gDisplayValues.change = 1; 
 //debug    Serial.println(String(gDisplayValues.watt) + " " + String(config.delta) + " " + String(config.deltaneg) + " " + String(gDisplayValues.dimmer) );
     } 
@@ -148,9 +164,9 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
 
     if (config.dimmerlocal) {
 
-        /// Cooler 
-        if ( gDisplayValues.dimmer > 10 ) { digitalWrite(cooler, HIGH); } // start cooler at 10%  }
-        else { digitalWrite(cooler, LOW); }
+        /// COOLER 
+        if ( gDisplayValues.dimmer > 10 ) { digitalWrite(COOLER, HIGH); } // start COOLER at 10%  }
+        else { digitalWrite(COOLER, LOW); }
 
 
             
@@ -165,9 +181,11 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
           dimmer_on();
           }
           else {
-            gDisplayValues.dimmer = 0 ;
+            //gDisplayValues.dimmer = 0 ;
             dimmer_hard.setPower(0); 
+            programme.run=false;
             ledcWrite(0, 0);
+            dimmer_change( config.dimmer, config.IDXdimmer, gDisplayValues.dimmer,puissance_dispo) ;
           }
         }
         else { 
@@ -184,11 +202,11 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
             if (!security){  
                 /// fonctionnement du dimmer local 
                  
-                if ( gDisplayValues.dimmer < config.localfuse ) { dimmer_hard.setPower(gDisplayValues.dimmer); dimmer_change( config.dimmer, config.IDXdimmer, 0 ) ;ledcWrite(0, gDisplayValues.dimmer*256/100);  }
+                if ( gDisplayValues.dimmer < config.localfuse && !programme.run ) { dimmer_hard.setPower(gDisplayValues.dimmer); dimmer_change( config.dimmer, config.IDXdimmer, 0, puissance_dispo ) ;ledcWrite(0, gDisplayValues.dimmer*256/100);  }
                 else {
                     dimmer_hard.setPower(config.localfuse); 
                     ledcWrite(0, config.localfuse*256/100);
-                    dimmer_change( config.dimmer, config.IDXdimmer, ( gDisplayValues.dimmer - config.localfuse ) ) ;
+                    dimmer_change( config.dimmer, config.IDXdimmer, ( gDisplayValues.dimmer - config.localfuse ),puissance_dispo ) ;
                 }
             }
           }
@@ -201,7 +219,7 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
 
     }
 
-    else { dimmer_change( config.dimmer, config.IDXdimmer, gDisplayValues.dimmer ) ;  }
+    else { dimmer_change( config.dimmer, config.IDXdimmer, gDisplayValues.dimmer, puissance_dispo ) ;  }
  
   
   }
@@ -214,8 +232,8 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
       /// Correction issue full power at start
       pinMode(outputPin, OUTPUT); 
       
-      pinMode(cooler, OUTPUT);
-      digitalWrite(cooler, LOW);
+      pinMode(COOLER, OUTPUT);
+      digitalWrite(COOLER, LOW);
 
       //digitalWrite(outputPin, HIGH);
       // configuration dimmer
@@ -230,6 +248,7 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
     /// fonction pour mettre en pause ou allumer le dimmer 
     void dimmer_on()
     {
+
       if (dimmer_hard.getState()==0) {
         dimmer_hard.setState(ON);
         delay(50);
@@ -256,7 +275,25 @@ if ( gDisplayValues.dimmer != 0 && gDisplayValues.watt >= (config.delta) ) {
       
     }
 
-
+//// récupération de la valeur du dimmer distant
+int dimmer_getState() {
+  int dimmer = 0 ; 
+  ///connexion au json distant 
+  if (WiFi.status() == WL_CONNECTED) { //Check WiFi connection status
+    HTTPClient http;  //Declare an object of class HTTPClient
+    http.begin("http://" + String(config.dimmer) + "/state");  //Specify request destination
+    int httpCode = http.GET();                                                                  //Send the request
+    if (httpCode > 0) { //Check the returning code
+      String payload = http.getString();   //Get the request response payload
+      //Serial.println(payload);                     //Print the response payload
+      DynamicJsonDocument doc(64);
+      deserializeJson(doc, payload);
+      dimmer = doc["dimmer"];
+    }
+    http.end();   //Close connection
+  }  
+  return dimmer ; 
+}
 
 
 #endif

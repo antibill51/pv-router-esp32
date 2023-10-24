@@ -6,10 +6,13 @@
 #include <ESPAsyncWebServer.h>
 #include "appweb.h"
 
+#include "functions/minuteur.h"
+
 extern DisplayValues gDisplayValues;
 extern Configmodule configmodule; 
 extern Configwifi configwifi; 
 extern Logs logging;
+extern Programme programme; 
 
 //***********************************
 //************* Gestion du serveur WEB
@@ -29,13 +32,17 @@ AsyncWebServer server(80);
 		//************* Setup - Web pages
 		//***********************************
 
+String getMinuteur(const Programme& minuteur);
+
 void notFound(AsyncWebServerRequest *request) {
     request->send(404, "text/plain", "Not found");
 }
 
 void compress_html(AsyncWebServerRequest *request,String filefs , String format ) {
-      AsyncWebServerResponse *response = request->beginResponse(SPIFFS, filefs, format );
+      AsyncWebServerResponse *response = request->beginResponse(SPIFFS, filefs, format);
       response->addHeader("Content-Encoding", "gzip");
+      response->addHeader("Cache-Control", "max-age=604800");
+      //response-> addHeader("Content-Disposition", "inline; filename='file,index.html'");
       request->send(response);
 }
 
@@ -64,8 +71,9 @@ if (AP) {
       //request->send_P(200, "text/plain", SPIFFSNO ); 
       serveur_response(request, SPIFFSNO);
     }
-
   });
+
+
 }
 else {
   server.on("/",HTTP_GET, [](AsyncWebServerRequest *request){
@@ -88,7 +96,7 @@ else {
     #ifndef LIGHT_FIRMWARE
        compress_html(request,"/config.html.gz", "text/html");
     #else
-       compress_html(request,"/config-ap.html.gz", "text/html");
+       compress_html(request,"/config-light.html.gz", "text/html");
     #endif
 
     }
@@ -100,6 +108,14 @@ else {
   });
 
 }
+
+  /*server.on("/config.html.gz",  HTTP_GET, [](AsyncWebServerRequest *request){  /// pour corriger le bug  safari
+      compress_html(request,"/config.html.gz", "text/html");   
+  });
+
+  server.on("/index.html.gz",  HTTP_GET, [](AsyncWebServerRequest *request){  /// pour corriger le bug  safari
+      compress_html(request,"/index.html.gz", "text/html");   
+  });*/
 
   server.on("/all.min.css",  HTTP_GET, [](AsyncWebServerRequest *request){
       compress_html(request,"/all.min.css.gz", "text/css");
@@ -140,20 +156,32 @@ server.on("/mqtt.json", HTTP_GET, [](AsyncWebServerRequest *request){
 server.on("/config.json", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send(SPIFFS, "/config.json", "application/json");
   });
-  
+
+server.on("/envoy.html", HTTP_GET, [](AsyncWebServerRequest *request){
+    //request->send(SPIFFS, "/envoy.html", "text/html");
+    compress_html(request,"/envoy.html.gz", "text/html");
+  });
+
+server.on("/enphase.json", HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/enphase.json", "application/json");
+  });
 
 server.on("/log.html", HTTP_ANY, [](AsyncWebServerRequest *request){
       compress_html(request,"/log.html.gz", "text/html");
   });
 
+server.on("/minuteur.html",  HTTP_GET, [](AsyncWebServerRequest *request){
+    request->send(SPIFFS, "/minuteur.html", "text/html");
+  });
+
 ///// Pages 
 /// Appel de fonction 
 
-if (!configmodule.pilote) {
+//if (!configmodule.pilote) {
   server.on("/chart.json", HTTP_GET, [](AsyncWebServerRequest *request){
     request->send_P(200, "application/json", getchart().c_str());
   }); 
-}
+//}
 
 /*
 
@@ -192,18 +220,18 @@ if (!configmodule.pilote) {
   });
 */
   server.on("/state", HTTP_GET, [](AsyncWebServerRequest *request){
-    //request->send_P(200, "text/plain", getState().c_str());
-    serveur_response(request, getState());
+    request->send_P(200, "application/json", getState().c_str());
+    //serveur_response(request, getState());
   });
 
-  server.on("/serial", HTTP_GET, [](AsyncWebServerRequest *request){
+/*  server.on("/serial", HTTP_GET, [](AsyncWebServerRequest *request){
     //request->send_P(200, "text/plain", getState().c_str());
     serveur_response(request, getState());
-  });
+  });*/
   
   server.on("/config", HTTP_GET, [](AsyncWebServerRequest *request){
-    //request->send_P(200, "text/plain", getconfig().c_str());
-    serveur_response(request, getconfig() );
+    request->send_P(200, "application/json", getconfig().c_str());
+    //serveur_response(request, getconfig() );
   });
 
 
@@ -212,11 +240,11 @@ server.on("/cosphi", HTTP_GET, [](AsyncWebServerRequest *request){
     //request->send_P(200, "text/plain", getcosphi().c_str());
     serveur_response(request, getcosphi());
   });
-  
+/*
 server.on("/puissance", HTTP_GET, [](AsyncWebServerRequest *request){
    // request->send_P(200, "text/plain",  getpuissance().c_str());
      serveur_response(request, getpuissance());
-  });
+  });*/  
 
 ///////////////
 //// wifi
@@ -242,8 +270,8 @@ server.on("/mqtt.html", HTTP_GET, [](AsyncWebServerRequest *request){
   });
 
 server.on("/getmqtt", HTTP_ANY, [] (AsyncWebServerRequest *request) {
-  //request->send(200, "text/plain",  getmqtt().c_str()); 
-  serveur_response(request, getmqtt());
+  request->send(200, "application/json",  getmqtt().c_str()); 
+  //serveur_response(request, getmqtt());
 });
  /// il serait bien que /getmqtt et getwifi soit directement en processing de l'appel de la page 
 
@@ -269,7 +297,7 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
 */
   server.on("/reboot", HTTP_ANY, [](AsyncWebServerRequest *request){
    #ifndef LIGHT_FIRMWARE
-   client.publish("panic", "/reboot appelé") ;
+   client.publish((topic_Xlyric+"panic").c_str(),1,true, "/reboot appelé") ;
    #endif
    request->redirect("/");
    config.restart = true;
@@ -282,11 +310,19 @@ server.onNotFound(notFound);
 /////////////////////////
 
 server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
-      ///   /get?send=on
-   /* if (request->hasParam(PARAM_INPUT_1)) 		  { inputMessage = request->getParam(PARAM_INPUT_1)->value();
-													config.sending = 0; 
-													if ( inputMessage != "On" ) { config.sending = 1; }
-													request->send(200, "text/html", getSendmode().c_str()); 	}*/
+      ///   /get?disengage_dimmer=on
+    if (request->hasParam(PARAM_INPUT_1)) {
+                          String engagedimmer;
+                          if(request->getParam(PARAM_INPUT_1)->value() == "on") {
+                            engagedimmer = "dimmer disengaged";
+                            gDisplayValues.dimmer_disengaged = true;
+                          }
+                          else {
+                            engagedimmer = "dimmer engaged";
+                            gDisplayValues.dimmer_disengaged = false;
+                          }
+                          request->send(200, "text/html", engagedimmer.c_str());}
+                          
 	   // /get?cycle=x
     if (request->hasParam(PARAM_INPUT_save)) { Serial.println(F("Saving configuration..."));
                           saveConfiguration(filename_conf, config);   
@@ -303,6 +339,7 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
    if (request->hasParam(PARAM_INPUT_port)) { config.port = request->getParam(PARAM_INPUT_port)->value().toInt(); }
    if (request->hasParam(PARAM_INPUT_IDX)) { config.IDX = request->getParam(PARAM_INPUT_IDX)->value().toInt();}
    if (request->hasParam(PARAM_INPUT_IDXdimmer)) { config.IDXdimmer = request->getParam(PARAM_INPUT_IDXdimmer)->value().toInt();}
+   if (request->hasParam("idxdallas")) { config.IDXdallas = request->getParam("idxdallas")->value().toInt();}
    if (request->hasParam(PARAM_INPUT_API)) { request->getParam(PARAM_INPUT_API)->value().toCharArray(config.apiKey,64);}
    if (request->hasParam(PARAM_INPUT_dimmer_power)) {gDisplayValues.dimmer = request->getParam( PARAM_INPUT_dimmer_power)->value().toInt(); gDisplayValues.change = 1 ;  } 
    if (request->hasParam(PARAM_INPUT_facteur)) { config.facteur = request->getParam(PARAM_INPUT_facteur)->value().toFloat();}
@@ -313,12 +350,38 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
    if (request->hasParam("offset")) { config.offset = request->getParam("offset")->value().toFloat();}
 
    /// @brief  wifi
-   if (request->hasParam("ssid")) { request->getParam("ssid")->value().toCharArray(configwifi.SID,50);  }
-   if (request->hasParam("password")) { request->getParam("password")->value().toCharArray(configwifi.passwd,50);    
-    logging.start += loguptime();
-    logging.start += "saving wifi\r\n";
-   configwifi.sauve_wifi();
+   bool wifimodif=false ; 
+   if (request->hasParam("ssid")) { request->getParam("ssid")->value().toCharArray(configwifi.SID,50); wifimodif=true; }
+   if (request->hasParam("password")) { 
+    char password[50];  
+       request->getParam("password")->value().toCharArray(password,50);
+          if (strcmp(password,SECURITEPASS) != 0) {  ///sécurisation du mot de passe pas en clair     
+              request->getParam("password")->value().toCharArray(configwifi.passwd,50); 
+          }
+      
+    //request->getParam("password")->value().toCharArray(configwifi.passwd,50);  
+    //logging.start += loguptime();
+    //logging.start += "saving wifi\r\n";
+    wifimodif=true; 
    }
+   if (wifimodif) { configwifi.sauve_wifi(); }
+
+    // Shelly
+   if (request->hasParam("EM")) { request->getParam("EM")->value().toCharArray(config.topic_Shelly,100);  
+      #ifdef NORMAL_FIRMWARE
+      if (strcmp(config.topic_Shelly,"") != 0 )  client.subscribe(config.topic_Shelly,1);
+      else client.unsubscribe(config.topic_Shelly);
+      #endif
+   }
+
+   // enphase
+   bool enphasemodif=false ; 
+   if (request->hasParam("envoyserver")) { request->getParam("envoyserver")->value().toCharArray(configmodule.hostname,16); enphasemodif=true; }
+   //if (request->hasParam("envport")) { request->getParam("envport")->value().toCharArray(configmodule.port,5);  enphasemodif=true;}
+   if (request->hasParam("envmodele")) { request->getParam("envmodele")->value().toCharArray(configmodule.envoy,2);  enphasemodif=true;}
+   if (request->hasParam("envversion")) { request->getParam("envversion")->value().toCharArray(configmodule.version,2); enphasemodif=true; }
+   if (request->hasParam("envtoken")) { request->getParam("envtoken")->value().toCharArray(configmodule.token,425); enphasemodif=true; }
+   if (enphasemodif) { saveenphase(enphase_conf, configmodule);}
 
    //// MQTT
    if (request->hasParam(PARAM_INPUT_mqttserver)) { request->getParam(PARAM_INPUT_mqttserver)->value().toCharArray(config.mqttserver,16);  }
@@ -326,8 +389,14 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
       saveConfiguration(filename_conf, config);   }
    if (request->hasParam("mqttuser")) { request->getParam("mqttuser")->value().toCharArray(configmqtt.username,50);  }
    if (request->hasParam("mqttport")) { config.mqttport = request->getParam("mqttport")->value().toInt();}
-   if (request->hasParam("mqttpassword")) { request->getParam("mqttpassword")->value().toCharArray(configmqtt.password,50); 
-      savemqtt(mqtt_conf, configmqtt); }
+   if (request->hasParam("mqttpassword")) { //request->getParam("mqttpassword")->value().toCharArray(configmqtt.password,50); 
+       char password[50];  
+       request->getParam("mqttpassword")->value().toCharArray(password,50);
+          if (strcmp(password,SECURITEPASS) != 0) {  ///sécurisation du mot de passe pas en clair     
+              request->getParam("mqttpassword")->value().toCharArray(configmqtt.password,50); 
+          }
+       savemqtt(mqtt_conf, configmqtt); 
+       }
 
   //// Dimmer local
     if (request->hasParam("Fusiblelocal")) { config.localfuse = request->getParam("Fusiblelocal")->value().toInt();}
@@ -366,9 +435,43 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
     if (request->hasParam("relaystart")) { config.relayon = request->getParam("relaystart")->value().toInt();}
     if (request->hasParam("relaystop")) { config.relayoff = request->getParam("relaystop")->value().toInt();}
 
+    //// minuteur 
+   if (request->hasParam("heure_demarrage")) { request->getParam("heure_demarrage")->value().toCharArray(programme.heure_demarrage,6);  }
+   if (request->hasParam("heure_arret")) { request->getParam("heure_arret")->value().toCharArray(programme.heure_arret,6);  }
+   if (request->hasParam("temperature")) { programme.temperature = request->getParam("temperature")->value().toInt();  programme.saveProgramme(); }
+
     //request->send(200, "text/html", getconfig().c_str());
     serveur_response(request,  getconfig());
 	}); 
 
+  server.on("/getminiteur", HTTP_ANY, [] (AsyncWebServerRequest *request) {
+    if (request->hasParam("dimmer")) { request->send(200, "application/json",  getMinuteur(programme));  }
+ 
+    //request->send(200, "application/json",  getminuteur(programme_relay2).c_str()); 
+  });
+
+  server.on("/setminiteur", HTTP_ANY, [] (AsyncWebServerRequest *request) {
+      String name; 
+      if (request->hasParam("dimmer")) { 
+              if (request->hasParam("heure_demarrage")) { request->getParam("heure_demarrage")->value().toCharArray(programme.heure_demarrage,6);  }
+              if (request->hasParam("heure_arret")) { request->getParam("heure_arret")->value().toCharArray(programme.heure_arret,6);  }
+              if (request->hasParam("temperature")) { programme.temperature = request->getParam("temperature")->value().toInt();   }
+              programme.saveProgramme();
+        request->send(200, "application/json",  getMinuteur(programme));  
+      }
+  });
+
 }
 
+String getMinuteur(const Programme& minuteur) {
+    DynamicJsonDocument doc(128);
+    doc["heure_demarrage"] = minuteur.heure_demarrage;
+    doc["heure_arret"] = minuteur.heure_arret;
+    doc["temperature"] = minuteur.temperature;
+    doc["heure"] = timeClient.getHours();
+    doc["minute"] = timeClient.getMinutes();
+
+    String retour;
+    serializeJson(doc, retour);
+    return retour;
+}

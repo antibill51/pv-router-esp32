@@ -1,11 +1,15 @@
 #include <Arduino.h>
 
-#include "WiFi.h"
+
+#include "WiFiClientSecure.h"
 
   #include <driver/adc.h>
   #include "config/config.h"
   #include "config/enums.h"
   #include "config/traduction.h"
+  #ifdef S3
+  #include "pin_config.h"
+  #endif
 
   #if  NTP
   #include <NTPClient.h>
@@ -42,15 +46,17 @@
   #include "functions/enphaseFunction.h"
   #include "functions/WifiFunctions.h"
   #include "functions/MQTT.h"
+  #include "functions/minuteur.h"
+  #include "functions/ha.h"
 
   #include "uptime.h"
   #include <driver/adc.h>
 #if DALLAS
 // Dallas 18b20
-#include <OneWire.h>
-#include <DallasTemperature.h>
-#include "tasks/dallas.h"
-#include "functions/dallasFunction.h"
+  #include <OneWire.h>
+  #include <DallasTemperature.h>
+  #include "tasks/dallas.h"
+  #include "functions/dallasFunction.h"
 #endif
 
 #if DIMMERLOCAL 
@@ -58,9 +64,9 @@
 #include "functions/dimmerFunction.h"
 #endif
 
-#ifndef LIGHT_FIRMWARE
-#include "tasks/client_loop.h"
-#endif
+//  #ifndef LIGHT_FIRMWARE
+//  #include "tasks/client_loop.h"
+//  #endif
 
 //***********************************
 //************* Afficheur Oled
@@ -85,6 +91,8 @@ Config config;
 Configwifi configwifi; 
 Configmodule configmodule; 
 
+///déclaration des programmateurs 
+Programme programme; 
 
 /// declare logs 
 Logs logging;
@@ -95,6 +103,10 @@ Mqtt configmqtt;
 int retry_wifi = 0;
 void connect_to_wifi();
 void handler_before_reset();
+void reboot_after_lost_wifi(int timeafterlost);
+void IRAM_ATTR function_off_screen();
+void IRAM_ATTR function_next_screen();
+
 #if  NTP
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, NTP_SERVER, NTP_OFFSET_SECONDS, NTP_UPDATE_INTERVAL_MS);
@@ -132,6 +144,12 @@ String loguptime();
     MQTT power_irms;
     MQTT power_apparent;
   #endif
+    MQTT enphase_cons_whLifetime;
+    MQTT enphase_prod_whLifetime;
+    MQTT enphase_current_power_consumption;
+    MQTT enphase_current_power_production;
+    MQTT surplus_routeur;
+  
 #endif
 
 /***************************
@@ -146,6 +164,10 @@ void setup()
   #if DEBUG == true
     Serial.begin(115200);
   #endif 
+  #if CORE_DEBUG_LEVEL > ARDUHAL_LOG_LEVEL_NONE
+    Serial.setDebugOutput(true);
+  #endif
+  Serial.println("\n================== " + String(VERSION) + " ==================");
   logging.init="197}11}1";
   logging.init += "#################  Restart reason  ###############\r\n";
   esp_reset_reason_t reason = esp_reset_reason();
@@ -155,12 +177,34 @@ void setup()
   Serial.println("start SPIFFS");
   logging.init += loguptime();
   logging.init += "Start Filesystem\r\n";
-  SPIFFS.begin();
+  if (!SPIFFS.begin(true)) {
+    Serial.println("SPIFFS Initialization failed!");
+    return;
+  }
+
+  /// Program & FS size
+    // size of the compiled program
+    uint32_t program_size = ESP.getSketchSize();
+
+    // size of the file system
+    uint32_t file_system_size = SPIFFS.totalBytes();
+
+    // used size of the file system
+    uint32_t file_system_used = SPIFFS.usedBytes();
+
+    // free size in the flash memory
+    uint32_t free_size = ESP.getFlashChipSize() - program_size - file_system_size + file_system_used;
+
+    Serial.println("Program size: " + String(program_size) + " bytes");
+    Serial.println("File system size: " + String(file_system_size) + " bytes");
+    Serial.println ("File system used: " + String(file_system_used) + " bytes");
+    Serial.println("Free space: " + String(free_size) + " bytes");
+
 
 /// test ACD 
 
     adc1_config_width(ADC_WIDTH_BIT_12);
-    // adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_11);
+    adc1_config_channel_atten(ADC1_CHANNEL_0,ADC_ATTEN_DB_11);
     adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
     adc1_config_channel_atten(ADC1_CHANNEL_4, ADC_ATTEN_DB_11);
     adc1_config_channel_atten(ADC1_CHANNEL_5, ADC_ATTEN_DB_11);
@@ -184,13 +228,16 @@ void setup()
        AP=false; 
   }
 
-   loadmqtt(mqtt_conf ,configmqtt);
+  configmodule.enphase_present=false; 
+  configmodule.Fronius_present=false;
+
+  loadmqtt(mqtt_conf ,configmqtt);
   // test if Fronius is present ( and load conf )
   configmodule.Fronius_present = loadfronius(fronius_conf, configmodule);
 
   // test if Enphase is present ( and load conf )
-  configmodule.enphase_present = loadenphase(enphase_conf, configmodule);
-
+  loadenphase(enphase_conf, configmodule);
+ 
   /// recherche d'une sonde dallas
   #if DALLAS
   Serial.println("start 18b20");
@@ -232,7 +279,8 @@ void setup()
     
     #ifdef TTGO
 
-        pinMode(SWITCH,INPUT);
+        pinMode(SWITCH,INPUT_PULLUP);
+        pinMode(BUTTON_LEFT,INPUT_PULLUP);
 
         display.init();
         //digitalWrite(TFT_BL, HIGH);
@@ -250,6 +298,9 @@ void setup()
     #endif
 #endif
 
+/// init du NTP
+ntpinit(); 
+
 //Jotta
   ledcSetup(0, GRIDFREQ , 8);
   ledcAttachPin(JOTTA, 0);
@@ -258,7 +309,6 @@ void setup()
 #if DIMMERLOCAL 
 Dimmer_setup();
 #endif
-
 
    // vérification de la présence d'index.html
   if(!SPIFFS.exists("/index.html.gz")){
@@ -272,6 +322,12 @@ Dimmer_setup();
     logging.init += loguptime();
     logging.init += CONFNO;
   }
+
+/// chargement des conf de minuteries
+  Serial.println("Loading minuterie");
+  programme.name="/dimmer";
+  programme.loadProgramme();
+  programme.saveProgramme();
 
   // Initialize Dimmer State 
   gDisplayValues.dimmer = 0;
@@ -288,17 +344,29 @@ Dimmer_setup();
   // ----------------------------------------------------------------
   // TASK: Connect to WiFi & keep the connection alive.
   // ----------------------------------------------------------------
-  if (!AP){
+  /*if (!AP){
     xTaskCreate(
       keepWiFiAlive,
       "keepWiFiAlive",  // Task name
-      5000,            // Stack size (bytes)
+      8000,            // Stack size (bytes)
       NULL,             // Parameter
       5,                // Task priority
       NULL          // Task handle
       
     );  //pdMS_TO_TICKS(30000)
-    } 
+    } */
+
+    xTaskCreate(
+      keepWiFiAlive2,
+      "keepWiFiAlive",  // Task name
+      8000,            // Stack size (bytes)
+      NULL,             // Parameter
+      5,                // Task priority
+      NULL          // Task handle
+      
+    );
+
+    
   #endif
 
   // ----------------------------------------------------------------
@@ -349,14 +417,18 @@ Dimmer_setup();
   // ----------------------------------------------------------------
   // Task: Update Dimmer power
   // ----------------------------------------------------------------
+  attachInterrupt(SWITCH, function_off_screen, FALLING);
+  attachInterrupt(BUTTON_LEFT, function_next_screen, FALLING);
+
   xTaskCreate( 
     switchDisplay,
     "Swith Oled",  // Task name
-    1000,                  // Stack size (bytes)
+    4000,                  // Stack size (bytes)
     NULL,                   // Parameter
     2,                      // Task priority
     NULL                    // Task handle
   );  // pdMS_TO_TICKS(1000)
+  
   #endif
 
 
@@ -420,20 +492,21 @@ Dimmer_setup();
           2,                // Task priority
           NULL              // Task handle
         );
+        
       #endif
     #endif
-    #ifndef LIGHT_FIRMWARE
-      if (config.mqtt) {
-          xTaskCreate(
-            client_loop,
-            "Update network data",
-            5000,            // Stack size (bytes)
-            NULL,             // Parameter
-            4,                // Task priority
-            NULL              // Task handle
-          );
-      }
-    #endif
+    // #ifndef LIGHT_FIRMWARE
+    //   if (config.mqtt) {
+    //       xTaskCreate(
+    //         client_loop,
+    //         "Update network data",
+    //         5000,            // Stack size (bytes)
+    //         NULL,             // Parameter
+    //         4,                // Task priority
+    //         NULL              // Task handle
+    //       );
+    //   }
+    // #endif
 
   }
     
@@ -466,20 +539,26 @@ Dimmer_setup();
         AsyncElegantOTA.begin(&server);
         server.begin(); 
       #endif
-#ifndef LIGHT_FIRMWARE
+  #ifndef LIGHT_FIRMWARE
+      if (!AP) {
+          if (config.mqtt) {
+            // Mqtt_init();
+           /// connexion MQTT 
+            async_mqtt_init();
+            connectToMqtt();
+            delay(1000); 
 
-if (!AP) {
-    if (config.mqtt) {
-      Mqtt_init();
-      init_MQTT_sensor();
-    // HA autoconf
-     if (configmqtt.HA) init_HA_sensor();}
-}
-#endif
+            init_MQTT_sensor(); // utilie pour jeedom et HA
 
+          // HA autoconf
+          if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
+            
+          }
+      }
+  #endif
   //if ( config.autonome == true ) {
     gDisplayValues.dimmer = 0; 
-    dimmer_change( config.dimmer, config.IDXdimmer, gDisplayValues.dimmer ) ; 
+    dimmer_change( config.dimmer, config.IDXdimmer, gDisplayValues.dimmer,0 ) ; 
   //}
 
 #endif
@@ -490,6 +569,10 @@ if (!AP) {
     #endif
   #endif
 
+
+
+
+
 esp_register_shutdown_handler( handler_before_reset );
 
 logging.power=true; logging.sct=true; logging.sinus=true; 
@@ -497,11 +580,16 @@ logging.power=true; logging.sct=true; logging.sinus=true;
 //WebSerial.begin(&server);
 //WebSerial.msgCallback(recvMsg);
 
-
 }
 
+
+/// @brief / Loop function
 void loop()
 {
+//// si perte du wifi après  6h, reboot
+  if (AP) {
+    reboot_after_lost_wifi(6);
+  }
 
 /// redémarrage sur demande
   if (config.restart) {
@@ -514,11 +602,9 @@ void loop()
   if (logging.start.length() > LOG_MAX_STRING_LENGTH ) { 
     logging.start = "";
   }
+ 
 
-  
-
-//serial_println(F("loop")); 
-
+// vérification de la connexion wifi 
   if ( WiFi.status() != WL_CONNECTED ) {
       connect_to_wifi();
       }
@@ -536,28 +622,104 @@ void loop()
 
     }
   }
+/// connexion MQTT
 #ifndef LIGHT_FIRMWARE
     if (!AP) {
       #if WIFI_ACTIVE == true
           if (config.mqtt) {
-            if (!client.connected()) { reconnect(); }
+            if (!client.connected()) { 
+              // reconnect(); 
+              connectToMqtt();
+              }
           // client.loop();
+          
           }
 
       #endif
     }
 #endif
+//// surveillance des fuites mémoires 
 #ifndef LIGHT_FIRMWARE
-  client.publish("memory", String(esp_get_free_heap_size()).c_str())   ;
+  client.publish((topic_Xlyric+"memory").c_str(),1,false, String(esp_get_free_heap_size()).c_str()) ;
 #endif
+
+  /// synchrisation de l'information entre le dimmer et l'affichage 
+  int dimmer1_state = dimmer_getState();
+  /// application uniquement si le dimmer est actif (Tmax non atteint)    
+  if (dimmer1_state != 0 ) {  
+  gDisplayValues.dimmer = dimmer1_state; 
+  }
+
+
+if (config.dimmerlocal) {
+  ///////////////// gestion des activité minuteur 
+  //// Dimmer 
+    Serial.println(dimmer_hard.getPower());
+    if (programme.run) { 
+        //  minuteur en cours
+        if (programme.stop_progr()) { 
+          dimmer_hard.setPower(0); 
+          dimmer_off();
+          DEBUG_PRINTLN("programme.run");
+          //sysvar.puissance=0;
+          Serial.println("stop minuteur dimmer");
+          //arret du ventilateur
+          digitalWrite(COOLER, LOW);
+          /// remonté MQTT
+          #ifndef LIGHT_FIRMWARE
+            Mqtt_send_DOMOTICZ(String(config.IDX), String(dimmer_hard.getPower()),"pourcent"); // remonté MQTT de la commande réelle
+            if (configmqtt.HA) {
+              int instant_power = dimmer_hard.getPower();
+              device_dimmer.send(String(instant_power * config.resistance/100));
+            } 
+          #endif
+        } 
+    } 
+    else { 
+      // minuteur à l'arret
+      if (programme.start_progr()){ 
+        //sysvar.puissance=config.localfuse; 
+        dimmer_on();
+        dimmer_hard.setPower(config.localfuse); 
+        delay (50);
+        Serial.println("start minuteur ");
+        //demarrage du ventilateur 
+        digitalWrite(COOLER, HIGH);
+        
+        /// remonté MQTT
+        #ifndef LIGHT_FIRMWARE
+          Mqtt_send_DOMOTICZ(String(config.IDX), String(dimmer_hard.getPower()),"pourcent"); // remonté MQTT de la commande réelle
+          if (configmqtt.HA) {
+            int instant_power = dimmer_hard.getPower();
+            device_dimmer.send(String(instant_power * config.resistance/100));
+          } 
+        #endif
+        offset_heure_ete(); // on corrige l'heure d'été si besoin
+      }
+    }
+}
+
+/// fonction de reboot hebdomadaire ( lundi 00:00 )
+
+if (!AP) {
+    time_reboot();
+}
+
+
   vTaskDelay(pdMS_TO_TICKS(10000));
 }
 
+/// @brief / end Loop function
+
+
+
 void connect_to_wifi() {
   ///// AP WIFI INIT 
+   
+
   if (AP || strcmp(configwifi.SID,"AP") == 0 ) {
-      AP=true; 
       APConnect(); 
+      //AP=true; 
       gDisplayValues.currentState = UP;
       gDisplayValues.IP = String(WiFi.softAPIP().toString());
       btStop();
@@ -605,21 +767,22 @@ void connect_to_wifi() {
           
               
               logging.init += "\r\n";
-              break;}
-      }
-
+              } 
+              break;
+        }
+    }
 
         //// timeout --> AP MODE 
         if ( timeoutwifi > 20 ) {
               WiFi.disconnect(); 
-              AP=true; 
+              //AP=true; 
               serial_println("timeout, go to AP mode ");
               
               gDisplayValues.currentState = UP;
              // gDisplayValues.IP = String(WiFi.softAPIP().toString());
               APConnect(); 
         }
-    }
+
 
       serial_println("WiFi connected");
       logging.init += loguptime();
@@ -628,7 +791,7 @@ void connect_to_wifi() {
       serial_println(WiFi.localIP());
         serial_print("force du signal:");
         serial_print(WiFi.RSSI());
-        serial_print("dBm");
+        serial_println("dBm");
       gDisplayValues.currentState = UP;
       gDisplayValues.IP = String(WiFi.localIP().toString());
       btStop();
@@ -645,6 +808,44 @@ String loguptime() {
 
 void handler_before_reset() {
   #ifndef LIGHT_FIRMWARE
-  client.publish("panic", "ESP reboot" ) ;
+  client.publish((topic_Xlyric+"panic").c_str(),1,true," ESP reboot" ) ;
   #endif
 }
+
+void reboot_after_lost_wifi(int timeafterlost) {
+  uptime::calculateUptime();
+  if ( uptime::getHours() > timeafterlost ) { 
+    delay(15000);  
+    config.restart = true; 
+  }
+}
+
+void IRAM_ATTR function_off_screen() {
+  gDisplayValues.screenbutton = true;
+}
+
+void IRAM_ATTR function_next_screen(){
+  gDisplayValues.nextbutton = true;
+  gDisplayValues.option++; 
+  if (gDisplayValues.option > 2 ) { gDisplayValues.option = 1 ;}; 
+}
+
+/*
+gDisplayValues.screenstate == HIGH ){ // if right button is pressed or HTTP call 
+        if (digitalRead(TFT_PIN)==HIGH) {             // and the status flag is LOW
+          gDisplayValues.screenstate = LOW ;  
+          logging.start += loguptime(); 
+          logging.start += "Oled Off\r\n";   
+          digitalWrite(TFT_PIN,LOW);     // and turn Off the OLED
+          }                           // 
+        else {                        // otherwise...      
+          Serial.println("button left/bottom pressed");
+          gDisplayValues.screenstate = LOW ;
+          logging.start += loguptime(); 
+          logging.start += +"Oled On\r\n";   
+          digitalWrite(TFT_PIN,HIGH);      // and turn On  the OLED
+          if (config.ScreenTime !=0 ) {
+            timer = millis();
+          }
+        }
+      }*/

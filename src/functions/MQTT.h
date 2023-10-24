@@ -3,8 +3,11 @@
 
 #include <Arduino.h>
 #ifndef LIGHT_FIRMWARE
-#include <PubSubClient.h>
+// #include <PubSubClient.h>
+#include <AsyncMqttClient.h>
+#include "functions/ha.h"
 
+extern Configmodule configmodule; 
 extern Mqtt configmqtt; 
 
 extern MQTT device_dimmer;
@@ -17,6 +20,8 @@ extern MQTT switch_1;
 extern MQTT switch_2;
 extern MQTT temperature;
 extern MQTT device_alarm_temp;
+extern MQTT surplus_routeur;
+
 
 #ifdef HARDWARE_MOD
         extern MQTT power_factor;
@@ -24,6 +29,10 @@ extern MQTT device_alarm_temp;
         extern MQTT power_irms;
         extern MQTT power_apparent;
 #endif
+        extern MQTT enphase_cons_whLifetime;
+        extern MQTT enphase_prod_whLifetime;
+        extern MQTT enphase_current_power_consumption;
+        extern MQTT enphase_current_power_production;
 
 void init_MQTT_sensor(){
         device_dimmer.Set_object_id("dimmer");
@@ -44,6 +53,9 @@ void init_MQTT_sensor(){
         compteur_inject.Set_object_id("inject_Wh");
         compteur_inject.Set_retain_flag(true);
 
+        surplus_routeur.Set_object_id("surplus");
+        surplus_routeur.Set_retain_flag(true);
+
         temperature.Set_object_id("temperature");
         temperature.Set_retain_flag(true);
 
@@ -60,6 +72,20 @@ void init_MQTT_sensor(){
         compteur_grid.send(String("0"));
         // switch_1.send(String(0));
         // switch_2.send(String(0));
+        if (configmodule.enphase_present == true) {
+ enphase_cons_whLifetime.Set_name("cons_enphase_cons_whLifetime");
+                enphase_cons_whLifetime.Set_object_id("enphase_cons_wh");
+                enphase_cons_whLifetime.Set_retain_flag(true);
+
+                enphase_prod_whLifetime.Set_object_id("enphase_prod_wh");
+                enphase_prod_whLifetime.Set_retain_flag(true);
+
+                enphase_current_power_consumption.Set_object_id("enphase_current_cons");
+                enphase_current_power_consumption.Set_retain_flag(true);
+
+                enphase_current_power_production.Set_object_id("enphase_current_prod");
+                enphase_current_power_production.Set_retain_flag(true);
+        }
 
         #ifdef HARDWARE_MOD
                 power_factor.Set_object_id("PowerFactor");
@@ -81,6 +107,13 @@ void init_HA_sensor(){
         // device_dimmer.Set_retain_flag(true);
         // device_dimmer.Set_expire_after(true);
         
+        surplus_routeur.Set_name("Ecart neutre");
+        surplus_routeur.Set_unit_of_meas("W");
+        surplus_routeur.Set_stat_cla("measurement");
+        surplus_routeur.Set_dev_cla("power");
+        surplus_routeur.Set_entity_type("sensor");
+
+
         device_routeur.Set_name("Puissance");
         // device_routeur.Set_object_id("power");
         device_routeur.Set_unit_of_meas("W");
@@ -155,7 +188,40 @@ void init_HA_sensor(){
         // device_alarm_temp.Set_retain_flag(true);
         // device_alarm_temp.Set_expire_after(true);
 
-        client.setBufferSize(1024);
+
+
+        if (configmodule.enphase_present == true) {
+
+
+                enphase_cons_whLifetime.Set_name("cons_enphase_cons_whLifetime");
+                enphase_cons_whLifetime.Set_unit_of_meas("Wh");
+                enphase_cons_whLifetime.Set_stat_cla("total_increasing");
+                enphase_cons_whLifetime.Set_dev_cla("energy");      
+                enphase_cons_whLifetime.Set_entity_type("sensor");
+
+                enphase_prod_whLifetime.Set_name("cons_enphase_prod_whLifetime");
+                enphase_prod_whLifetime.Set_unit_of_meas("Wh");
+                enphase_prod_whLifetime.Set_stat_cla("total_increasing");
+                enphase_prod_whLifetime.Set_dev_cla("energy");      
+                enphase_prod_whLifetime.Set_entity_type("sensor");
+
+                enphase_current_power_consumption.Set_name("enphase_current_power_consumtion");
+                enphase_current_power_consumption.Set_unit_of_meas("W");
+                enphase_current_power_consumption.Set_stat_cla("measurement");
+                enphase_current_power_consumption.Set_dev_cla("power");
+                enphase_current_power_consumption.Set_entity_type("sensor");
+
+                enphase_current_power_production.Set_name("enphase_current_power_production");
+                enphase_current_power_production.Set_unit_of_meas("W");
+                enphase_current_power_production.Set_stat_cla("measurement");
+                enphase_current_power_production.Set_dev_cla("power");
+                enphase_current_power_production.Set_entity_type("sensor");
+        }
+
+
+
+
+        // client.setBufferSize(1024);
         if (configmqtt.HA){
         device_routeur.HA_discovery();
         device_dimmer.HA_discovery();
@@ -166,6 +232,14 @@ void init_HA_sensor(){
         compteur_grid.HA_discovery();
         switch_1.HA_discovery(); 
         switch_2.HA_discovery(); 
+
+        enphase_cons_whLifetime.HA_discovery();
+        enphase_prod_whLifetime.HA_discovery();
+        enphase_current_power_consumption.HA_discovery();
+        enphase_current_power_production.HA_discovery();
+        surplus_routeur.HA_discovery();
+
+
         }
         #ifdef HARDWARE_MOD
 

@@ -4,6 +4,7 @@
 #include "energyFunctions.h"
 #include "MQTT.h"
 #include "spiffsFunctions.h"
+#include <RBDdimmer.h>
 
 String configweb; 
 extern DisplayValues gDisplayValues;
@@ -11,6 +12,8 @@ extern Config config;
 extern Configwifi configwifi; 
 extern Mqtt configmqtt; 
 extern Logs logging;
+extern Configmodule configmodule; 
+extern dimmerLamp dimmer_hard; 
 #ifdef  TTGO
 #include <TFT_eSPI.h>
 #include <SPI.h>
@@ -18,7 +21,7 @@ extern TFT_eSPI display ;   // Invoke library
 #endif
 int middleoscillo = 1800;
 
-const char* PARAM_INPUT_1 = "send"; /// paramettre de retour sendmode
+const char* PARAM_INPUT_1 = "disengage_dimmer"; /// paramettre de retour sendmode
 const char* PARAM_INPUT_2 = "cycle"; /// paramettre de retour cycle
 const char* PARAM_INPUT_3 = "readtime"; /// paramettre de retour readtime
 const char* PARAM_INPUT_4 = "cosphi"; /// paramettre de retour cosphi
@@ -77,7 +80,7 @@ String oscilloscope() {
   delayMicroseconds (config.readtime);
   } 
   
-  //temp =  analogRead(ADC_INPUT); signe = analogRead(ADC_PORTEUSE);
+  ////temp =  analogRead(ADC_INPUT); signe = analogRead(ADC_PORTEUSE);
   temp =  adc1_get_raw((adc1_channel_t)4); signe = adc1_get_raw((adc1_channel_t)5);
   moyenne = middleoscillo  + signe/50; 
   retour += String(timer) + "," + String(moyenne) + "," + String(temp) + "]]" ;
@@ -113,10 +116,22 @@ String getState() {
   String state=STABLE; 
   if (gDisplayValues.watt >= config.delta  ) {   state = GRID; }
   if (gDisplayValues.watt <= config.deltaneg ) {   state = INJECTION; }
+  //Serial.println(gDisplayValues.temperature);  
+  if (gDisplayValues.temperature == "null" ) { gDisplayValues.temperature = "0";  }
   if (gDisplayValues.temperature == "" ) { gDisplayValues.temperature = "0";  }
-  state = state + ";" + int(gDisplayValues.watt) + ";" + gDisplayValues.dimmer + ";" + config.delta + ";" + config.deltaneg + ";" + gDisplayValues.temperature ;
+  //Serial.println(gDisplayValues.temperature);  
+  DynamicJsonDocument doc(128);
+  doc["state"] = state;
+  doc["watt"] = int(gDisplayValues.watt);
+  doc["dimmer"] = gDisplayValues.puissance_route;
+  doc["temperature"] = gDisplayValues.temperature;
+  doc["version"] = VERSION;
+  state=""; 
+  serializeJson(doc, state);
+  // state = state + ";" + int(gDisplayValues.watt) + ";" + gDisplayValues.dimmer + ";" + config.delta + ";" + config.deltaneg + ";" + gDisplayValues.temperature ;
   return String(state);
 }
+
 
 String stringbool(bool mybool){
   String truefalse = "true";
@@ -136,9 +151,17 @@ String getServermode(String Servermode) {
   if ( Servermode == "screen" ) {  gDisplayValues.screenstate = !gDisplayValues.screenstate; }
   if ( Servermode == "Jeedom" ) {   config.UseJeedom = !config.UseJeedom;}
   if ( Servermode == "Autonome" ) {   config.autonome = !config.autonome; }
-  if ( Servermode == "Dimmer local" ) {   config.dimmerlocal = !config.dimmerlocal; }
+  if ( Servermode == "Dimmer local" ) {   
+                    config.dimmerlocal = !config.dimmerlocal;  
+                    /// correction bug #26 
+                    dimmer_hard.setPower(0); 
+                    
+  }
   if ( Servermode == "MQTT" ) {   config.mqtt = !config.mqtt; }
-  if ( Servermode == "polarité" ) {   config.polarity = !config.polarity; }
+  if ( Servermode == "polarity" ) {   config.polarity = !config.polarity; }
+  if ( Servermode == "envoy" ) {   configmodule.enphase_present = !configmodule.enphase_present; }
+  if ( Servermode == "frontius" ) {   configmodule.Fronius_present = !configmodule.Fronius_present; }
+
   #ifndef LIGHT_FIRMWARE
 
   if ( Servermode == "HA" ) {   configmqtt.HA = !configmqtt.HA; 
@@ -178,28 +201,75 @@ String getpuissance() {
 }
 //***********************************
 String getconfig() {
-  configweb = String(config.IDXdimmer) + ";" +  config.num_fuse + ";"  + String(config.IDX) + ";"  +  String(VERSION) +";" + "middle" +";"+ config.delta +";"+config.cycle+";"+config.dimmer+";"+config.readtime +";"+config.cosphi+";"+stringbool(config.UseDomoticz)+";"+stringbool(config.UseJeedom)+";"+stringbool(config.autonome)+";"+config.apiKey+";"+stringbool(config.dimmerlocal)+";"+config.facteur+";"+stringbool(config.mqtt)+";"+config.mqttserver+ ";"  + String(config.Publish)+";"+config.deltaneg+";"+config.resistance+";"+config.polarity+";"+config.ScreenTime+";"+config.localfuse+";"+config.tmax+";"+config.voltage+";"+config.offset+";"+stringbool(config.flip)+";"+stringbool(configmqtt.HA)+";"+config.relayon+";"+config.relayoff+";"+ stringbool(configmqtt.JEEDOM)+";"+stringbool(configmqtt.DOMOTICZ)+";"+stringbool(configmqtt.HTTP);
+  String configweb; 
+  DynamicJsonDocument doc(512);
+  doc["Fusible"] = config.num_fuse;
+  doc["version"] = String(VERSION);
+  doc["delta"] = config.delta;
+  doc["deltaneg"] = config.deltaneg;
+  doc["dimmer"] = config.dimmer;
+  doc["cosphi"] = config.cosphi;
+  doc["dimmerlocal"] = config.dimmerlocal;
+  
+  char buffer[8];
+  dtostrf(config.facteur, 5, 2, buffer); 
+  doc["facteur"] = buffer;
+
+  doc["resistance"] = config.resistance;
+  doc["polarity"] = config.polarity;
+  doc["screentime"] = config.ScreenTime;
+  doc["Fusiblelocal"] = config.localfuse;
+  doc["maxtemp"] = config.tmax;
+  doc["voltage"] = config.voltage;
+  doc["offset"] = config.offset;
+  doc["flip"] = config.flip;
+  doc["relaystart"] = config.relayon;
+  doc["relaystop"] = config.relayoff;
+
+  serializeJson(doc, configweb);
+  return String(configweb);
+}
+
+String getenvoy() {
   return String(configweb);
 }
 //***********************************
 String getchart() {
   String retour ="" ;
+  //ne sert à rien si enphase en route
+  if (configmodule.enphase_present == false) {
     retour = oscilloscope() ;
-      return String(retour);
+  }
+        return String(retour);
 }
 //***********************************
 //***********************************
 String getwifi() {
-
-   String retour =String(configwifi.SID) + ";" + String(configwifi.passwd)  ;
+  String retour =String(configwifi.SID) + ";" + String(SECURITEPASS)  ;
   return String(retour) ;
 }
 
 String getmqtt() {
-
-   String retour =String(config.mqttserver) + ";" + String(config.Publish) + ";" + String(configmqtt.username) + ";" + String(configmqtt.password) + ";" + stringbool(config.mqtt) + ";" + String(config.IDX) + ";" + String(config.IDXdimmer) + ";" + String(config.mqttport)+";"+stringbool(configmqtt.HA)+";"+stringbool(configmqtt.JEEDOM)+";"+stringbool(configmqtt.DOMOTICZ)+";"+stringbool(configmqtt.HTTP);
+  String retour; 
+  DynamicJsonDocument doc(512);
+  doc["server"] = config.mqttserver;
+  doc["topic"] = config.Publish;
+  doc["user"] = configmqtt.username;
+  doc["password"] = SECURITEPASS;
+  doc["MQTT"] = config.mqtt;
+  doc["IDX"] = config.IDX;
+  doc["IDXDIMMER"] = config.IDXdimmer;
+  doc["port"] = config.mqttport;
+  doc["HA"] = configmqtt.HA;
+  doc["JEEDOM"] = configmqtt.JEEDOM;
+  doc["DOMOTICZ"] = configmqtt.DOMOTICZ;
+  doc["HTTP"] = configmqtt.HTTP;
+  doc["EM"] = config.topic_Shelly;
+  doc["IDXDALLAS"] = config.IDXdallas;
+  serializeJson(doc, retour);
   return String(retour) ;
 }
+
 
 String getdebug() {
   configweb = "";
@@ -239,22 +309,22 @@ String getlogs() {
   }
 
 //***********************************
-String processor(const String& var){
+/*String processor(const String& var){
    Serial.println(var);
    if (var == "SIGMA"){
     return getSigma();
   }
-  /*else if (var == "SENDMODE"){
-  
-    return getSendmode();
-  }*/
-  else if (var == "STATE"){
-    
+  if (var == "STATE"){
     return getState();
-  }  
+  }
+  if (var == "VERSION"){
+    return VERSION;
+  }
+    
+
 return getState();
 }
-
+*/
 
 //***********************************
 //************* Fonction domotique 
@@ -426,6 +496,15 @@ void serial_read() {
         return; 
       }
 
+   /*   index = message_get.indexOf("HA");
+      if (index != -1 ){
+                  configmqtt.HA = !configmqtt.HA; 
+                  savemqtt(mqtt_conf, configmqtt);
+                  Serial.print("/r/n MQTT pour HA est maintenant :");
+                  Serial.println(String(configmqtt.HA).c_str());
+        return; 
+      }*/
+
       if (message_get.length() !=0){
         Serial.println("Commande disponibles :");
         Serial.println("'reboot' pour redémarrer le routeur ");
@@ -433,6 +512,7 @@ void serial_read() {
         Serial.println("'pass' pour changer le mdp wifi");
         Serial.println("'log' pour afficher les logs serial");
         Serial.println("'flip' pour retourner l'ecran");
+       // Serial.println("'HA' pour activer ou désactiver MQTT pour Home assistant");
       }
     }
  }

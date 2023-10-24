@@ -1,3 +1,4 @@
+
 <html lang="en">
 
 <head>
@@ -12,7 +13,8 @@
 
   <!-- Custom fonts for this template-->
  <link href="all.min.css" rel="stylesheet" type="text/css"> 
-  
+  <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+
   <!-- Custom styles for this template-->
   <link href="sb-admin-2.min.css" rel="stylesheet">
 
@@ -39,12 +41,12 @@
 
       <!-- Nav Item - Dashboard -->
       <li class="nav-item active">
-        <a class="nav-link" href="/">
+        <a class="nav-link" href="/" target="_blank">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Dashboard</span><br>
-		<span id="version"></span></a>
-		  
-      </li>
+          <span id="version">Version: </span>
+        </a>
+		  </li>
 
 
 
@@ -59,22 +61,29 @@
       <!-- Nav Item - Pages Collapse Menu -->
 	  <li class="nav-item active">
         <a class="nav-link" href="/">
-          <i class="fas fa-fw fa-cog"></i>
-          <span>retour conso</span></a>
+          <i class="fas fa-fw fa-plug"></i>
+          <span>Retour conso</span></a>
     </li>
 
     <li class="nav-item active">
         <a class="nav-link" href="/wifi.html">
-          <i class="fas fa-fw fa-cog"></i>
+          <i class="fas fa-fw fa-wifi"></i>
           <span>Configuration Wifi</span></a>
     </li>
+ 
+    <li class="nav-item active">
+        <a class="nav-link" href="/envoy.html">
+        <i class="fas fa-fw fa-book"></i>
+        <span>BETA: Config Envoy</span></a>
+    </li>
+    
 
     <li class="nav-item active">
       <a class="nav-link" href="/log.html">
         <i class="fas fa-fw fa-info"></i>
       <span>Console logs</span></a>
     </li>
-
+  
     <li class="nav-item active">
       <a class="nav-link" href="/update">
         <i class="fas fa-fw fa-download"></i>
@@ -83,11 +92,10 @@
 
     <li class="nav-item active">
       <a class="nav-link" href="/reboot">
-        <i class="fas fa-fw fa-power-off"></i>
-      <span>Reboot</span></a>
-    </li>
-  
-
+          <i class="fas fa-fw fa-power-off"></i>
+          <span>Reboot</span>
+      </a>
+    </li>  
 
       <!-- Divider -->
       <hr class="sidebar-divider d-none d-md-block">
@@ -132,6 +140,7 @@
 
 
 
+
             
 
             <div class="topbar-divider d-none d-sm-block"></div>
@@ -147,9 +156,9 @@
         <div class="container-fluid">
 
           <!-- Page Heading -->
-		  <h1 class="h3 mb-2 text-gray-800">Configuration AP mode</h1>
-          <p class="mb-4">configuration page of pv router, remember to save your config file on the flash after apply parameters.</p>
-		  <p class="mb-4">FAQ and help  : <a href="https://pvrouteur.apper-solaire.org/shelves/fr-documentation" target="_blank"> ici </a></p>
+		  <h1 class="h3 mb-2 text-gray-800">Configuration</h1>
+          <p class="mb-4">Page de configuration de votre pv routeur, pensez à sauvegarder votre configuration sur la flash après l'avoir appliqué.</p>
+		  <p class="mb-4">page rapide d'aide : <a href="https://pvrouteur.apper-solaire.org/shelves/fr-documentation" target="_blank"> ici </a></p>
   
 
           <!-- Content Row -->
@@ -162,7 +171,7 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">State</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="state"></span></div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="state">0</span></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-leaf fa-2x text-gray-300"></i>
@@ -179,7 +188,7 @@
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
                       <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Sigma</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="sigma"></span></div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="sigma">0</span></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-plug fa-2x text-gray-300"></i>
@@ -203,8 +212,8 @@
                 <div class="card-body">
                   <div class="row no-gutters align-items-center">
                     <div class="col mr-2">
-                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">save on flash</div>
-                      <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="save"   ><a href="#">SAVE</a></span><br><span id="savemsg"></span></div>
+                      <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Sauvegarder sur la flash</div>
+                      <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="save"   ><a href="#">SAUVEGARDER</a></span><br><span id="savemsg"></span></div>
                     </div>
                     <div class="col-auto">
                       <i class="fas fa-download fa-2x text-gray-300"></i>
@@ -218,6 +227,7 @@
 
 		<div class="col-lg-6">
     <form class="user" id="formulaire" method="post" action=""  >
+    
       <div class="card position-relative">
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-primary">Configuration</h6>
@@ -225,6 +235,8 @@
         </div>
         <div class="card-body">
           <div class="col-lg-12">
+           
+
 
             <br>
 
@@ -236,8 +248,8 @@
               <div class="card-body">
                 <div class="form-group row">
 
-                    <div class="col-sm-6 limite"><span>Limiteur en %</span>
-                        <input type="text" class="form-control form-control-user" id="Fusible" placeholder="%FUSE%">
+                    <div class="col-sm-6 limite"><span>Limiteur (%)</span>
+                        <input type="number" step="1" class="form-control form-control-user" id="Fusible" placeholder="%FUSE%">
                     </div>
                 </div> 
               </div>
@@ -263,7 +275,7 @@
 
             <div class="card position-relative">
               <div class="card-header py-6">
-                <h6 class="m-0 font-weight-bold text-primary">Dimmer Local</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Dimmer Local </h6>
                   <span id="saveform"></span>
               </div>
               <div class="card-body">
@@ -271,28 +283,45 @@
                 <div class="form-group row"> 
                   
                     <div class="col-sm-3">
-                      <div class="custom-control custom-checkbox small">
-                              <input type="checkbox" class="custom-control-input" id="dimmerlocal">
-                              <label class="custom-control-label" for="dimmerlocal" onclick="sendservermode(this.innerHTML);" >Dimmer local</label>
-                      </div>
+                    <div class="custom-control custom-checkbox small">
+                            <input type="checkbox" class="custom-control-input" id="dimmerlocal">
+                            <label class="custom-control-label" for="dimmerlocal" onclick="sendservermode(this.innerHTML);" >Dimmer local</label>
+                    </div>
                     </div>
                     <div class="col-sm-3">
-                        Limiteur local : <input type="text" class="form-control form-control-user" id="Fusiblelocal" placeholder="%FUSELOCAL%">
+                        Limiteur local (%): <input type="number"  step="1" class="form-control form-control-user" id="Fusiblelocal" placeholder="%FUSELOCAL%">
                     </div>
-                    <div class="col-sm-3"><span>Charge connectée</span>
-                      <input type="text" class="form-control form-control-user" id="resistance" placeholder="%RESISTANCE%">
+                    <div class="col-sm-3"><span>Charge connectée (W) </span>
+                      <input type="number" step="1" class="form-control form-control-user" id="resistance" placeholder="%RESISTANCE%">
                     </div>
                     <div class="col-sm-3">
-                      Max temp : <input type="text" class="form-control form-control-user" id="maxtemp" placeholder="%MAXTEMP%">
-                  </div>
+                      Max temp (°C): <input type="number" step="1"class="form-control form-control-user" id="maxtemp" placeholder="%MAXTEMP%">
+                    </div>
 
                 </div>
               </div>
             </div>
-      
-				
 
-							
+            <br>
+
+            <div class="card position-relative">
+              <div class="card-header py-6">
+                <h6 class="m-0 font-weight-bold text-primary">Relay</h6>
+                  <span id="saveform"></span>
+              </div>
+              <div class="card-body">
+
+                <div class="form-group row"> 
+                  
+                    <div class="col-sm-3">
+                        Mise en route à X% : <input type="number" step="1" class="form-control form-control-user" id="relaystart" placeholder="%RELAYSTART%">
+                    </div>
+                    <div class="col-sm-3">
+                       Arret à X% : <input type="number" step="1" class="form-control form-control-user" id="relaystop" placeholder="%RELAYSTOP%">
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <br>
 
@@ -307,8 +336,8 @@
               </div>
                 <div class="card-body">        
                 <div class="form-group row">
-                <div class="col-sm-3 delta"><span>Limite Consommation (Delta)</span> </div>
-                  <div class="col-sm-3 deltaneg"><span>Limite Injection (deltaneg)</span> </div>
+                <div class="col-sm-3 delta"><span>Limite Consommation (Delta)(W)</span> </div>
+                  <div class="col-sm-3 deltaneg"><span>Limite Injection (deltaneg)(W)</span> </div>
                   
                 
 
@@ -316,10 +345,10 @@
 				
                 <div class="form-group row">
                   <div class="col-sm-3">
-                  <input type="text" class="form-control form-control-user" id="delta" placeholder="%DELTA%">
+                  <input type="number" step="1" class="form-control form-control-user" id="delta" placeholder="%DELTA%">
                 </div>
                 <div class="col-sm-3">
-                  <input type="text" class="form-control form-control-user" id="deltaneg" placeholder="%DELTANEG%">
+                  <input type="number" step="1" class="form-control form-control-user" id="deltaneg" placeholder="%DELTANEG%">
                 </div>
 
 				  
@@ -333,12 +362,27 @@
                 </div>
                 <div class="form-group row">
                   <div class="col-sm-3">
-                    <input type="text" class="form-control form-control-user" id="cosphi" placeholder="%COSPHI%">
+                    <input type="number" step="1" class="form-control form-control-user" id="cosphi" placeholder="%COSPHI%">
                   </div>
                   <div class="col-sm-3">
                     <input type="text" class="form-control form-control-user" id="facteur" placeholder="%facteur%">
                   </div>
+                  
 
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-3"><span>Correction Voltage (V)</span></div>
+                  <div class="col-sm-3">Correction Offset (W)</div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-3">
+                    <input type="number" step="1" class="form-control form-control-user" id="voltage" placeholder="%voltage%">
+                  </div>
+                  <div class="col-sm-3">
+                    <input type="number" step="1" class="form-control form-control-user" id="offset" placeholder="%offset%">
+                  </div>
                 </div>
 
                 <div class="form-group row">
@@ -356,7 +400,7 @@
               </div>
               <div class="form-group row">
                 <div class="col-sm-3">
-                  <input type="text" class="form-control form-control-user" id="screentime" placeholder="%SCREENTIME%">
+                  <input type="number" step="1" class="form-control form-control-user" id="screentime" placeholder="%SCREENTIME%">
                 </div>
                 <div class="col-sm-3">
                   <div class="custom-control custom-checkbox small">
@@ -371,27 +415,18 @@
                     <label class="custom-control-label" for="flip" onclick="sendservermode(this.innerHTML);" >flip</label>
                   </div>
                 </div>
-
               </div> 
             </div>
           </div>
           <br>
-			  
-
 				
 	
 				
-				<input type="submit" value="Apply parameters" class="btn btn-primary btn-user btn-block">
+				<input type="submit" value=" Application des parametres" class="btn btn-primary btn-user btn-block">
 				
                 <hr>
 
               </form>
-
-
-
-
-
-
               <hr>
             </div>
           </div>
@@ -402,40 +437,59 @@
 
 
           <!-- Content Row -->
-		
+
+
+   			
+				
 <script type='text/javascript'> 
       //<!-- rafraichissement valeurs -->
-  setInterval(function refreshsend( ) {
-          $.getJSON('/state', function(data) {
-            // Récupérer les données du JSON
-              var state = data.state;
-              var watt = data.watt;
-            document.getElementById("state").innerHTML = state;
-            document.getElementById("sigma").innerHTML = watt;
-            });
-  }, 5000);
+      setInterval(function refreshsend( ) {
+        $.getJSON('/state', function(data) {
+          // Récupérer les données du JSON
+            var state = data.state;
+            var watt = data.watt;
+            var version = data.version;
+          document.getElementById("state").innerHTML = state;
+          document.getElementById("sigma").innerHTML = watt;
+          document.getElementById("version").innerHTML = version;
+          });
+          }, 5000);
 
-  function sendservermode (mode) {
+function sendmode (mode) {
 
-      $.get( "/get", { servermode: mode } )
-      .done(function(data) { 
-      $( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
-      var config = data.split(";");
-      }); 
-  }
+		$.get( "/get", { send: 	mode } )
+		.done(function(data) {
+		document.getElementById("sendmode").innerHTML = "Request sent";
+		document.getElementById("sendmode2").innerHTML = "Request sent";
+		});
 
-  function save () {				  
-        $.get( "/get", { save: "yes" } )
-      .done(function(data) {
-      
-      });		
-  }
-</script >
- 
+
+}
+
+function sendservermode (mode) {
+
+		$.get( "/get", { servermode: mode } )
+		.done(function(data) { 
+		$( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
+		}); 
+}
+
+function save () {				  
+  		$.get( "/get", { save: "yes" } )
+		.done(function(data) {
+		});		
+}
+
+
+		
+		</script >
+           
+
+
 <script src="jquery.min.js"></script>
 
 <!-- de la doc -->
-<script>
+  <script>
           $( "div.delta" )
           .mouseover(function() {
             $( this ).find( "span" ).text( "La puissance du dimmer baissera au dessus de cette valeur" );
@@ -459,7 +513,7 @@
           .mouseout(function() {
             $( this ).find( "span" ).text( "limiteur en %" );
           });
-          
+
           $( "div.cosphi" )
           .mouseover(function() {
             $( this ).find( "span" ).text( "Valeur par defaut 5" );
@@ -468,56 +522,59 @@
             $( this ).find( "span" ).text( "Cosphi" );
           });
           
-</script>
+  </script>
 
 <script>
 
 
-  <!-- sauvegarde de la configuration --> 
-  $( "#save" ).click(function() {
+<!--- sauvegarde de la configuration --> 
+$( "#save" ).click(function() {
 
-    
-        $.get( "/get", { save: "yes" } )
-      .done(function(data) {
-      $( "#savemsg" ).text( "Configuration sauvegardée" ).show().fadeOut( 5000 );
-      });	
-      
+  
+  		$.get( "/get", { save: "yes" } )
+		.done(function(data) {
+		$( "#savemsg" ).text( "Configuration sauvegardée" ).show().fadeOut( 5000 );
+		});	
+		
 
-  });
+});
 
-  $( "#formulaire" ).submit(function() {
+$( "#formulaire" ).submit(function() {
 
-    var data = {'server':$('#hostname').val(), 'idx':$('#IDX').val(), 'idxdimmer':$('#IDXDIMMER').val(),	 'cosphi':$('#cosphi').val(), 'fuse':$('#Fusible').val()	, 'cycle':$('#cycle').val(), 'dimmer':$('#dimmer').val(),'port':$('#port').val(), 'delta':$('#delta').val(),'deltaneg':$('#deltaneg').val(),  'apiKey':$('#apiKey').val(), 'facteur':$('#facteur').val(),'mqttserver':$('#mqttserver').val(),'publish':$('#publish').val(),'resistance':$('#resistance').val(),'screentime':$('#screentime').val(),'Fusiblelocal':$('#Fusiblelocal').val(),'maxtemp':$('#maxtemp').val(),'voltage':$('#voltage').val(), 'offset':$('#offset').val() } 
+	 var data = {'server':$('#hostname').val(), 'idx':$('#IDX').val(), 'idxdimmer':$('#IDXDIMMER').val(),	 'cosphi':$('#cosphi').val(), 'fuse':$('#Fusible').val()	, 'cycle':$('#cycle').val(), 'dimmer':$('#dimmer').val(),'port':$('#port').val(), 'delta':$('#delta').val(),'deltaneg':$('#deltaneg').val(),  'apiKey':$('#apiKey').val(), 'facteur':$('#facteur').val(),'resistance':$('#resistance').val(),'screentime':$('#screentime').val(),'Fusiblelocal':$('#Fusiblelocal').val(),'maxtemp':$('#maxtemp').val(), 'voltage':$('#voltage').val(), 'offset':$('#offset').val() , 'relaystart':$('#relaystart').val(), 'relaystop':$('#relaystop').val()} 
 
-      
-          $.ajax({
-              type: "GET",
-              data: data,
-              url: "get",
+		
+        $.ajax({
+            type: "GET",
+            data: data,
+            url: "get",
 
-              success: function(retour){
-                  $( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
-                      
-              }
-          });
-    return false;
-  });
+            success: function(retour){
+                $( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
+                     
+            }
+        });
+  return false;
+});
 
-  var recupconfig =  $.getJSON('/config', function(data) {
-    for (var key in data) {
-      if (data.hasOwnProperty(key)) {
-        var element = document.getElementById(key);
-        if (element) {
-          element.value = data[key];
-          if (element.type === 'checkbox') {
-            element.checked = data[key];
-          }
+
+
+var recupconfig =  $.getJSON('/config', function(data) {
+  for (var key in data) {
+    if (data.hasOwnProperty(key)) {
+      var element = document.getElementById(key);
+      if (element) {
+        element.value = data[key];
+        if (element.type === 'checkbox') {
+          element.checked = data[key];
         }
       }
     }
-  });
+  }
+});
 
 </script>
+	  
                 </div>
               </div>
             </div>
@@ -542,13 +599,15 @@
 
   </div>
   <!-- End of Page Wrapper -->
-  <!-- Bootstrap core JavaScript-->
 
-  <script src="bootstrap.bundle.min.js"></script>
+  <!-- Bootstrap core JavaScript-->
+  <!-- Bootstrap core JavaScript-->
+  <script src="/jquery.min.js"></script>
+  <script src="/bootstrap.bundle.min.js"></script>
 
   <!-- Core plugin JavaScript-->
+  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> --> 
 
-  <script src="bootstrap.bundle.min.js"></script>
   <!-- Custom scripts for all pages-->
   <script src="sb-admin-2.js"></script>
  <script>
@@ -567,4 +626,5 @@
   });
 </script>
 </body>
+
 </html>

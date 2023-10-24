@@ -116,7 +116,7 @@ int half;
 #if DIMMERLOCAL 
     #define outputPin  26 // PSM on board
     #define zerocross  27 // for boards with CHANGEBLE input pins // ZC on board
-    #define cooler 12 // Pin for cooler. (switch on dimmer)
+    #define COOLER 12 // Pin for COOLER. (switch on dimmer)
 
 #endif
 
@@ -162,8 +162,8 @@ bool discovery_temp = false;
  * Local measurements
  */
 #define LOCAL_MEASUREMENTS 30
-#define FACTEURPUISSANCE 10.50
-#define COMPENSATION 70 ///  % d'asservissement pour l'envoie de puissance au dimmer.
+// #define FACTEURPUISSANCE 10.50 // remplacé par la valeur configurable sur l'interface web
+#define COMPENSATION 100 ///  % d'asservissement pour l'envoie de puissance au dimmer.
 
 /**
  * Syncing time with an NTP server
@@ -182,8 +182,14 @@ bool discovery_temp = false;
   //  #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define VERSION "version 20230324"
+#define RELEASE "Version 20231008"
+    #ifdef LIGHT_FIRMWARE
+        #define VERSION "Light " RELEASE
+        #else
+        #define VERSION RELEASE
+    #endif
 
+#define EnvoyJ "/auth/check_jwt"
 #define EnvoyR "/api/v1/production"
 #define EnvoyS "/production.json"
 
@@ -202,6 +208,24 @@ bool AP=true;
 //// JOTTA 
 #define JOTTA  2
 #define GRIDFREQ 90 ///PWM frequency
+
+#ifdef S3
+    #define ADC_INPUT 10
+    #define INPUT 3
+    #define RELAY1 43
+    #define RELAY2 44
+    #define SWITCH 14
+    #define BUTTON_LEFT 0 // bouton droit ttgo
+    #define outputPin  1 // PSM on board
+    #define zerocross  2 // for boards with CHANGEBLE input pins // ZC on board
+    #define COOLER 18 // Pin for COOLER. (switch on dimmer)
+#endif
+
+  #ifdef Debug
+    #define DEBUG_PRINTLN(x) Serial.println(x)
+  #else
+    #define DEBUG_PRINTLN(x)
+  #endif
 
 #endif
 

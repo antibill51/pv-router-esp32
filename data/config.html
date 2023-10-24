@@ -28,11 +28,11 @@
                 <hr class="sidebar-divider my-0">
                 <!-- Nav Item - Dashboard -->
                 <li class="nav-item active">
-                    <a class="nav-link" href="https://github.com/xlyric/pv-router-esp32/blob/main/MAJ.md" target="_blank">
+                    <a class="nav-link" href="/" target="_blank">
                         <i class="fas fa-fw fa-tachometer-alt"></i>
                         <span>Dashboard</span>
                         <br>
-                        <span id="version"></span>
+                        <span id="version">Version:</span>
                     </a>
                 </li>
                 <!-- Divider -->
@@ -58,6 +58,18 @@
                     <a class="nav-link" href="/mqtt.html">
                         <i class="fas fa-fw fa-book"></i>
                         <span>Configuration mqtt</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/minuteur.html">
+                        <i class="fas fa-fw fa-moon"></i>
+                        <span>Config Minuteur</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/envoy.html">
+                        <i class="fas fa-fw fa-book"></i>
+                        <span>BETA: Config Envoy</span>
                     </a>
                 </li>
                 <li class="nav-item active">
@@ -117,25 +129,6 @@
                                 <!-- Dropdown - Messages -->
                                 <div class="dropdown-menu dropdown-menu-right p-3 shadow animated--grow-in" aria-labelledby="searchDropdown"></div>
                             </li>
-                            <!-- Nav Item - Alerts -->
-                            <li class="nav-item dropdown no-arrow mx-1">
-                                <a
-                                    class="nav-link dropdown-toggle"
-                                    href="#"
-                                    id="alertsDropdown"
-                                    role="button"
-                                    data-toggle="dropdown"
-                                    aria-haspopup="true"
-                                    aria-expanded="false"
-                                >
-                                    Transmission mode
-                                    <i class="fas fa-bell fa-fw"></i>
-                                    <!-- Counter - Alerts -->
-                                    <span class="badge badge-danger badge-counter">
-                                        <span id="sendmode2" onclick="sendmode(this.innerHTML);"></span>
-                                    </span>
-                                </a>
-                            </li>
                             <div class="topbar-divider d-none d-sm-block"></div>
                         </ul>
                     </nav>
@@ -159,11 +152,11 @@
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">State</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <span id="state"></span>
+                                                    <span id="state">0</span>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
-                                                <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                                                <i class="fas fa-leaf fa-2x text-gray-300"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -177,11 +170,11 @@
                                             <div class="col mr-2">
                                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Sigma</div>
                                                 <div class="h5 mb-0 font-weight-bold text-gray-800">
-                                                    <span id="sigma"></span>
+                                                    <span id="sigma">0</span>
                                                 </div>
                                             </div>
                                             <div class="col-auto">
-                                                <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                                                <i class="fas fa-plug fa-2x text-gray-300"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -235,19 +228,13 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="form-group row">
-                                                        <div class="col-sm-6">
-                                                            <span>Charge connectée</span>
-                                                            <input
-                                                                type="text"
-                                                                class="form-control form-control-user"
-                                                                id="resistance"
-                                                                placeholder="%RESISTANCE%"
-                                                            >
+                                                        <div class="col-sm-9 limite">
+                                                            <span>Limiteur<br />(%)  </span>
                                                         </div>
-                                                        <div class="col-sm-6 limite">
-                                                            <span>Limiteur en %</span>
+                                                        <div class="col-sm-3">
                                                             <input
-                                                                type="text"
+                                                                type="number"
+                                                                step="1"
                                                                 class="form-control form-control-user"
                                                                 id="Fusible"
                                                                 placeholder="%FUSE%"
@@ -259,18 +246,20 @@
                                             <br>
                                             <div class="card position-relative">
                                                 <div class="card-header py-3">
-                                                    <h6 class="m-0 font-weight-bold text-primary">Dimmer Distant</h6>
+                                                    <h6 class="m-0 font-weight-bold text-primary">Dimmer Distant    </h6>
                                                     <span id="saveform"></span>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="form-group row">
-                                                        <div class="col-sm-6">
-                                                            Dimmer IP:
+                                                        <div class="col-sm-7">
+                                                            <span>Dimmer<br />IP</span>
+                                                        </div>
+                                                        <div class="col-sm-5">
                                                             <input
                                                                 type="text"
                                                                 class="form-control form-control-user"
                                                                 id="dimmer"
-                                                                placeholder="%DIMMER%"
+                                                                placeholder="N/A"
                                                             >
                                                         </div>
                                                     </div>
@@ -284,25 +273,52 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="form-group row">
-                                                        <div class="col-sm-3">
+                                                        <div class="col-sm-10">
+                                                            <span>Dimmer<br />local</span>
+                                                        </div>
+                                                        <div class="col-sm-1">
                                                             <div class="custom-control custom-checkbox small">
                                                                 <input type="checkbox" class="custom-control-input" id="dimmerlocal">
-                                                                <label class="custom-control-label" for="dimmerlocal" onclick="sendservermode(this.innerHTML);">Dimmer local</label>
+                                                                <label class="custom-control-label" for="dimmerlocal" onclick="sendservermode(this.innerHTML);"></label>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-5">
-                                                            Limiteur local :
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-9">
+                                                            <span>Limiteur local<br />(%)</span>
+                                                        </div>
+                                                        <div class="col-sm-3">
                                                             <input
-                                                                type="text"
+                                                                type="number"
+                                                                step="1"
                                                                 class="form-control form-control-user"
                                                                 id="Fusiblelocal"
                                                                 placeholder="%FUSELOCAL%"
                                                             >
                                                         </div>
-                                                        <div class="col-sm-4">
-                                                            Max temp :
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-9">
+                                                            <span>Charge connectée<br />(W)</span>
+                                                        </div>
+                                                        <div class="col-sm-3">
                                                             <input
-                                                                type="text"
+                                                                type="number"
+                                                                step="1"
+                                                                class="form-control form-control-user"
+                                                                id="resistance"
+                                                                placeholder="%RESISTANCE%"
+                                                            >
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-9">
+                                                            <span>Max temp <br />(°C)</span>
+                                                        </div>
+                                                        <div class="col-sm-3">
+                                                            <input
+                                                                type="number"
+                                                                step="1"
                                                                 class="form-control form-control-user"
                                                                 id="maxtemp"
                                                                 placeholder="%MAXTEMP%"
@@ -310,32 +326,38 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <br>
-                                            <div class="card position-relative">
-                                                <div class="card-header py-6">
-                                                    <h6 class="m-0 font-weight-bold text-primary">Relay</h6>
-                                                    <span id="saveform"></span>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group row">
-                                                        <div class="col-sm-5">
-                                                            Mise en route à X% :
-                                                            <input
-                                                                type="text"
-                                                                class="form-control form-control-user"
-                                                                id="relaystart"
-                                                                placeholder="%RELAYSTART%"
-                                                            >
+                                                <br>
+                                                <div class="card position-relative">
+                                                    <div class="card-header py-6">
+                                                        <h6 class="m-0 font-weight-bold text-primary">Relais</h6>
+                                                        <span id="saveform"></span>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="form-group row">
+                                                            <div class="col-sm-9">
+                                                            <span>Mise en route à<br />(%)</span>
+                                                            </div>
+                                                            <div class="col-sm-3">
+                                                                <input
+                                                                    type="text"
+                                                                    class="form-control form-control-user"
+                                                                    id="relaystart"
+                                                                    placeholder="%RELAYSTART%"
+                                                                >
+                                                            </div>
                                                         </div>
-                                                        <div class="col-sm-4">
-                                                            Arret à X% :
-                                                            <input
-                                                                type="text"
-                                                                class="form-control form-control-user"
-                                                                id="relaystop"
-                                                                placeholder="%RELAYSTOP%"
-                                                            >
+                                                        <div class="form-group row">
+                                                            <div class="col-sm-9">
+                                                                <span>Arret à <br />(%)</span>
+                                                            </div>
+                                                            <div class="col-sm-3">
+                                                                <input
+                                                                    type="text"
+                                                                    class="form-control form-control-user"
+                                                                    id="relaystop"
+                                                                    placeholder="%RELAYSTOP%"
+                                                                >
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -348,14 +370,9 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="form-group row">
-                                                        <div class="col-sm-3 delta">
-                                                            <span>Limite Consommation (Delta)</span>
+                                                        <div class="col-sm-9 delta">
+                                                            <span>Limite Consommation<br />(Delta)</span>
                                                         </div>
-                                                        <div class="col-sm-3 deltaneg">
-                                                            <span>Limite Injection (deltaneg)</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row">
                                                         <div class="col-sm-3">
                                                             <input
                                                                 type="text"
@@ -364,31 +381,24 @@
                                                                 placeholder="%DELTA%"
                                                             >
                                                         </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-9 deltaneg">
+                                                            <span>Limite Injection <br /> (Deltaneg)</span>
+                                                        </div>
                                                         <div class="col-sm-3">
-                                                            <input
-                                                                type="text"
-                                                                class="form-control form-control-user"
-                                                                id="deltaneg"
-                                                                placeholder="%DELTANEG%"
-                                                            >
+                                                        <input
+                                                            type="text"
+                                                            class="form-control form-control-user"
+                                                            id="deltaneg"
+                                                            placeholder="%DELTANEG%"
+                                                        >
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
-                                                        <div class="col-sm-3 cosphi">
-                                                            <span>Cosphi</span>
+                                                        <div class="col-sm-9 cosphi">
+                                                            <span>Cosphi<br />(5)</span>
                                                         </div>
-                                                        <!-- <div class="col-sm-3">Facteur de correction</div> -->
-                                                        <div class="col-sm-3">
-                                                            <span>Facteur de correction</span>
-                                                        </div>
-                                                        <div class="col-sm-3">
-                                                            <span>Correction Voltage</span>
-                                                        </div>
-                                                        <div class="col-sm-3">
-                                                            <span>Correction Offset</span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row">
                                                         <div class="col-sm-3">
                                                             <input
                                                                 type="text"
@@ -396,6 +406,12 @@
                                                                 id="cosphi"
                                                                 placeholder="%COSPHI%"
                                                             >
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <!-- <div class="col-sm-3">Facteur de correction</div> -->
+                                                        <div class="col-sm-9">
+                                                            <span>Facteur de correction<br />(10.5)</span>
                                                         </div>
                                                         <div class="col-sm-3">
                                                             <input
@@ -405,6 +421,11 @@
                                                                 placeholder="%facteur%"
                                                             >
                                                         </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-9">
+                                                            <span>Correction Voltage<br />(233)</span>
+                                                        </div>
                                                         <div class="col-sm-3">
                                                             <input
                                                                 type="text"
@@ -412,6 +433,11 @@
                                                                 id="voltage"
                                                                 placeholder="%voltage%"
                                                             >
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-9">
+                                                            <span>Correction Offset<br />(W)</span>
                                                         </div>
                                                         <div class="col-sm-3">
                                                             <input
@@ -423,13 +449,13 @@
                                                         </div>
                                                     </div>
                                                     <div class="form-group row">
-                                                        <div class="col-sm-6">
-                                                            <span>Inversion de la mesure (+/-) :</span>
+                                                        <div class="col-sm-10">
+                                                            <span>Inversion de la mesure<br />(+/-)</span>
                                                         </div>
-                                                        <div class="col-sm-3">
+                                                        <div class="col-sm-1">
                                                             <div class="custom-control custom-checkbox small">
                                                                 <input type="checkbox" class="custom-control-input" id="polarity">
-                                                                <label class="custom-control-label" for="polarity" onclick="sendservermode(this.innerHTML);">polarité</label>
+                                                                <label class="custom-control-label" for="polarity" onclick="sendservermode(this.innerHTML);"></label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -443,21 +469,7 @@
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="form-group row">
-                                                        <div class="col-sm-4">Screen switch off (0: unlimited)</div>
-                                                        <div class="col-sm-2"></div>
-                                                        <div class="col-sm-4">
-                                                            <div class="custom-control custom-checkbox small">
-                                                                <button
-                                                                    type="button"
-                                                                    class="btn btn-primary btn-user btn-block"
-                                                                    id="screen"
-                                                                    onclick="sendservermode('screen');"
-                                                                >ON/OFF Oled</button>
-                                                                <!--   <label class="custom-control-label" for="screen" onclick="sendservermode(this.innerHTML);" >screen</label>-->
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group row">
+                                                        <div class="col-sm-9"><span>Screen switch off<br />(0: unlimited)</span></div>
                                                         <div class="col-sm-3">
                                                             <input
                                                                 type="text"
@@ -466,11 +478,32 @@
                                                                 placeholder="%SCREENTIME%"
                                                             >
                                                         </div>
-                                                        <div class="col-sm-4"></div>
-                                                        <div class="col-sm-3">
+                                                    </div>
+                                                    <div class="form-group row">
+                                                        <div class="col-sm-4">
                                                             <div class="custom-control custom-checkbox small">
-                                                                <input type="checkbox" class="custom-control-input" id="flip">
-                                                                <label class="custom-control-label" for="flip" onclick="sendservermode(this.innerHTML);">flip</label>
+                                                                <button
+                                                                    type="button"
+                                                                    class="btn btn-primary btn-user btn-block"
+                                                                    id="screen"
+                                                                    onclick="sendservermode('screen');"
+                                                                >ON/OFF</button>
+                                                                <!--   <label class="custom-control-label" for="screen" onclick="sendservermode(this.innerHTML);" >screen</label>-->
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-4"></div>
+                                                        <div class="col-sm-4">
+                                                            <div class="custom-control custom-checkbox small">
+                                                                <button
+                                                                    type="button"
+                                                                    class="btn btn-primary btn-user btn-block"
+                                                                    id="flip"
+                                                                    onclick="sendservermode('flip');"
+                                                                >180°</button>
+
+
+                                                                <!-- <input type="checkbox" class="custom-control-input" id="flip">
+                                                                <label class="custom-control-label" for="flip" onclick="sendservermode(this.innerHTML);">flip</label> -->
                                                             </div>
                                                         </div>
                                                     </div>
@@ -486,28 +519,21 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- Content Row -->
-                <script type="text/javascript"> 
-setInterval(function refreshsend( ) {
-var xhttpstate = $.get ({
-		url : '/state',
-		type : 'GET',
-		dataType: "text",
-		success: function ( result ) { 
-		var config = result.split(";");
-		
-		document.getElementById("state").innerHTML = config[0];
-		document.getElementById("sigma").innerHTML = config[1];
-		
-		
-	
-		},
-		async: true });
-  }, 5000 ) ;
+                    <!-- Content Row -->
+                    <script type="text/javascript"> 
+      //<!-- rafraichissement valeurs -->
+      setInterval(function refreshsend( ) {
+        $.getJSON('/state', function(data) {
+          // Récupérer les données du JSON
+            var state = data.state;
+            var watt = data.watt;
+            var version = data.version;
+          document.getElementById("state").innerHTML = state;
+          document.getElementById("sigma").innerHTML = watt;
+          document.getElementById("version").innerHTML = version;
+          });
+          }, 5000);
 
-
-	
 function sendmode (mode) {
 
 		$.get( "/get", { send: 	mode } )
@@ -524,45 +550,31 @@ function sendservermode (mode) {
 		$.get( "/get", { servermode: mode } )
 		.done(function(data) { 
 		$( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
-		var config = data.split(";");
-		//document.getElementById("autonome").value = config[12];
-		//document.getElementById("UseDomoticz").value = config[10];
-		//document.getElementById("UseJeedom").value = config[11];
-		document.getElementById("dimmerlocal").value = config[14];
-		//document.getElementById("Usemqtt").value = config[16];
-    document.getElementById("polarity").value = config[20];
-    document.getElementById("screen").value = config[21];
-    document.getElementById("flip").value = config[22];
-    }); 
-
-
+		}); 
 }
-
 
 function save () {				  
   		$.get( "/get", { save: "yes" } )
 		.done(function(data) {
-		
 		});		
-
-
 }
+
 
 		
 		</script >
            
 
 
-<script src="jquery.min.js"></script>
-
-<!-- de la doc -->
-  <script>
+<script src="jquery.min.js">
+                    </script>
+                    <!-- de la doc -->
+                    <script>
           $( "div.delta" )
           .mouseover(function() {
             $( this ).find( "span" ).text( "La puissance du dimmer baissera au dessus de cette valeur" );
           })
           .mouseout(function() {
-            $( this ).find( "span" ).text( "Limite Consommation (Delta)" );
+            $( this ).find( "span" ).html( "Limite Consommation<br />(Delta)" );
           });
 
           $( "div.deltaneg" )
@@ -570,7 +582,7 @@ function save () {
             $( this ).find( "span" ).text( "La puissance du dimmer augmentara en dessous de cette valeur" );
           })
           .mouseout(function() {
-            $( this ).find( "span" ).text( "Limite Injection (deltaneg)" );
+            $( this ).find( "span" ).html( "Limite Injection<br />(Deltaneg)" );
           });
 
           $( "div.limite" )
@@ -578,10 +590,18 @@ function save () {
             $( this ).find( "span" ).text( "Somme de la puissance souhaité sur la totalité des dimmers en %, peut donc dépasser 100%" );
           })
           .mouseout(function() {
-            $( this ).find( "span" ).text( "limiteur en %" );
+            $( this ).find( "span" ).html( "Limiteur <br />(%)" );
           });
-                </script>
-                <script>
+
+          $( "div.cosphi" )
+          .mouseover(function() {
+            $( this ).find( "span" ).text( "Valeur par defaut 5" );
+          })
+          .mouseout(function() {
+            $( this ).find( "span" ).html( "Cosphi<br />(5)" );
+          });
+                    </script>
+                    <script>
 
 
 <!--- sauvegarde de la configuration --> 
@@ -598,7 +618,7 @@ $( "#save" ).click(function() {
 
 $( "#formulaire" ).submit(function() {
 
-	 var data = {'server':$('#hostname').val(), 'idx':$('#IDX').val(), 'idxdimmer':$('#IDXDIMMER').val(), 'cosphi':$('#cosphi').val(), 'fuse':$('#Fusible').val()	, 'cycle':$('#cycle').val(), 'dimmer':$('#dimmer').val(),'port':$('#port').val(), 'delta':$('#delta').val(),'deltaneg':$('#deltaneg').val(),  'apiKey':$('#apiKey').val(), 'facteur':$('#facteur').val(),'mqttserver':$('#mqttserver').val(),'publish':$('#publish').val(),'resistance':$('#resistance').val(),'screentime':$('#screentime').val(),'Fusiblelocal':$('#Fusiblelocal').val(),'maxtemp':$('#maxtemp').val(), 'voltage':$('#voltage').val(), 'offset':$('#offset').val() , 'relaystart':$('#relaystart').val(), 'relaystop':$('#relaystop').val()} 
+	 var data = {'server':$('#hostname').val(), 'idx':$('#IDX').val(), 'idxdimmer':$('#IDXDIMMER').val(),	 'cosphi':$('#cosphi').val(), 'fuse':$('#Fusible').val()	, 'cycle':$('#cycle').val(), 'dimmer':$('#dimmer').val(),'port':$('#port').val(), 'delta':$('#delta').val(),'deltaneg':$('#deltaneg').val(),  'apiKey':$('#apiKey').val(), 'facteur':$('#facteur').val(),'mqttserver':$('#mqttserver').val(),'publish':$('#publish').val(),'resistance':$('#resistance').val(),'screentime':$('#screentime').val(),'Fusiblelocal':$('#Fusiblelocal').val(),'maxtemp':$('#maxtemp').val(), 'voltage':$('#voltage').val(), 'offset':$('#offset').val() , 'relaystart':$('#relaystart').val(), 'relaystop':$('#relaystop').val()} 
 
 		
         $.ajax({
@@ -616,102 +636,58 @@ $( "#formulaire" ).submit(function() {
 
 
 
-
-var recupconfig = $.get ({
-		url : '/config',
-		type : 'GET',
-		dataType: "text",
-		async: false }).responseText; 
-				  
-        var config = recupconfig.split(";");
-    i=0;
-    i++;
-    document.getElementById("Fusible").value = config[i];	  
-    i++;
-    i++;
-    document.getElementById("version").innerHTML = config[i];
-    i++;
-    i++;
-    document.getElementById("delta").value = config[i];
-    i++;
-    i++;
-    document.getElementById("dimmer").value = config[i];
-    i++;
-    i++;
-    document.getElementById("cosphi").value = config[i];
-    i++;
-    i++;
-    i++;
-    //document.getElementById("autonome").checked = config[i];
-		//document.getElementById("autonome").value = config[i];
-    i++;
-    i++;
-
-    document.getElementById("dimmerlocal").checked = config[i];
-		document.getElementById("dimmerlocal").value = config[i];
-    i++;
-		document.getElementById("facteur").value = config[i];
-    i++;
-    //document.getElementById("Usemqtt").checked = config[i];
-		//document.getElementById("Usemqtt").value = config[i];
-    i++;
-    i++;
-    i++;
-    document.getElementById("deltaneg").value = config[i];
-    i++;
-		document.getElementById("resistance").value = config[i];
-    i++;
-    document.getElementById("polarity").checked = config[i];
-		document.getElementById("polarity").value = config[i];
-    i++;
-		document.getElementById("screentime").value = config[i];	  
-    i++;
-		document.getElementById("Fusiblelocal").value = config[i];	
-    i++;
-		document.getElementById("maxtemp").value = config[i];	
-    i++;
-		document.getElementById("voltage").value = config[i];	
-    i++;
-		document.getElementById("offset").value = config[i];	
-    i++;
-    document.getElementById("flip").checked = config[i];
-		document.getElementById("flip").value = config[i];
-    i++;
-    i++;
-    document.getElementById("relaystart").checked = config[i];
-		document.getElementById("relaystart").value = config[i];
-    i++;
-    document.getElementById("relaystop").checked = config[i];
-		document.getElementById("relaystop").value = config[i];
-                </script>
+var recupconfig =  $.getJSON('/config', function(data) {
+  for (var key in data) {
+    if (data.hasOwnProperty(key)) {
+      var element = document.getElementById(key);
+      if (element) {
+        element.value = data[key];
+        if (element.type === 'checkbox') {
+          element.checked = data[key];
+        }
+      }
+    }
+  }
+});
+                    </script>
+                </div>
             </div>
         </div>
     </div>
-    <!-- End of Content Wrapper -->
-
-  </div>
-  <!-- End of Page Wrapper -->
-
-
-
-
-
-  <!-- Bootstrap core JavaScript-->
-  <!-- Bootstrap core JavaScript-->
-  <script src="/jquery.min.js"></script>
-  <script src="/bootstrap.bundle.min.js"></script>
-
-  <!-- Core plugin JavaScript-->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> --> 
-
-  <!-- Custom scripts for all pages-->
-  <script src="sb-admin-2.js"></script>
- <script>
-
-
-
-
+</div>
+<!-- /.container-fluid -->
+</div>
+<!-- End of Main Content -->
+<!-- Footer -->
+<footer class="sticky-footer bg-white">
+    <div class="container my-auto">
+        <div class="copyright text-center my-auto">
+            <span>https://github.com/xlyric/  - 2023</span>
+        </div>
+    </div>
+</footer>
+<!-- End of Footer -->
+</div>
+<!-- End of Content Wrapper -->
+</div>
+<!-- End of Page Wrapper -->
+<!-- Bootstrap core JavaScript-->
+<!-- Bootstrap core JavaScript-->
+<script src="/jquery.min.js"></script>
+<script src="/bootstrap.bundle.min.js"></script>
+<!-- Core plugin JavaScript-->
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> -->
+<!-- Custom scripts for all pages-->
+<script src="sb-admin-2.js"></script>
+<script></script>
+<script src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"></script>
+<script>
+  kofiWidgetOverlay.draw('clyric', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support me',
+    'floating-chat.donateButton.background-color': '#00b9fe',
+    'floating-chat.donateButton.text-color': '#fff'
+  });
 </script>
-
 </body>
 </html>

@@ -52,7 +52,7 @@ extern String loguptime();
   while ( adc1_get_raw((adc1_channel_t)5) == margin  ) {
   delayMicroseconds (3);  
     Watchdog++;
-    if ( Watchdog > 2500  ) {  Serial.print(NO_SYNC); gDisplayValues.porteuse = false ; break;}  
+    if ( Watchdog > 2500  ) {  Serial.println(NO_SYNC); gDisplayValues.porteuse = false ; break;}  
 	}
     
 }
@@ -141,11 +141,13 @@ void injection(){
 }
 #endif
 
-    const int nbmesure = 72 ; /// nombre de mesure par ondulation
-    const int nombre_cycle  = 4 ; /// nombre de cycle pour affiner la mesure
-    const int freqmesure = nbmesure*(nombre_cycle+1) ;  // nombre total de mesures
-    int tableau[freqmesure]; // mesure ADC Ampères
-    int porteuse[freqmesure]; // mesure ADC Volts
+const int nbmesure = 72 ; /// nombre de mesure par ondulation
+const int nombre_cycle  = 8 ; /// nombre de cycle pour affiner la mesure
+const int freqmesure = nbmesure*(nombre_cycle+1) ;  // nombre total de mesures
+int tableau[freqmesure]; // mesure ADC Ampères
+int porteuse[freqmesure]; // mesure ADC Volts
+// int middle_debug ; 
+// int positive_debug ; 
 
     //float constante_voltage = 4.33; 
 
@@ -280,7 +282,7 @@ while (loop < freqmesure ) {
 
 
     //positive = ( positive / ( FACTEURPUISSANCE  * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
-    positive = ( ( positive * config.voltage ) / ( FACTEURPUISSANCE  * nombre_cycle * 230 ) ) + config.offset ; 
+    positive = ( ( positive * config.voltage ) / ( config.facteur  * nombre_cycle * 230 ) ) + config.offset ; 
 
 
 if ( zero > 75 ) { 

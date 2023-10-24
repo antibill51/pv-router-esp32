@@ -3,7 +3,7 @@
 
 #include "../config/config.h"
 #include "../config/enums.h"
-
+#include "functions/ha.h"
 
     //***********************************
     //************* Test de la présence d'une 18b20 
@@ -102,7 +102,7 @@ float CheckTemperature(String label, byte deviceAddress[12]){
 
   float tempC = sensors.getTempC(deviceAddress);
   Serial.print(label);
-  logging.init += loguptime();
+  //logging.init += loguptime();
     if ( (tempC == -127.00) || (tempC == -255.00) ) {
     
     //// cas d'une sonde trop longue à préparer les valeurs 

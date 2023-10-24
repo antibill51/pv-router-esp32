@@ -1,92 +1,116 @@
 <html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <title>Pv router - Configuration</title>
-        <!-- Custom fonts for this template-->
-        <link href="all.min.css" rel="stylesheet" type="text/css">
-        <!-- Custom styles for this template-->
-        <link href="sb-admin-2.min.css" rel="stylesheet">
-    </head>
-    <body id="page-top">
-        <!-- Page Wrapper -->
-        <div id="wrapper">
-            <!-- Sidebar -->
-            <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-                <!-- Sidebar - Brand -->
-                <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
-                    <div class="sidebar-brand-icon rotate-n-15">
-                        <i class="fas fa-laugh-wink"></i>
-                    </div>
-                    <div class="sidebar-brand-text mx-3">Pv router</div>
-                </a>
-                <!-- Divider -->
-                <hr class="sidebar-divider my-0">
-                <!-- Nav Item - Dashboard -->
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">
-                        <i class="fas fa-fw fa-tachometer-alt"></i>
-                        <span>Dashboard</span>
-                        <br>
-                        <span id="version"></span>
-                    </a>
-                </li>
-                <!-- Divider -->
-                <hr class="sidebar-divider">
-                <!-- Heading -->
-                <div class="sidebar-heading">
-                    Interface
-                </div>
-                <!-- Nav Item - Pages Collapse Menu -->
-                <li class="nav-item active">
-                    <a class="nav-link" href="/">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>retour conso</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="/wifi.html">
-                        <i class="fas fa-fw fa-cog"></i>
-                        <span>Configuration Wifi</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="/log.html">
-                        <i class="fas fa-fw fa-info"></i>
-                        <span>Console logs</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="/update">
-                        <i class="fas fa-fw fa-download"></i>
-                        <span>OTA</span>
-                    </a>
-                </li>
-                <li class="nav-item active">
-                    <a class="nav-link" href="/reboot">
-                        <i class="fas fa-fw fa-power-off"></i>
-                        <span>Reboot</span>
-                    </a>
-                </li>
-                <!-- Divider -->
-                <hr class="sidebar-divider d-none d-md-block">
-                <!-- Sidebar Toggler (Sidebar) -->
-                <div class="text-center d-none d-md-inline">
-                    <button class="rounded-circle border-0" id="sidebarToggle"></button>
-                </div>
-            </ul>
-            <!-- End of Sidebar -->
-            <!-- Content Wrapper -->
-            <div id="content-wrapper" class="d-flex flex-column">
-                <!-- Main Content -->
-                <div id="content">
-                    <!-- Topbar -->
-                    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                        <!-- Sidebar Toggle (Topbar) -->
-                        <!--       <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>Pv router - Configuration</title>
+
+  <!-- Custom fonts for this template-->
+ <link href="all.min.css" rel="stylesheet" type="text/css"> 
+  
+  <!-- Custom styles for this template-->
+  <link href="sb-admin-2.min.css" rel="stylesheet">
+
+</head>
+
+<body id="page-top">
+
+  <!-- Page Wrapper -->
+  <div id="wrapper">
+
+    <!-- Sidebar -->
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+      <!-- Sidebar - Brand -->
+      <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/">
+        <div class="sidebar-brand-icon rotate-n-15">
+          <i class="fas fa-laugh-wink"></i>
+        </div>
+        <div class="sidebar-brand-text mx-3">Pv router</div>
+      </a>
+
+      <!-- Divider -->
+      <hr class="sidebar-divider my-0">
+
+      <!-- Nav Item - Dashboard -->
+      <li class="nav-item active">
+        <a class="nav-link" href="/">
+          <i class="fas fa-fw fa-tachometer-alt"></i>
+          <span>Dashboard</span><br>
+		<span id="version"></span></a>
+		  
+      </li>
+
+
+
+      <!-- Divider -->
+      <hr class="sidebar-divider">
+
+      <!-- Heading -->
+      <div class="sidebar-heading">
+        Interface
+      </div>
+
+      <!-- Nav Item - Pages Collapse Menu -->
+	  <li class="nav-item active">
+        <a class="nav-link" href="/">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>retour conso</span></a>
+    </li>
+
+    <li class="nav-item active">
+        <a class="nav-link" href="/wifi.html">
+          <i class="fas fa-fw fa-cog"></i>
+          <span>Configuration Wifi</span></a>
+    </li>
+
+    <li class="nav-item active">
+      <a class="nav-link" href="/log.html">
+        <i class="fas fa-fw fa-info"></i>
+      <span>Console logs</span></a>
+    </li>
+
+    <li class="nav-item active">
+      <a class="nav-link" href="/update">
+        <i class="fas fa-fw fa-download"></i>
+      <span>OTA</span></a>
+    </li>
+
+    <li class="nav-item active">
+      <a class="nav-link" href="/reboot">
+        <i class="fas fa-fw fa-power-off"></i>
+      <span>Reboot</span></a>
+    </li>
+  
+
+
+      <!-- Divider -->
+      <hr class="sidebar-divider d-none d-md-block">
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
+
+    </ul>
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+      <!-- Main Content -->
+      <div id="content">
+
+        <!-- Topbar -->
+        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+          <!-- Sidebar Toggle (Topbar) -->
+   <!--       <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
             <i class="fa fa-bars"></i>
           </button>
 
@@ -141,7 +165,7 @@
                       <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="state"></span></div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-calendar fa-2x text-gray-300"></i>
+                      <i class="fas fa-leaf fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -158,7 +182,7 @@
                       <div class="h5 mb-0 font-weight-bold text-gray-800"><span id="sigma"></span></div>
                     </div>
                     <div class="col-auto">
-                      <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
+                      <i class="fas fa-plug fa-2x text-gray-300"></i>
                     </div>
                   </div>
                 </div>
@@ -211,9 +235,7 @@
               </div>
               <div class="card-body">
                 <div class="form-group row">
-                    <div class="col-sm-6"><span>Charge connectée</span>
-                      <input type="text" class="form-control form-control-user" id="resistance" placeholder="%RESISTANCE%">
-                    </div>
+
                     <div class="col-sm-6 limite"><span>Limiteur en %</span>
                         <input type="text" class="form-control form-control-user" id="Fusible" placeholder="%FUSE%">
                     </div>
@@ -254,12 +276,16 @@
                               <label class="custom-control-label" for="dimmerlocal" onclick="sendservermode(this.innerHTML);" >Dimmer local</label>
                       </div>
                     </div>
-                    <div class="col-sm-5">
+                    <div class="col-sm-3">
                         Limiteur local : <input type="text" class="form-control form-control-user" id="Fusiblelocal" placeholder="%FUSELOCAL%">
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-3"><span>Charge connectée</span>
+                      <input type="text" class="form-control form-control-user" id="resistance" placeholder="%RESISTANCE%">
+                    </div>
+                    <div class="col-sm-3">
                       Max temp : <input type="text" class="form-control form-control-user" id="maxtemp" placeholder="%MAXTEMP%">
                   </div>
+
                 </div>
               </div>
             </div>
@@ -376,79 +402,40 @@
 
 
           <!-- Content Row -->
-
-
-   			
-				
-				  <script type='text/javascript'> 
-setInterval(function refreshsend( ) {
-var xhttpstate = $.get ({
-		url : '/state',
-		type : 'GET',
-		dataType: "text",
-		success: function ( result ) { 
-		var config = result.split(";");
 		
-		document.getElementById("state").innerHTML = config[0];
-		document.getElementById("sigma").innerHTML = config[1];
-		
-		
-	
-		},
-		async: true });
-  }, 5000 ) ;
+<script type='text/javascript'> 
+      //<!-- rafraichissement valeurs -->
+  setInterval(function refreshsend( ) {
+          $.getJSON('/state', function(data) {
+            // Récupérer les données du JSON
+              var state = data.state;
+              var watt = data.watt;
+            document.getElementById("state").innerHTML = state;
+            document.getElementById("sigma").innerHTML = watt;
+            });
+  }, 5000);
 
+  function sendservermode (mode) {
 
-	
-function sendmode (mode) {
+      $.get( "/get", { servermode: mode } )
+      .done(function(data) { 
+      $( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
+      var config = data.split(";");
+      }); 
+  }
 
-		$.get( "/get", { send: 	mode } )
-		.done(function(data) {
-		document.getElementById("sendmode").innerHTML = "Request sent";
-		document.getElementById("sendmode2").innerHTML = "Request sent";
-		});
+  function save () {				  
+        $.get( "/get", { save: "yes" } )
+      .done(function(data) {
+      
+      });		
+  }
+</script >
+ 
+<script src="jquery.min.js"></script>
 
-
-}
-
-function sendservermode (mode) {
-
-		$.get( "/get", { servermode: mode } )
-		.done(function(data) { 
-		$( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
-		var config = data.split(";");
-		//document.getElementById("autonome").value = config[12];
-		//document.getElementById("UseDomoticz").value = config[10];
-		//document.getElementById("UseJeedom").value = config[11];
-		document.getElementById("dimmerlocal").value = config[14];
-		//document.getElementById("Usemqtt").value = config[16];
-    document.getElementById("polarity").value = config[20];
-    document.getElementById("screen").value = config[21];
-    document.getElementById("flip").value = config[22];
-  }); 
-
-
-}
-
-
-function save () {				  
-  		$.get( "/get", { save: "yes" } )
-		.done(function(data) {
-		
-		});		
-
-
-}
-
-		
-		</script >
-           
-
-
-<script src="jquery.min.js">
-                    </script>
-                    <!-- de la doc -->
-                    <script>
+<!-- de la doc -->
+<script>
           $( "div.delta" )
           .mouseover(function() {
             $( this ).find( "span" ).text( "La puissance du dimmer baissera au dessus de cette valeur" );
@@ -472,134 +459,112 @@ function save () {
           .mouseout(function() {
             $( this ).find( "span" ).text( "limiteur en %" );
           });
-                    </script>
-                    <script>
+          
+          $( "div.cosphi" )
+          .mouseover(function() {
+            $( this ).find( "span" ).text( "Valeur par defaut 5" );
+          })
+          .mouseout(function() {
+            $( this ).find( "span" ).text( "Cosphi" );
+          });
+          
+</script>
+
+<script>
 
 
-<!-- sauvegarde de la configuration --> 
-$( "#save" ).click(function() {
+  <!-- sauvegarde de la configuration --> 
+  $( "#save" ).click(function() {
 
-  
-  		$.get( "/get", { save: "yes" } )
-		.done(function(data) {
-		$( "#savemsg" ).text( "Configuration sauvegardée" ).show().fadeOut( 5000 );
-		});	
-		
+    
+        $.get( "/get", { save: "yes" } )
+      .done(function(data) {
+      $( "#savemsg" ).text( "Configuration sauvegardée" ).show().fadeOut( 5000 );
+      });	
+      
 
-});
+  });
 
-$( "#formulaire" ).submit(function() {
+  $( "#formulaire" ).submit(function() {
 
-  var data = {'server':$('#hostname').val(), 'idx':$('#IDX').val(), 'idxdimmer':$('#IDXDIMMER').val(),	 'cosphi':$('#cosphi').val(), 'fuse':$('#Fusible').val()	, 'cycle':$('#cycle').val(), 'dimmer':$('#dimmer').val(),'port':$('#port').val(), 'delta':$('#delta').val(),'deltaneg':$('#deltaneg').val(),  'apiKey':$('#apiKey').val(), 'facteur':$('#facteur').val(),'mqttserver':$('#mqttserver').val(),'publish':$('#publish').val(),'resistance':$('#resistance').val(),'screentime':$('#screentime').val(),'Fusiblelocal':$('#Fusiblelocal').val(),'maxtemp':$('#maxtemp').val(), 'voltage':$('#voltage').val(), 'offset':$('#offset').val() , 'relaystart':$('#relaystart').val(), 'relaystop':$('#relaystop').val()} 
+    var data = {'server':$('#hostname').val(), 'idx':$('#IDX').val(), 'idxdimmer':$('#IDXDIMMER').val(),	 'cosphi':$('#cosphi').val(), 'fuse':$('#Fusible').val()	, 'cycle':$('#cycle').val(), 'dimmer':$('#dimmer').val(),'port':$('#port').val(), 'delta':$('#delta').val(),'deltaneg':$('#deltaneg').val(),  'apiKey':$('#apiKey').val(), 'facteur':$('#facteur').val(),'mqttserver':$('#mqttserver').val(),'publish':$('#publish').val(),'resistance':$('#resistance').val(),'screentime':$('#screentime').val(),'Fusiblelocal':$('#Fusiblelocal').val(),'maxtemp':$('#maxtemp').val(),'voltage':$('#voltage').val(), 'offset':$('#offset').val() } 
 
-		
-        $.ajax({
-            type: "GET",
-            data: data,
-            url: "get",
+      
+          $.ajax({
+              type: "GET",
+              data: data,
+              url: "get",
 
-            success: function(retour){
-                $( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
-                     
-            }
-        });
-  return false;
-});
+              success: function(retour){
+                  $( "#saveform" ).text( "Configuration appliqué" ).show().fadeOut( 5000 );
+                      
+              }
+          });
+    return false;
+  });
 
+  var recupconfig =  $.getJSON('/config', function(data) {
+    for (var key in data) {
+      if (data.hasOwnProperty(key)) {
+        var element = document.getElementById(key);
+        if (element) {
+          element.value = data[key];
+          if (element.type === 'checkbox') {
+            element.checked = data[key];
+          }
+        }
+      }
+    }
+  });
 
-
-
-var recupconfig = $.get ({
-    url : '/config',
-    type : 'GET',
-    dataType: "text",
-    async: false }).responseText; 
-                
-    var config = recupconfig.split(";");
-    i=0;
-    i++;
-    document.getElementById("Fusible").value = config[i];	  
-    i++;
-    i++;
-    document.getElementById("version").innerHTML = config[i];
-    i++;
-    i++;
-    document.getElementById("delta").value = config[i];
-    i++;
-    i++;
-    document.getElementById("dimmer").value = config[i];
-    i++;
-    i++;
-    document.getElementById("cosphi").value = config[i];
-    i++;
-    i++;
-    i++;
-    //document.getElementById("autonome").checked = config[i];
-    //document.getElementById("autonome").value = config[i];
-    i++;
-    i++;
-    document.getElementById("dimmerlocal").checked = config[i];
-    document.getElementById("dimmerlocal").value = config[i];
-    i++;
-    document.getElementById("facteur").value = config[i];
-    i++;
-    //document.getElementById("Usemqtt").checked = config[i];
-    //document.getElementById("Usemqtt").value = config[i];
-    i++;
-    i++;
-    i++;
-    document.getElementById("deltaneg").value = config[i];
-    i++;
-    document.getElementById("resistance").value = config[i];
-    i++;
-    document.getElementById("polarity").checked = config[i];
-    document.getElementById("polarity").value = config[i];
-    i++;
-    document.getElementById("screentime").value = config[i];	  
-    i++;
-    document.getElementById("Fusiblelocal").value = config[i];	
-    i++;
-    document.getElementById("maxtemp").value = config[i];	  
-    i++;
-    document.getElementById("voltage").value = config[i];	
-    i++;
-    document.getElementById("offset").value = config[i];	
-    i++;
-    document.getElementById("flip").checked = config[i];
-    document.getElementById("flip").value = config[i];
-    i++;
-    i++;
-    document.getElementById("relaystart").checked = config[i];
-		document.getElementById("relaystart").value = config[i];
-    i++;
-    document.getElementById("relaystop").checked = config[i];
-		document.getElementById("relaystop").value = config[i];
-                    </script>
+</script>
                 </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
-</div>
-<!-- /.container-fluid -->
-</div>
-<!-- End of Main Content -->
-<!-- Footer -->
-<footer class="sticky-footer bg-white">
-    <div class="container my-auto">
-        <div class="copyright text-center my-auto">
-            <span>https://github.com/xlyric/  - 2021</span>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>https://github.com/xlyric/  - 2023</span>
+          </div>
         </div>
+      </footer>
+      <!-- End of Footer -->
+
     </div>
-</footer>
-<!-- End of Footer -->
-</div>
-<!-- Bootstrap core JavaScript-->
-<script src="jquery.min.js"></script>
-<script src="bootstrap.bundle.min.js"></script>
-<!-- Core plugin JavaScript-->
-<script src="bootstrap.bundle.min.js"></script>
-<!-- Custom scripts for all pages-->
-<script src="sb-admin-2.js"></script>
-<script></script>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+  <!-- Bootstrap core JavaScript-->
+
+  <script src="bootstrap.bundle.min.js"></script>
+
+  <!-- Core plugin JavaScript-->
+
+  <script src="bootstrap.bundle.min.js"></script>
+  <!-- Custom scripts for all pages-->
+  <script src="sb-admin-2.js"></script>
+ <script>
+
+
+
+
+</script>
+<script src='https://storage.ko-fi.com/cdn/scripts/overlay-widget.js'></script>
+<script>
+  kofiWidgetOverlay.draw('clyric', {
+    'type': 'floating-chat',
+    'floating-chat.donateButton.text': 'Support me',
+    'floating-chat.donateButton.background-color': '#00b9fe',
+    'floating-chat.donateButton.text-color': '#fff'
+  });
+</script>
 </body>
 </html>
