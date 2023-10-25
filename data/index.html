@@ -44,9 +44,9 @@
         <a class="nav-link" href="/">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Dashboard</span><br>
-		<span id="version">Version: </span><br>
-    <span id="RSSI">RSSI : </span>
-</a> 
+          <span id="version">Version: </span><br>
+          <span id="RSSI">RSSI (dB): </span>
+        </a> 
 		  
       </li>
 
@@ -364,7 +364,7 @@
 // Récupérer les données du JSON
       var state = data.state;
       var watt = data.watt;
-      var dimmerW = data.dimmerW;
+      var dimmer = data.dimmer;
       var temperature = data.temperature;
       if (temperature == null) { temperature = 0 ; }
       var version = data.version; 
@@ -374,7 +374,7 @@
       dataGaugePA.setValue(0, 1, watt);
 
       dataGaugePApower.setValue(0, 0, "Watt"); 
-		  dataGaugePApower.setValue(0, 1, dimmerW);
+		  dataGaugePApower.setValue(0, 1, dimmer);
 
       dataGaugePAtemp.setValue(0, 0, "Temp °C"); 
       dataGaugePAtemp.setValue(0, 1, temperature);
@@ -389,7 +389,7 @@
       document.getElementById("RSSI").innerHTML = 'RSSI : ' + rssi + ' dBm';
 
     });
-  }, 2000);
+  }, 5000);
   
  			
 var recupconfig = $.get ({

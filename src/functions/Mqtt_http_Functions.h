@@ -17,7 +17,7 @@ WiFiClient espClient;
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
 void onMqttSubscribe(uint16_t packetId, uint8_t qos);
-void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
+// void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 #endif
 extern Config config;
@@ -30,11 +30,10 @@ String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substrin
 // String node_ids = WiFi.macAddress().substring(0,2)+ WiFi.macAddress().substring(4,6)+ WiFi.macAddress().substring(8,10) + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
 String node_id = String("PvRouter-") + node_mac; 
 String topic_Xlyric = "Xlyric/"+ node_id +"/";
-
-String command_switch = String(topic_Xlyric + "switch/command");
-// String command_number = String(topic_Xlyric + "number/command");
-// String command_select = String(topic_Xlyric + "select/command");
-// String command_button = String(topic_Xlyric + "button/command");
+String command_switch = String(topic_Xlyric + "command/switch");
+String command_number = String(topic_Xlyric + "command/number");
+// String command_select = String(topic_Xlyric + "command/select");
+// String command_button = String(topic_Xlyric + "command/button");
 // void Mqtt_HA_hello(); // non utilisé maintenant 
 void reconnect();
 /***
@@ -48,13 +47,16 @@ void reconnect();
       // while (!client.connected()) {
         Serial.println("-----------------------------");
         Serial.println("Attempting MQTT reconnection...");
+        logging.start += loguptime();
+        logging.start += "Attempting MQTT reconnection...reconnect()\r\n"; 
 
         // Attempt to connect
         // client.publish(String(topic_Xlyric +"status").c_str() ,0,true, "online"); // status Online
 
     // if (client.connect(node_id.c_str(), configmqtt.username, configmqtt.password, String(topic_Xlyric +"status").c_str(), 2, true, "offline", false)) {       //Connect to MQTT server
       client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
-      client.subscribe(command_switch.c_str(),1);
+      client.subscribe((command_switch + "/#").c_str(),1);
+      client.subscribe((command_number + "/#").c_str(),1);
       if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
 
       Serial.println("MQTT reconnect : connected");
@@ -89,23 +91,22 @@ void async_mqtt_init() {
   ip.fromString(config.mqttserver);
   DEBUG_PRINTLN(ip);
   client.setClientId(node_id.c_str());
-  client.setKeepAlive(30);
+  client.setKeepAlive(60);
   client.setWill(arrayWill, 2, true, "offline");
   client.setCredentials(configmqtt.username, configmqtt.password);
   client.onDisconnect(onMqttDisconnect);
   client.onSubscribe(onMqttSubscribe);
   client.onMessage(callback);
-
   client.setServer(ip, config.mqttport);
   client.setMaxTopicLength(768); // 1024 -> 768 
   client.onConnect(onMqttConnect);
-
+  logging.start += loguptime();
+  logging.start += "MQTT topic for dimmer(s) : " + topic_Xlyric + "sensors/dimmer/state\r\n"; 
   }
 
 void connectToMqtt() {
   DEBUG_PRINTLN("Connecting to MQTT...");
   client.connect();
-
 }
 
 void onMqttConnect(bool sessionPresent) {
@@ -113,7 +114,6 @@ void onMqttConnect(bool sessionPresent) {
   Serial.print("Session present: ");
   Serial.println(sessionPresent);
   client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
-
 
 
 }
@@ -189,17 +189,20 @@ Fonction MQTT callback
 void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
   StaticJsonDocument<64> doc2;
   deserializeJson(doc2, payload);
-  if (strcmp( Subscribedtopic, command_switch.c_str() ) == 0) { 
-    if (doc2.containsKey("Switch1")) { 
-        int relay = doc2["Switch1"]; 
+  // if (strcmp( Subscribedtopic, command_switch.c_str() ) == 0) { 
+  logging.start += loguptime() + "Subscribedtopic : " + String(Subscribedtopic)+ "\r\n";
+  logging.start += loguptime() + "command_number : " + String(command_number)+ "\r\n";
+  if (strstr( Subscribedtopic, command_switch.c_str() ) != NULL) { 
+    if (doc2.containsKey("relay1")) { 
+        int relay = doc2["relay1"]; 
         if ( relay == 0) { digitalWrite(RELAY1 , LOW); }
         else { digitalWrite(RELAY1 , HIGH); } 
         logging.start += loguptime();
         logging.start += "RELAY1 at " + String(relay) + "\r\n"; 
         switch_1.send(String(relay));
     }
-    if (doc2.containsKey("Switch2")) { 
-        int relay = doc2["Switch2"]; 
+    if (doc2.containsKey("relay2")) { 
+        int relay = doc2["relay2"]; 
         if ( relay == 0) { digitalWrite(RELAY2 , LOW); }
         else { digitalWrite(RELAY2 , HIGH); } 
         logging.start += loguptime();
@@ -212,6 +215,18 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
       if (strcmp( doc2["state"] , "unavailable" ) == 0 ) { gDisplayValues.Shelly = -2; }
       else { gDisplayValues.Shelly = doc2["state"];  }
   }
+  if (strstr( Subscribedtopic, command_number.c_str() ) != NULL) { 
+    if (doc2.containsKey("resistance")) { 
+      int resistance = doc2["resistance"]; 
+      if (config.resistance != resistance ) {
+        config.resistance = resistance;
+        logging.start += loguptime();
+        logging.start += "MQTT resistance at " + String(resistance) + "\r\n";
+        device_resistance.send(String(resistance));
+      }
+    }
+  }
+
   //
 }
 

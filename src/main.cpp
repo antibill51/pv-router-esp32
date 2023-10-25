@@ -128,6 +128,7 @@ String loguptime();
 
 
   MQTT device_dimmer;
+  MQTT device_dimmer_routed_power;
   MQTT device_routeur; 
   MQTT device_grid;
   MQTT device_inject;
@@ -137,6 +138,8 @@ String loguptime();
   MQTT switch_2;
   MQTT temperature;
   MQTT device_alarm_temp;
+  MQTT device_resistance;
+  MQTT compteur_route;
 
   #ifdef HARDWARE_MOD
     MQTT power_factor;
@@ -549,12 +552,10 @@ Dimmer_setup();
             async_mqtt_init();
             connectToMqtt();
             delay(1000); 
-
-            init_MQTT_sensor(); // utilie pour jeedom et HA
-
-          // HA autoconf
-          if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
-            
+            reconnect();
+            init_MQTT_sensor(); // utile pour jeedom et HA
+            // HA autoconf
+            if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
           }
       }
   #endif
@@ -630,7 +631,6 @@ void loop()
       #if WIFI_ACTIVE == true
           if (config.mqtt) {
             if (!client.connected()) { 
-              // reconnect(); 
               connectToMqtt();
               }
           // client.loop();
@@ -672,7 +672,8 @@ if (config.dimmerlocal) {
             Mqtt_send_DOMOTICZ(String(config.IDX), String(dimmer_hard.getPower()),"pourcent"); // remonté MQTT de la commande réelle
             if (configmqtt.HA) {
               int instant_power = dimmer_hard.getPower();
-              device_dimmer.send(String(instant_power * config.resistance/100));
+              device_dimmer.send(String(instant_power));
+              device_dimmer_routed_power.send(String(instant_power * config.resistance/100));
             } 
           #endif
         } 

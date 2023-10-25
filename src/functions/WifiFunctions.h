@@ -219,13 +219,13 @@ void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info) {
   dimmertemp = info.got_ip.ip_info.ip.addr; 
   if (dimmeradress(dimmertemp)) {
     Serial.println("dimmer ");
-        logging.init += loguptime();
-    logging.start += "New Dimmer on AP :" + String(dimmertemp) +"\r\n";
+    logging.init += loguptime();
+    logging.init += "New Dimmer on AP :" + String(dimmertemp) +"\r\n";
   }
   else {
     Serial.println("not dimmer");
     logging.init += loguptime();
-    logging.start += "New Connexion on AP :" + String(dimmertemp) +"\r\n";
+    logging.init += "New Connexion on AP :" + String(dimmertemp) +"\r\n";
   }
 
   Serial.println(dimmertemp);

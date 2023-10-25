@@ -26,6 +26,8 @@ extern Logs Logging;
       extern MQTT compteur_grid;
       extern MQTT temperature;
       extern MQTT device_alarm_temp;
+      extern MQTT compteur_route;
+      
       #ifdef HARDWARE_MOD
             extern MQTT power_factor;
             extern MQTT power_vrms;
@@ -44,6 +46,7 @@ long beforetime;
 #define timemilli 3.6e+6 
 float WHtempgrid=0;
 float WHtempinject=0;
+float WHrouted=0;
 
 int Pow_mqtt_send = 0;
 
@@ -127,7 +130,10 @@ if (!AP) {
                   if ( Pow_mqtt_send >= 5 ) {
                   long timemesure = start-beforetime;
                   float wattheure = (timemesure * abs(gDisplayValues.watt) / timemilli) ;  
+                  float wattrouted = (timemesure * abs(gDisplayValues.puissance_route) / timemilli) ;  
             #ifndef LIGHT_FIRMWARE
+                  WHrouted += wattrouted; 
+                  compteur_route.send(String(WHrouted));
 
                   if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDX), String(int(gDisplayValues.watt)));  }
                   if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {

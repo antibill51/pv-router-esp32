@@ -344,7 +344,7 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
    if (request->hasParam(PARAM_INPUT_dimmer_power)) {gDisplayValues.dimmer = request->getParam( PARAM_INPUT_dimmer_power)->value().toInt(); gDisplayValues.change = 1 ;  } 
    if (request->hasParam(PARAM_INPUT_facteur)) { config.facteur = request->getParam(PARAM_INPUT_facteur)->value().toFloat();}
    if (request->hasParam(PARAM_INPUT_tmax)) { config.tmax = request->getParam(PARAM_INPUT_tmax)->value().toInt();}
-   if (request->hasParam("resistance")) { config.resistance = request->getParam("resistance")->value().toInt();}
+   if (request->hasParam("resistance")) { config.resistance = request->getParam("resistance")->value().toInt(); device_resistance.send(String(config.resistance));}
    if (request->hasParam("screentime")) { config.ScreenTime = request->getParam("screentime")->value().toInt();}
    if (request->hasParam("voltage")) { config.voltage = request->getParam("voltage")->value().toFloat();}
    if (request->hasParam("offset")) { config.offset = request->getParam("offset")->value().toFloat();}

@@ -145,10 +145,11 @@ void affichage_normal(){
                     #ifndef POURCENTAGE
                       if (gDisplayValues.puissance_route < 10000 ) {
                       drawtext16TTGO(0, 70, String(gDisplayValues.puissance_route), TFT_GREEN);
-                      display.setCursor(0, 120, 2);
-                      display.setTextColor(TFT_WHITE, TFT_BLACK);
-                      display.setTextSize(1);
-                      display.println(gDisplayValues.dimmer);
+                      // display.setCursor(0, 120, 2);
+                      // display.setTextColor(TFT_WHITE, TFT_BLACK);
+                      // display.setTextSize(1);
+                      // display.println(gDisplayValues.dimmer);
+                      drawtext10TTGO(0, 110, String(gDisplayValues.dimmer) + " %", TFT_WHITE);
 
                       }
                       else {
@@ -156,10 +157,12 @@ void affichage_normal(){
                       }
                     #else
                       drawtext16TTGO(0, 70, String(gDisplayValues.dimmer), TFT_GREEN);
-                      display.setCursor(0, 120, 2);
-                      display.setTextColor(TFT_WHITE, TFT_BLACK);
-                      display.setTextSize(1);
-                      display.println(gDisplayValues.puissance_route);
+                      // display.setCursor(0, 120, 2);
+                      // display.setTextColor(TFT_WHITE, TFT_BLACK);
+                      // display.setTextSize(1);
+                      // display.println(gDisplayValues.puissance_route);
+                      drawtext10TTGO(0, 110, String(gDisplayValues.puissance_route) + " W", TFT_WHITE);
+
                     #endif
                   #endif
 

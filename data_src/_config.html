@@ -43,7 +43,7 @@
         <a class="nav-link" href="/" target="_blank">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>Dashboard</span><br>
-          <span id="version">Version: </span>
+          <span id="version">Version: </span><br>
           <span id="RSSI">RSSI (dB): </span>
 
         </a>
@@ -481,7 +481,7 @@
                                                         <div class="col-sm-1">
                                                             <div class="custom-control custom-checkbox small">
                                                                 <input type="checkbox" class="custom-control-input" id="polarity">
-                                                                <label class="custom-control-label" for="polarity" onclick="sendservermode(this.innerHTML);"></label>
+                                                                <label class="custom-control-label" for="polarity" onclick="sendservermode('polarity');"></label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -517,7 +517,7 @@
                                                                 <!--   <label class="custom-control-label" for="screen" onclick="sendservermode(this.innerHTML);" >screen</label>-->
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-4"></div>
+                                                        <div class="col-sm-3"></div>
                                                         <div class="col-sm-4">
                                                             <div class="custom-control custom-checkbox small">
                                                                 <button

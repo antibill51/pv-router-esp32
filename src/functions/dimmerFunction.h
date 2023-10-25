@@ -38,6 +38,7 @@ extern Programme programme;
     extern Logs logging;
   #ifndef LIGHT_FIRMWARE
     extern MQTT device_dimmer; 
+    extern MQTT device_dimmer_routed_power;
     extern MQTT surplus_routeur;
   #endif
 
@@ -85,7 +86,8 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puiss
               if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); }
               // Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); 
               if ((configmqtt.HA)|| (configmqtt.JEEDOM)) {
-                device_dimmer.send(String(gDisplayValues.puissance_route)); 
+                device_dimmer.send(String(dimmervalue)); 
+                device_dimmer_routed_power.send(String(gDisplayValues.puissance_route)); 
                 surplus_routeur.send(String(puissance_dispo));
                 } 
             }
