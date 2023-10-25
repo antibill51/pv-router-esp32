@@ -117,7 +117,6 @@ int half;
     #define outputPin  26 // PSM on board
     #define zerocross  27 // for boards with CHANGEBLE input pins // ZC on board
     #define COOLER 12 // Pin for COOLER. (switch on dimmer)
-
 #endif
 
 #if DALLAS
@@ -182,7 +181,7 @@ bool discovery_temp = false;
   //  #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define RELEASE "Version 20231008"
+#define RELEASE "Version 20231023"
     #ifdef LIGHT_FIRMWARE
         #define VERSION "Light " RELEASE
         #else

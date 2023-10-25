@@ -90,7 +90,7 @@ void loadConfiguration(const char *filename, Config &config) {
 
   config.polarity = doc["polarity"] | false;
   strlcpy(config.dimmer,                  // <- destination
-          doc["dimmer"] | "192.168.1.254", // <- source
+          doc["dimmer"] | "none", // <- source
           sizeof(config.dimmer));         // <- destination's capacity
 
    strlcpy(config.mqttserver,                  // <- destination
