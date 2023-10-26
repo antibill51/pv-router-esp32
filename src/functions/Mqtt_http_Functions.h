@@ -47,8 +47,6 @@ void reconnect();
       // while (!client.connected()) {
         Serial.println("-----------------------------");
         Serial.println("Attempting MQTT reconnection...");
-        logging.start += loguptime();
-        logging.start += "Attempting MQTT reconnection...reconnect()\r\n"; 
 
         // Attempt to connect
         // client.publish(String(topic_Xlyric +"status").c_str() ,0,true, "online"); // status Online

@@ -210,7 +210,7 @@ void init_HA_sensor(){
         switch_1.Set_name("Relais 1");
         // switch_1.Set_object_id("relay1");
         switch_1.Set_entity_type("switch");
-        // switch_1.Set_retain_flag(true);
+        switch_1.Set_retain_flag(true);
         switch_1.Set_retain(true);
         // switch_1.Set_expire_after(true);
 
@@ -218,7 +218,7 @@ void init_HA_sensor(){
         switch_2.Set_name("Relais 2");
         // switch_2.Set_object_id("relay2");
         switch_2.Set_entity_type("switch");
-        // switch_2.Set_retain_flag(true);
+        switch_2.Set_retain_flag(true);
         switch_2.Set_retain(true);
         // switch_2.Set_expire_after(true);
 
@@ -226,7 +226,7 @@ void init_HA_sensor(){
         // device_alarm_temp.Set_object_id("alarm_temp");
         device_alarm_temp.Set_entity_type("binary_sensor");
         device_alarm_temp.Set_dev_cla("problem");
-        // device_alarm_temp.Set_retain_flag(true);
+        device_alarm_temp.Set_retain_flag(true);
         // device_alarm_temp.Set_expire_after(true);
 
 
