@@ -200,7 +200,7 @@ bool initEnphase = true; // Permet de lancer le contrôle du token une fois au d
 
 bool Enphase_get_7_Production(void){
   
-  int httpCode;
+  int httpCode = 0;
   bool retour = false;
   String adr = String(configmodule.hostname);
   String url = "/404.html" ;
