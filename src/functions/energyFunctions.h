@@ -288,7 +288,7 @@ while (loop < freqmesure ) {
 
 if ( zero > 75 ) { 
   if (logging.sct) {    
-    strcat(logging.log_init,"--> SCT013 Prob not connected  ?\r\n");
+    logging.Set_log_init("--> SCT013 Prob not connected  ?\r\n");
     logging.sct = false; }
 }
 //logging.start += "zero detected : " + String(zero) +   "\r\n" ;

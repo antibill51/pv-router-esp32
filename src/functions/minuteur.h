@@ -70,12 +70,17 @@ struct Programme {
   public:bool run; 
   public:int heure;
   public:int minute;
-  public:String name;
+  //public:String name2;
+  private:char name_minuteur[12]; 
   
+  // setter name 
+  public:void Set_name(String setter) {strlcpy(name_minuteur, setter.c_str(), sizeof(name_minuteur)); }
+
+
   /// @brief sauvegarde
   /// @param programme_conf 
   public:void saveProgramme() {
-        const char * c_file = name.c_str();
+        //const char * c_file = name;
         //Serial.println(c_file);
         DynamicJsonDocument doc(192);
       
@@ -85,7 +90,7 @@ struct Programme {
         doc["temperature"] = temperature;
         
           // Open file for writing
-        File configFile = SPIFFS.open(c_file, "w");
+        File configFile = SPIFFS.open(name_minuteur, "w");
         if (!configFile) {
           Serial.println(F("Failed to open config file for writing"));
           return;
@@ -104,8 +109,8 @@ struct Programme {
   
 
   public:bool loadProgramme() {
-        const char * c_file = name.c_str();
-        File configFile = SPIFFS.open(c_file, "r");
+        //const char * c_file = name;
+        File configFile = SPIFFS.open(name_minuteur, "r");
 
         // Allocate a temporary JsonDocument
         // Don't forget to change the capacity to match your requirements.
@@ -148,7 +153,7 @@ bool start_progr() {
         digitalWrite(COOLER, HIGH);
         run=true; 
         timeClient.update();
-        strcat(logging.log_init,"minuteur: start\r\n");
+        logging.Set_log_init("minuteur: start\r\n");
         return true; 
     }
   }
@@ -160,7 +165,7 @@ bool stop_progr() {
   /// sécurité temp
   if ( gDisplayValues.temperature.toFloat() >= config.tmax  || gDisplayValues.temperature.toFloat() >= temperature ) { 
     digitalWrite(COOLER, LOW);
-    strcat(logging.log_init,"minuteur: stop\r\n");
+    logging.Set_log_init("minuteur: stop\r\n");
     run=false; 
 
      // protection flicking
@@ -174,7 +179,7 @@ bool stop_progr() {
   sscanf(heure_arret, "%d:%d", &heures, &minutes);
   if(timeClient.isTimeSet()) {
     if (heures == timeClient.getHours() && minutes == timeClient.getMinutes()) {
-        strcat(logging.log_init,"minuteur: stop\r\n");
+        logging.Set_log_init("minuteur: stop\r\n");
         digitalWrite(COOLER, LOW);
         run=false; 
         timeClient.update();

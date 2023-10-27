@@ -98,10 +98,10 @@ void async_mqtt_init() {
   client.setServer(ip, config.mqttport);
   client.setMaxTopicLength(768); // 1024 -> 768 
   client.onConnect(onMqttConnect);
-  strcat(logging.log_init,loguptime2()); 
-  strcat(logging.log_init,"MQTT topic for dimmer(s) : ");
-  strcat(logging.log_init,topic_Xlyric.c_str());
-  strcat(logging.log_init,"sensors/dimmer/state\r\n");
+  logging.Set_log_init(loguptime2()); 
+  logging.Set_log_init("MQTT topic for dimmer(s) : ");
+  logging.Set_log_init(topic_Xlyric.c_str());
+  logging.Set_log_init("sensors/dimmer/state\r\n");
   }
 
 void connectToMqtt() {
