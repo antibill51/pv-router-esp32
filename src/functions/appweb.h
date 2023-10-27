@@ -446,7 +446,7 @@ void processMessage(String message_get ) {
 */
 void serial_read() {
   String message_get; 
-  int watchdog; 
+  int watchdog = 0; 
 
     while (Serial.available() > 0 || watchdog > 255 )
     {
