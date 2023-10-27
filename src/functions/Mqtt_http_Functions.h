@@ -188,8 +188,8 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
   StaticJsonDocument<64> doc2;
   deserializeJson(doc2, payload);
   // if (strcmp( Subscribedtopic, command_switch.c_str() ) == 0) { 
-  logging.start += loguptime() + "Subscribedtopic : " + String(Subscribedtopic)+ "\r\n";
-  logging.start += loguptime() + "command_number : " + String(command_number)+ "\r\n";
+  // logging.start += loguptime() + "Subscribedtopic : " + String(Subscribedtopic)+ "\r\n";
+  // logging.start += loguptime() + "command_number : " + String(command_number)+ "\r\n";
   if (strstr( Subscribedtopic, command_switch.c_str() ) != NULL) { 
     if (doc2.containsKey("relay1")) { 
         int relay = doc2["relay1"]; 
