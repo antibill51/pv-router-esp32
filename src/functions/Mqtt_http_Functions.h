@@ -98,8 +98,10 @@ void async_mqtt_init() {
   client.setServer(ip, config.mqttport);
   client.setMaxTopicLength(768); // 1024 -> 768 
   client.onConnect(onMqttConnect);
-  logging.start += loguptime();
-  logging.start += "MQTT topic for dimmer(s) : " + topic_Xlyric + "sensors/dimmer/state\r\n"; 
+  strcat(logging.log_init,loguptime2()); 
+  strcat(logging.log_init,"MQTT topic for dimmer(s) : ");
+  strcat(logging.log_init,topic_Xlyric.c_str());
+  strcat(logging.log_init,"sensors/dimmer/state\r\n");
   }
 
 void connectToMqtt() {
@@ -188,23 +190,17 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
   StaticJsonDocument<64> doc2;
   deserializeJson(doc2, payload);
   // if (strcmp( Subscribedtopic, command_switch.c_str() ) == 0) { 
-  // logging.start += loguptime() + "Subscribedtopic : " + String(Subscribedtopic)+ "\r\n";
-  // logging.start += loguptime() + "command_number : " + String(command_number)+ "\r\n";
   if (strstr( Subscribedtopic, command_switch.c_str() ) != NULL) { 
     if (doc2.containsKey("relay1")) { 
         int relay = doc2["relay1"]; 
         if ( relay == 0) { digitalWrite(RELAY1 , LOW); }
         else { digitalWrite(RELAY1 , HIGH); } 
-        logging.start += loguptime();
-        logging.start += "RELAY1 at " + String(relay) + "\r\n"; 
         switch_1.send(String(relay));
     }
     if (doc2.containsKey("relay2")) { 
         int relay = doc2["relay2"]; 
         if ( relay == 0) { digitalWrite(RELAY2 , LOW); }
         else { digitalWrite(RELAY2 , HIGH); } 
-        logging.start += loguptime();
-        logging.start += "RELAY2 at " + String(relay) + "\r\n"; 
         switch_2.send(String(relay));
     }
   }
@@ -218,8 +214,6 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
       int resistance = doc2["resistance"]; 
       if (config.resistance != resistance ) {
         config.resistance = resistance;
-        logging.start += loguptime();
-        logging.start += "MQTT resistance at " + String(resistance) + "\r\n";
         device_resistance.send(String(resistance));
       }
     }

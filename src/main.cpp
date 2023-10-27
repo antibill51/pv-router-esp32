@@ -122,11 +122,10 @@ unsigned char measureIndex = 0;
 #if DALLAS
 Dallas dallas; 
 #endif
-String loguptime();
+
+//String loguptime();
+char *loguptime2();
 #ifndef LIGHT_FIRMWARE
-
-
-
   MQTT device_dimmer;
   MQTT device_dimmer_routed_power;
   MQTT device_routeur; 
@@ -151,8 +150,9 @@ String loguptime();
     MQTT enphase_prod_whLifetime;
     MQTT enphase_current_power_consumption;
     MQTT enphase_current_power_production;
-    MQTT surplus_routeur;
+    // MQTT surplus_routeur;
   
+    // HA device_state; 
 #endif
 
 /***************************
@@ -171,20 +171,22 @@ void setup()
     Serial.setDebugOutput(true);
   #endif
   Serial.println("\n================== " + String(VERSION) + " ==================");
-  logging.init="197}11}1";
-  logging.init += "#################  Restart reason  ###############\r\n";
+  strcat(logging.log_init,"197}11}1");
+  strcat(logging.log_init,"#################  Restart reason  ###############\r\n");
   esp_reset_reason_t reason = esp_reset_reason();
-  logging.init += reason ; 
-  logging.init += "\r\n#################  Starting System  ###############\r\n";
+  strcat(logging.log_init,String(reason).c_str());
+  strcat(logging.log_init,"\r\n#################  Starting System  ###############\r\n");
+    
   //démarrage file system
   Serial.println("start SPIFFS");
-  logging.init += loguptime();
-  logging.init += "Start Filesystem\r\n";
+  strcat(logging.log_init,loguptime2());
+  strcat(logging.log_init,"Start Filesystem\r\n");
+  
   if (!SPIFFS.begin(true)) {
     Serial.println("SPIFFS Initialization failed!");
     return;
   }
-
+  //Serial.println(logging.log_init);
   /// Program & FS size
     // size of the compiled program
     uint32_t program_size = ESP.getSketchSize();
@@ -228,8 +230,8 @@ void setup()
     AP=false; 
   }*/
   if (configwifi.recup_wifi()){
-     logging.init += loguptime();
-     logging.init += "Wifi config \r\n"; 
+     strcat(logging.log_init,loguptime2());
+     strcat(logging.log_init,"Wifi config \r\n");
        AP=false; 
   }
 
@@ -318,14 +320,15 @@ Dimmer_setup();
    // vérification de la présence d'index.html
   if(!SPIFFS.exists("/index.html.gz")){
     Serial.println(SPIFFSNO);  
-    logging.init += loguptime();
-    logging.init += SPIFFSNO ;
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,SPIFFSNO);
   }
 
   if(!SPIFFS.exists(filename_conf)){
     Serial.println(CONFNO);  
-    logging.init += loguptime();
-    logging.init += CONFNO;
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,CONFNO);
+
   }
 
 /// chargement des conf de minuteries
@@ -602,10 +605,19 @@ void loop()
   }
 
 /// vérification du buffer log 
-  if (logging.start.length() > LOG_MAX_STRING_LENGTH ) { 
-    logging.start = "";
-  }
- 
+ // if (logging.start.length() > LOG_MAX_STRING_LENGTH - 5 ) { 
+  //  logging.start = "";
+  //}
+   ///  vérification de la tailld du buffer log_init ( 600 caractères max ) il est créé à 650 caractères ( enums.h )
+   /// pour éviter les buffer overflow et fuite mémoire. 
+   if (strlen(logging.log_init) > 600 ) {
+    logging.log_init[0] = '\0';
+    strcat(logging.log_init,"197}11}1");
+   }
+// affichage en mode serial de la taille de la chaine de caractère logging.log_init
+//Serial.print( "log_init : " );
+//Serial.println( strlen(logging.log_init) );
+
 
 // vérification de la connexion wifi 
   if ( WiFi.status() != WL_CONNECTED ) {
@@ -643,6 +655,8 @@ void loop()
 //// surveillance des fuites mémoires 
 #ifndef LIGHT_FIRMWARE
   client.publish((topic_Xlyric+"memory").c_str(),1,false, String(esp_get_free_heap_size()).c_str()) ;
+  client.publish((topic_Xlyric+"min free").c_str(),1,false, String(esp_get_minimum_free_heap_size()).c_str()) ;
+
 #endif
 
   /// synchrisation de l'information entre le dimmer et l'affichage 
@@ -735,41 +749,41 @@ void connect_to_wifi() {
       WiFi.setSleep(false);
       WiFi.begin(configwifi.SID, configwifi.passwd); 
       int timeoutwifi=0;
-      logging.init += loguptime();
-      logging.init += "Start Wifi Network " + String(configwifi.SID) +  "\r\n";
+      strcat(logging.log_init,loguptime2());
+      strcat(logging.log_init,"Start Wifi Network");
+      strcat(logging.log_init,String(configwifi.SID).c_str());
+      strcat(logging.log_init,"\r\n");
+      
       while ( WiFi.status() != WL_CONNECTED ) {
         delay(500);
         Serial.print(".");
         timeoutwifi++; 
 
         if (timeoutwifi > 20 ) {
-              logging.init += loguptime();
-              logging.init += "timeout, go to AP mode \r\n" ;  
-              logging.init += loguptime();
-              logging.init += "Wifi State :";
-              logging.init += loguptime();
+              strcat(logging.log_init,loguptime2());
+              strcat(logging.log_init,"timeout, go to AP mode \r\n");
+              strcat(logging.log_init,loguptime2());
+              strcat(logging.log_init,"Wifi State :");
+              strcat(logging.log_init,loguptime2());
               
               switch (WiFi.status()) {
                   case 1:
-
-                      logging.init += "SSID is not available" ; 
+                      strcat(logging.log_init,"SSID is not available");
                       break;
                   case 4:
 
-                      logging.init += "The connection fails for all the attempts"  ;
+                      strcat(logging.log_init,"The connection fails for all the attempts");
                       break;
                   case 5:
-                      logging.init +="The connection is lost" ; 
+                      strcat(logging.log_init,"The connection is lost");
                       break;
                   case 6:
-                      logging.init +="Disconnected from the network" ; 
+                      strcat(logging.log_init,"Disconnected from the network");
                       break;
                   default:
-                      logging.init +="I have no idea ?! " ; 
                       break;
           
-              
-              logging.init += "\r\n";
+              strcat(logging.log_init,"\r\n");
               } 
               break;
         }
@@ -788,8 +802,8 @@ void connect_to_wifi() {
 
 
       serial_println("WiFi connected");
-      logging.init += loguptime();
-      logging.init += "Wifi connected\r\n";
+      strcat(logging.log_init,loguptime2());
+      strcat(logging.log_init,"Wifi connected\r\n");
       serial_println("IP address: ");
       serial_println(WiFi.localIP());
         serial_print("force du signal:");
@@ -801,11 +815,23 @@ void connect_to_wifi() {
       #endif
   }
 }
-
+/*
 String loguptime() {
   String uptime_stamp;
   uptime::calculateUptime();
   uptime_stamp = String(uptime::getDays())+":"+String(uptime::getHours())+":"+String(uptime::getMinutes())+":"+String(uptime::getSeconds())+ "\t";
+  return uptime_stamp;
+} */
+
+
+char *loguptime2() {
+  static char uptime_stamp[20]; // Vous devrez définir une taille suffisamment grande pour stocker votre temps
+
+  uptime::calculateUptime();
+
+  // Utilisez snprintf pour formater le texte dans le tableau de caractères
+  snprintf(uptime_stamp, sizeof(uptime_stamp), "%d:%d:%d:%d\t", uptime::getDays(), uptime::getHours(), uptime::getMinutes(), uptime::getSeconds());
+
   return uptime_stamp;
 }
 
@@ -837,15 +863,13 @@ void IRAM_ATTR function_next_screen(){
 gDisplayValues.screenstate == HIGH ){ // if right button is pressed or HTTP call 
         if (digitalRead(TFT_PIN)==HIGH) {             // and the status flag is LOW
           gDisplayValues.screenstate = LOW ;  
-          logging.start += loguptime(); 
-          logging.start += "Oled Off\r\n";   
+ 
           digitalWrite(TFT_PIN,LOW);     // and turn Off the OLED
           }                           // 
         else {                        // otherwise...      
           Serial.println("button left/bottom pressed");
           gDisplayValues.screenstate = LOW ;
-          logging.start += loguptime(); 
-          logging.start += +"Oled On\r\n";   
+
           digitalWrite(TFT_PIN,HIGH);      // and turn On  the OLED
           if (config.ScreenTime !=0 ) {
             timer = millis();

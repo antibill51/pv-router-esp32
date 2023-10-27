@@ -39,7 +39,7 @@ extern Programme programme;
   #ifndef LIGHT_FIRMWARE
     extern MQTT device_dimmer; 
     extern MQTT device_dimmer_routed_power;
-    extern MQTT surplus_routeur;
+    // extern MQTT surplus_routeur;
   #endif
 
 
@@ -75,7 +75,12 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puiss
             if (logging.serial){
             Serial.println(POWER_COMMAND + String(dimmervalue));
             }
-        if (logging.power) {     logging.start += loguptime(); logging.start += POWER_COMMAND + String(dimmervalue) + "\r\n"; logging.power = false;}
+        if (logging.power) {    
+            strcat(logging.log_init,loguptime2());
+            strcat(logging.log_init,POWER_COMMAND);
+            strcat(logging.log_init,String(dimmervalue).c_str());
+            strcat(logging.log_init,"\r\n");
+            logging.power = false;}
       }
       //// Mqtt send information
       #ifndef LIGHT_FIRMWARE
@@ -88,7 +93,7 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puiss
               if ((configmqtt.HA)|| (configmqtt.JEEDOM)) {
                 device_dimmer.send(String(dimmervalue)); 
                 device_dimmer_routed_power.send(String(gDisplayValues.puissance_route)); 
-                surplus_routeur.send(String(puissance_dispo));
+                // surplus_routeur.send(String(puissance_dispo));
                 } 
             }
         }

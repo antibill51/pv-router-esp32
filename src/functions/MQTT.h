@@ -21,7 +21,7 @@ extern MQTT switch_1;
 extern MQTT switch_2;
 extern MQTT temperature;
 extern MQTT device_alarm_temp;
-extern MQTT surplus_routeur;
+// extern MQTT surplus_routeur;
 extern MQTT device_resistance;
 extern MQTT compteur_route;
 
@@ -62,8 +62,8 @@ void init_MQTT_sensor(){
         compteur_route.Set_object_id("route_Wh");
         compteur_route.Set_retain_flag(true);
 
-        surplus_routeur.Set_object_id("surplus");
-        surplus_routeur.Set_retain_flag(true);
+        // surplus_routeur.Set_object_id("surplus");
+        // surplus_routeur.Set_retain_flag(true);
 
         temperature.Set_object_id("temperature");
         temperature.Set_retain_flag(true);
@@ -134,13 +134,13 @@ void init_HA_sensor(){
         // device_dimmer_routed_power.Set_retain_flag(true);
         // device_dimmer_routed_power.Set_expire_after(true);
 
-        surplus_routeur.Set_name("Ecart zone neutre");
-        surplus_routeur.Set_unit_of_meas("W");
-        surplus_routeur.Set_stat_cla("measurement");
-        surplus_routeur.Set_dev_cla("power");
-        surplus_routeur.Set_entity_type("sensor");
-        // surplus_routeur.Set_retain_flag(true);
-        // surplus_routeur.Set_expire_after(true);
+        // surplus_routeur.Set_name("Ecart zone neutre");
+        // surplus_routeur.Set_unit_of_meas("W");
+        // surplus_routeur.Set_stat_cla("measurement");
+        // surplus_routeur.Set_dev_cla("power");
+        // surplus_routeur.Set_entity_type("sensor");
+        // // surplus_routeur.Set_retain_flag(true);
+        // // surplus_routeur.Set_expire_after(true);
 
 
         device_routeur.Set_name("Puissance");
@@ -326,7 +326,7 @@ void init_HA_sensor(){
         device_dimmer_routed_power.HA_discovery();
         device_grid.HA_discovery();
         device_inject.HA_discovery();
-        surplus_routeur.HA_discovery();
+        // surplus_routeur.HA_discovery();
         compteur_inject.HA_discovery();
         compteur_grid.HA_discovery();
         switch_1.HA_discovery(); 

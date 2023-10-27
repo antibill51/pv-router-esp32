@@ -30,8 +30,8 @@ bool dallaspresent () {
 
 if ( !ds.search(dallas.addr)) {
     Serial.println("Dallas not connected");
-    logging.init += loguptime();
-    logging.init += "Dallas not connected\r\n";
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,"Dallas not connected\r\n");
     Serial.println();
     ds.reset_search();
     delay(250);
@@ -78,8 +78,10 @@ if ( !ds.search(dallas.addr)) {
 
   Serial.print("  present = ");
   Serial.println(dallas.present, HEX);
-      logging.init += loguptime();
-  logging.init += "Dallas present at address" + String(dallas.present, HEX) + "\r\n";
+  strcat(logging.log_init,loguptime2());
+  strcat(logging.log_init,"Dallas present at address");
+  strcat(logging.log_init,String(dallas.present, HEX).c_str());
+  strcat(logging.log_init,"\r\n");
 
 #ifndef LIGHT_FIRMWARE
   if (!discovery_temp) {
@@ -102,7 +104,6 @@ float CheckTemperature(String label, byte deviceAddress[12]){
 
   float tempC = sensors.getTempC(deviceAddress);
   Serial.print(label);
-  //logging.init += loguptime();
     if ( (tempC == -127.00) || (tempC == -255.00) ) {
     
     //// cas d'une sonde trop longue à préparer les valeurs 
@@ -110,13 +111,15 @@ float CheckTemperature(String label, byte deviceAddress[12]){
     tempC = sensors.getTempC(deviceAddress);
       if ( (tempC == -127.00) || (tempC == -255.00) ) {
       Serial.print("Error getting temperature");
-       logging.start += "Dallas on error\r\n";
+       strcat(logging.log_init,"Dallas on error\r\n");
        tempC = gDisplayValues.temperature.toFloat(); 
       }
   } else {
     Serial.print(" Temp C: ");
     Serial.println(tempC);
-    logging.start += "temp :"+ String(tempC) +" \r\n";
+    strcat(logging.log_init,"temp :");
+    strcat(logging.log_init,String(tempC).c_str());
+    strcat(logging.log_init," \r\n");
     return (tempC); 
    
     

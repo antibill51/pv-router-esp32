@@ -16,7 +16,8 @@
 #include <ArduinoJson.h> // ArduinoJson : https://github.com/bblanchon/ArduinoJson
 
 
-extern String loguptime(); 
+//extern String loguptime(); 
+extern char *loguptime2();
 
 const char *filename_conf = "/config.json";
 extern Config config; 
@@ -39,8 +40,9 @@ void loadConfiguration(const char *filename, Config &config) {
   DeserializationError error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println(F("Failed to read, using default configuration in function loadConfiguration"));
-    logging.init += loguptime();
-    logging.init += "Failed to read, using default configuration in function loadConfiguration\r\n";
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,"Failed to read, using default configuration in function loadConfiguration\r\n");
+
 
   }
 
@@ -83,7 +85,7 @@ void loadConfiguration(const char *filename, Config &config) {
   config.flip = doc["flip"] | true;
   config.tmax = doc["tmax"] | 65;
   config.localfuse = doc["localfuse"] | 50;
-  config.voltage = doc["voltage"] | 233;
+  config.voltage = doc["voltage"] | 233.0;
   config.offset = doc["offset"] | -10;
   config.relayoff = doc["relayoff"] | 95;
   config.relayon = doc["relayon"] | 100;
@@ -106,8 +108,8 @@ void loadConfiguration(const char *filename, Config &config) {
           sizeof(config.topic_Shelly));
 
   configFile.close();
-  logging.start += loguptime();
-  logging.start += "config file loaded\r\n";
+  strcat(logging.log_init,loguptime2());
+  strcat(logging.log_init,"config file loaded\r\n");
 }
 
 //***********************************
@@ -120,8 +122,8 @@ void saveConfiguration(const char *filename, const Config &config) {
    File configFile = SPIFFS.open(filename_conf, "w");
   if (!configFile) {
     Serial.println(F("Failed to open config file for writing in function Save configuration"));
-    logging.init += loguptime();
-    logging.init += "Failed to open config file for writing in function Save configuration\r\n";
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,"Failed to open config file for writing in function Save configuration\r\n");
     return;
   } 
 
@@ -129,6 +131,7 @@ void saveConfiguration(const char *filename, const Config &config) {
   // Don't forget to change the capacity to match your requirements.
   // Use arduinojson.org/assistant to compute the capacity.
   DynamicJsonDocument doc(1024);
+  // DynamicJsonDocument doc(2048);
 
   // Set the values in the document
   doc["hostname"] = config.hostname;
@@ -203,8 +206,8 @@ bool loadmqtt(const char *filename, Mqtt &configmqtt) {
   DeserializationError error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println(F("Failed to read MQTT config "));
-    logging.init += loguptime();
-    logging.init += "Failed to read MQTT config\r\n";
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,"Failed to read MQTT config\r\n");
     return false;
   }
 
@@ -224,8 +227,9 @@ bool loadmqtt(const char *filename, Mqtt &configmqtt) {
   configmqtt.HTTP = doc["HTTP"] | true;
 
   configFile.close();
-  logging.init += loguptime();
-  logging.init += "MQTT config loaded\r\n"; 
+  strcat(logging.log_init,loguptime2());
+  strcat(logging.log_init,"MQTT config loaded\r\n");
+
 return true;    
 }
 
@@ -235,8 +239,8 @@ void savemqtt(const char *filename, const Mqtt &configmqtt) {
    File configFile = SPIFFS.open(mqtt_conf, "w");
   if (!configFile) {
     Serial.println(F("Failed to open config file for writing in function mqtt configuration"));
-    logging.init += loguptime();
-    logging.init += "Failed to open config file for writing in function mqtt configuration\r\n";
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,"Failed to open config file for writing in function mqtt configuration\r\n");
     return;
   } 
 
@@ -256,8 +260,8 @@ void savemqtt(const char *filename, const Mqtt &configmqtt) {
   // Serialize JSON to file
   if (serializeJson(doc, configFile) == 0) {
     Serial.println(F("Failed to write to file in function Save configuration "));
-    logging.init += loguptime();
-    logging.init += "Failed to write to file in function Save configuration\r\n";
+    strcat(logging.log_init,loguptime2());
+    strcat(logging.log_init,"Failed to write to file in function Save configuration\r\n");
     
   }
 
@@ -287,7 +291,7 @@ bool loadwifi(const char *filename, Configwifi &configwifi) {
   DeserializationError error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println(F("Failed to read wifi config, AP mode activated "));
-    logging.init += loguptime();
+    strcat(logging.log_init,loguptime2());
     logging.init += "Failed to read wifi config, AP mode activated\r\n";
 
     return false;
@@ -313,7 +317,7 @@ void saveWifi(const char *filenamewifi, const Configwifi &configwifi) {
    File configFile = SPIFFS.open(wifi_conf, "w");
   if (!configFile) {
     Serial.println(F("Failed to open config file for writing in function wifi configuration"));
-    logging.init += loguptime();
+    strcat(logging.log_init,loguptime2());
     logging.init += "Failed to open config file for writing in function wifi configuration\r\n";
     return;
   } 
@@ -330,7 +334,7 @@ void saveWifi(const char *filenamewifi, const Configwifi &configwifi) {
   // Serialize JSON to file
   if (serializeJson(doc, configFile) == 0) {
     Serial.println(F("Failed to write to file in function Save configuration "));
-    logging.init += loguptime();
+    strcat(logging.log_init,loguptime2());
     logging.init += "Failed to write to file in function Save configuration\r\n";
     
   }

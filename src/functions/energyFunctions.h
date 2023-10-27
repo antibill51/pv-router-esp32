@@ -8,7 +8,8 @@ extern DisplayValues gDisplayValues;
 extern Config config; 
 extern Logs logging;
 
-extern String loguptime(); 
+//extern String loguptime(); 
+extern char *loguptime2();
 
   // ***********************************
   // ** recherche du point 0. temps 20 ms max ... 
@@ -142,7 +143,7 @@ void injection(){
 #endif
 
 const int nbmesure = 72 ; /// nombre de mesure par ondulation
-const int nombre_cycle  = 8 ; /// nombre de cycle pour affiner la mesure
+const int nombre_cycle  = 4 ; /// nombre de cycle pour affiner la mesure
 const int freqmesure = nbmesure*(nombre_cycle+1) ;  // nombre total de mesures
 int tableau[freqmesure]; // mesure ADC Ampères
 int porteuse[freqmesure]; // mesure ADC Volts
@@ -286,7 +287,9 @@ while (loop < freqmesure ) {
 
 
 if ( zero > 75 ) { 
-  if (logging.sct) {     logging.start  += loguptime(); logging.start += "--> SCT013 Prob not connected  ?\r\n" ; logging.sct = false; }
+  if (logging.sct) {    
+    strcat(logging.log_init,"--> SCT013 Prob not connected  ?\r\n");
+    logging.sct = false; }
 }
 //logging.start += "zero detected : " + String(zero) +   "\r\n" ;
 

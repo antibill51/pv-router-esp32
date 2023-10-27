@@ -523,6 +523,7 @@
                 "SPI_FREQUENCY=40000000",
                 "SPI_READ_FREQUENCY=6000000",
                 "NORMAL_FIRMWARE",
+                "COMPILE_NAME=\"MQTT\"",
                 "HAVE_CONFIG_H",
                 "MBEDTLS_CONFIG_FILE=\"mbedtls/esp_config.h\"",
                 "UNITY_INCLUDE_CONFIG_H",
