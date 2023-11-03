@@ -620,8 +620,8 @@ void loop()
   // client.publish(gDisplayValues.pvname.c_str(), String(esp_get_free_heap_size()).c_str()) ;
   // client.publish((gDisplayValues.pvname + " min free").c_str(), String(esp_get_minimum_free_heap_size()).c_str()) ;
 
-  client.publish((topic_Xlyric+"memory").c_str(),1,false, String(esp_get_free_heap_size()).c_str()) ;
-  client.publish((topic_Xlyric+"min free").c_str(),1,false, String(esp_get_minimum_free_heap_size()).c_str()) ;
+  client.publish((topic_Xlyric+"memory").c_str(),1,true, String(esp_get_free_heap_size()).c_str()) ;
+  client.publish((topic_Xlyric+"min free").c_str(),1,true, String(esp_get_minimum_free_heap_size()).c_str()) ;
 
 #endif
 
