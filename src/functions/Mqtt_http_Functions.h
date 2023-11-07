@@ -23,7 +23,7 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
 extern Config config;
 extern DisplayValues gDisplayValues;
 extern Mqtt configmqtt;
-
+extern Logs logging;
 
 #ifndef LIGHT_FIRMWARE
 String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
@@ -47,7 +47,8 @@ void reconnect();
       // while (!client.connected()) {
         Serial.println("-----------------------------");
         Serial.println("Attempting MQTT reconnection...");
-
+        logging.Set_log_init(loguptime2());
+        logging.Set_log_init("MQTT reconnect : attempting reconnection\r\n");
         // Attempt to connect
         // client.publish(String(topic_Xlyric +"status").c_str() ,0,true, "online"); // status Online
 

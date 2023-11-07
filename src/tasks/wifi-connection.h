@@ -70,6 +70,10 @@ void keepWiFiAlive(void * parameter){
     }
 }
 
+extern Memory task_mem; 
+
+/// @brief  task qui permet de rechercher le wifi configuré en cas de passage en mode AP et reboot si trouvé
+/// @param parameter 
 void keepWiFiAlive2(void * parameter){
     for(;;){
         //serial_println(F("Wifi task"));
@@ -78,7 +82,7 @@ void keepWiFiAlive2(void * parameter){
                 }
         
                 
-
+            task_mem.task_keepWiFiAlive2 = uxTaskGetStackHighWaterMark(NULL);
             vTaskDelay(pdMS_TO_TICKS(30000));
             //continue;
         }

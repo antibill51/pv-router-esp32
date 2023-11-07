@@ -36,6 +36,8 @@
   #include "tasks/gettemp.h"
 
   #include "tasks/Serial_task.h"
+  #include "tasks/send-mqtt.h"
+  #include "tasks/watchdog_memory.h"
 
   //#include "functions/otaFunctions.h"
   #include "functions/spiffsFunctions.h"
@@ -98,6 +100,8 @@ Programme programme;
 Logs logging;
 /// declare MQTT 
 Mqtt configmqtt;
+/// surveillance mémoire
+Memory task_mem; 
 
 
 int retry_wifi = 0;
@@ -364,10 +368,22 @@ Dimmer_setup();
     );  //pdMS_TO_TICKS(30000)
     } */
 
+    /// task du watchdog de la mémoire
+    xTaskCreate(
+      watchdog_memory,
+      "watchdog_memory",  // Task name
+      5000,            // Stack size (bytes)
+      NULL,             // Parameter
+      5,                // Task priority
+      NULL          // Task handle
+    );  //pdMS_TO_TICKS(30000)
+
+
+     //// task pour remettre le wifi en route en cas de passage en mode AP
     xTaskCreate(
       keepWiFiAlive2,
       "keepWiFiAlive",  // Task name
-      8000,            // Stack size (bytes)
+      5000,            // Stack size (bytes)
       NULL,             // Parameter
       5,                // Task priority
       NULL          // Task handle
@@ -413,8 +429,8 @@ Dimmer_setup();
   // ----------------------------------------------------------------
   xTaskCreate(
     dallasread,
-    "Dallas temp",  // Task name
-    2000,                  // Stack size (bytes)
+    "Dallas local temp",  // Task name
+    4000,                  // Stack size (bytes)
     NULL,                   // Parameter
     2,                      // Task priority
     NULL                    // Task handle
@@ -447,7 +463,7 @@ Dimmer_setup();
   xTaskCreate(
     measureElectricity,
     "Measure electricity",  // Task name
-    15000,                  // Stack size (bytes)
+    5000,                  // Stack size (bytes)
     NULL,                   // Parameter
     7,                      // Task priority
     NULL                    // Task handle
@@ -462,7 +478,7 @@ Dimmer_setup();
   xTaskCreate(
     updateDimmer,
     "Update Dimmer",  // Task name
-    5000,                  // Stack size (bytes)
+    4000,                  // Stack size (bytes)
     NULL,                   // Parameter
     4,                      // Task priority
     NULL                    // Task handle
@@ -480,6 +496,21 @@ Dimmer_setup();
     4,                      // Task priority
     NULL                    // Task handle
   );  //pdMS_TO_TICKS(15000)
+
+// ----------------------------------------------------------------
+  // Task: MQTT send
+  // ----------------------------------------------------------------
+
+    xTaskCreate(
+    send_to_mqtt,
+    "Update MQTT",  // Task name
+    7000,                  // Stack size (bytes)
+    NULL,                   // Parameter
+    4,                      // Task priority
+    NULL                    // Task handle
+  );  //pdMS_TO_TICKS(10000)
+
+
   #endif
 
 #endif
@@ -611,8 +642,9 @@ void loop()
     if (!AP) {
       #if WIFI_ACTIVE == true
           if (config.mqtt) {
-            if (!client.connected()) { 
+            if (!client.connected() && (WiFi.status() == WL_CONNECTED )) { 
               connectToMqtt();
+              // delay (1000); 
               }
           // client.loop();
           
@@ -698,7 +730,7 @@ if (!AP) {
     time_reboot();
 }
 
-
+  task_mem.task_loop = uxTaskGetStackHighWaterMark(NULL);
   vTaskDelay(pdMS_TO_TICKS(10000));
 }
 
