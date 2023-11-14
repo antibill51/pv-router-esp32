@@ -64,7 +64,7 @@ void send_to_mqtt(void * parameter){
     
       #if WIFI_ACTIVE == true
                   Pow_mqtt_send ++ ;
-                  if ( Pow_mqtt_send >= 5 ) {
+                  if ( Pow_mqtt_send >= 2 ) { //5
                   long timemesure = start-beforetime;
                   float wattheure = (timemesure * abs(gDisplayValues.watt) / timemilli) ;  
                   float wattrouted = (timemesure * abs(gDisplayValues.puissance_route) / timemilli) ;  
@@ -192,7 +192,7 @@ void send_to_mqtt(void * parameter){
       } 
       task_mem.task_send_mqtt = uxTaskGetStackHighWaterMark(NULL);
    // Sleep for 10 seconds
-    vTaskDelay(pdMS_TO_TICKS(4500));
+    vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
   }
 }
 

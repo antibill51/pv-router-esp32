@@ -13,6 +13,7 @@
 #include <Preferences.h> 
 #include <TimeLib.h>
 
+
 #define SECURITEPASS "MyPassword"
 
 // The state in which the device can be. This mainly affects what
@@ -43,7 +44,7 @@ struct DisplayValues {
   bool screenbutton;
   bool nextbutton;
   int option=0;
-  String temperature;
+  float temperature = 0.0 ;
   int Fronius_conso; 
   int Fronius_prod; 
   int Fronius_totalconso;
@@ -57,6 +58,7 @@ struct DisplayValues {
   int puissance_route=0;
   bool dimmer_disengaged=false;
   const String pvname = "PV ROUTER " + WiFi.macAddress().substring(12,14) + WiFi.macAddress().substring(15,17);
+  int serial_timeout = 0 ; ///arret du service serial après x loop d'inactivité
 };
 
 struct Config {

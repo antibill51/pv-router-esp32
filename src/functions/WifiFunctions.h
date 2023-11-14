@@ -6,6 +6,7 @@
 #include "WiFi.h"
 #include "HTTPClient.h"
 
+
 #include "../config/enums.h"
 #include "../config/config.h"
 
@@ -84,6 +85,10 @@ void WiFiEvent(WiFiEvent_t event) {
       break;
     case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
       Serial.println("Disconnected from WiFi access point");
+      if (AP) {
+        savelogs( "-- sortie du mode AP -- ");
+        ESP.restart();
+      }
       WiFi.begin(ssid, passphrase);
       break;
     case ARDUINO_EVENT_WIFI_STA_AUTHMODE_CHANGE:

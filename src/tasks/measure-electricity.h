@@ -98,15 +98,19 @@ if (!AP) {
 
 // shelly 
       #ifdef NORMAL_FIRMWARE
+         if (client.connected() && (WiFi.status() == WL_CONNECTED ))  {
             if (strcmp(config.topic_Shelly,"") != 0)   { 
             // client.loop(); // on vérifie coté mqtt si nouvelle info
             gDisplayValues.watt = gDisplayValues.Shelly ;  // on met à jour
             gDisplayValues.porteuse = true; // et c'est bon. 
             }
+         }
       #endif
 ///enphase
       if (configmodule.enphase_present ) {
-            Enphase_get();
+            if (WiFi.status() == WL_CONNECTED )  {
+                  Enphase_get();
+            }
             //if ( configmodule.pilote ) { 
                   //// inversion des valeurs pour enphase piloteur
                   if (String(configmodule.envoy) == "S") {
@@ -123,81 +127,15 @@ if (!AP) {
                   }
 
               //    }
-            }
-///enphase
+      }
+///fronius
       if (configmodule.Fronius_present ){
-            Fronius_get();
-            }           
+            if (WiFi.status() == WL_CONNECTED )  {
+                  Fronius_get();
+            }
+      }           
 
 
-      // #if WIFI_ACTIVE == true
-      //             Pow_mqtt_send ++ ;
-      //             if ( Pow_mqtt_send >= 5 ) {
-      //             long timemesure = start-beforetime;
-      //             float wattheure = (timemesure * abs(gDisplayValues.watt) / timemilli) ;  
-      //             float wattrouted = (timemesure * abs(gDisplayValues.puissance_route) / timemilli) ;  
-      //       #ifndef LIGHT_FIRMWARE
-      //             WHrouted += wattrouted; 
-      //             compteur_route.send(String(WHrouted));
-
-      //             if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDX), String(int(gDisplayValues.watt)));  }
-      //             if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {
-      //                   device_routeur.send(String(int(gDisplayValues.watt)));
-      //                   #ifdef HARDWARE_MOD
-      //                         power_apparent.send(String(int(PVA)));
-      //                         power_vrms.send(String(int(Vrms)));
-      //                         power_irms.send(String(Irms));
-      //                         power_factor.send(String(PowerFactor));
-      //                   #endif
-      //                    if (configmodule.enphase_present ) {
-      //                         enphase_cons_whLifetime.send(String(int(gDisplayValues.enp_cons_whLifetime)));
-      //                         enphase_prod_whLifetime.send(String(int(gDisplayValues.enp_prod_whLifetime)));
-      //                         enphase_current_power_consumption.send(String(int(gDisplayValues.enp_current_power_consumption)));
-      //                         enphase_current_power_production.send(String(int(gDisplayValues.enp_current_power_production)));
-      //                    }
-      //             }
-
-      //             // send if injection
-      //             if (gDisplayValues.watt < 0 ){
-      //                   if (configmqtt.DOMOTICZ) {
-      //                         Mqtt_send_DOMOTICZ(String(config.IDX), String(int(-gDisplayValues.watt)),"injection","Reseau");
-      //                         Mqtt_send_DOMOTICZ(String(config.IDX), String("0") ,"grid","Reseau");
-      //                   }
-      //                   if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {
-      //                         device_inject.send(String(int(-gDisplayValues.watt)));
-      //                         device_grid.send(String("0"));
-      //                         WHtempinject += wattheure; 
-      //                         compteur_inject.send(String(WHtempinject));
-      //                   }
-                  
-                  
-      //             // if (configmqtt.HA)compteur_grid.send(String("0"));
-      //             }
-      //             else {
-      //                   if (configmqtt.DOMOTICZ) {
-      //                                     Mqtt_send_DOMOTICZ(String(config.IDX), String("0"),"injection","Reseau");
-      //                                     Mqtt_send_DOMOTICZ(String(config.IDX), String(int(gDisplayValues.watt)),"grid","Reseau");
-      //                   }
-                  
-      //                   if ((configmqtt.HA) || (configmqtt.JEEDOM)) {
-      //                         device_grid.send(String(int(gDisplayValues.watt)));
-      //                         device_inject.send(String("0"));
-      //                         WHtempgrid += wattheure;
-      //                         compteur_grid.send(String(WHtempgrid));
-      //                   }
-      //             }
-      //                   if (discovery_temp) {
-      //                         if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDXdallas), String(gDisplayValues.temperature),"","Dallas" );} //  bug#11  remonté domoticz
-      //                         if ((configmqtt.HA) || (configmqtt.JEEDOM)) {
-      //                               temperature.send(String(gDisplayValues.temperature));
-      //                               device_alarm_temp.send(stringboolMQTT(security));
-      //                         }
-      //                   }
-      //       #endif
-      //             beforetime = start; 
-      //             Pow_mqtt_send = 0 ;
-      //             }                   
-      // #endif
 
 }
 
@@ -210,7 +148,7 @@ long end = millis();
       }
       else
       {      
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            vTaskDelay(pdMS_TO_TICKS(3000));
       }
 
     }    
