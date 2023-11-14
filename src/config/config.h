@@ -181,7 +181,7 @@ bool discovery_temp = false;
   //  #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define RELEASE "Version 20231107"
+#define RELEASE "Version 20231109"
     #ifdef LIGHT_FIRMWARE
         #define VERSION "Light " RELEASE
         #else
@@ -202,7 +202,7 @@ bool AP=true;
 #define RELAY2 15
 
 /// taille max des logs stockée
-#define LOG_MAX_STRING_LENGTH 650 
+#define LOG_MAX_STRING_LENGTH 1000 
 
 //// JOTTA 
 #define JOTTA  2

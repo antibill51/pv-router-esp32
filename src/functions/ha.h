@@ -65,8 +65,9 @@ struct MQTT
   }
 
   private:String HA_sensor_type() {
-    String topic = "homeassistant/"+ entity_type +"/"+ node_id +"/";
-    String topic_Xlyric = "Xlyric/"+ node_id +"/";
+    
+    const String topic = "homeassistant/"+ entity_type +"/"+ node_id + "/";
+    const String topic_Xlyric = "Xlyric/"+ node_id +"/";
     String info;
     if (entity_type == "sensor") {
             info =         "\"dev_cla\": \""+dev_cla+"\","
@@ -116,18 +117,18 @@ struct MQTT
 
   //bool cmd_t; 
 
-  private:String IPaddress = WiFi.localIP().toString();
+  private:const String IPaddress = WiFi.localIP().toString();
 
   //private:String state_topic; 
   //private:String stat_t; 
   //private:String avty_t;
 
 
-  private:String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-  private:String node_id = String("PvRouter-") + node_mac; 
-  private:String HA_device_declare() { 
-              String IPaddress = WiFi.localIP().toString();
-              String info =         "\"dev\": {"
+  private:const String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
+  private:const String node_id = String("PvRouter-") + node_mac; 
+  private:const String HA_device_declare() { 
+              const String IPaddress = WiFi.localIP().toString();
+              const String info =         "\"dev\": {"
             "\"ids\": \""+ node_id + "\","
             "\"name\": \""+ node_id + "\","
             "\"sw\": \"PvRouter "+ String(VERSION) +"\","
@@ -140,10 +141,10 @@ struct MQTT
   
 
     public:void HA_discovery(){
-      String topic = "homeassistant/"+ entity_type +"/"+ node_id +"/";
-      String topic_Xlyric = "Xlyric/"+ node_id +"/";
+      const String topic = "homeassistant/"+ entity_type +"/"+ node_id +"/";
+      const String topic_Xlyric = "Xlyric/"+ node_id +"/";
 
-      String device= "{\"name\": \""+ name + "\"," 
+      const String device= "{\"name\": \""+ name + "\"," 
             "\"obj_id\": \"PvRouter-"+ object_id +"-"+ node_mac + "\"," 
             "\"uniq_id\": \""+ node_mac + "-" + object_id +"\","
             "\"stat_t\": \""+ topic_Xlyric + "sensors/" + object_id +"/state\"," 
@@ -162,8 +163,8 @@ struct MQTT
 
   public:void send(String value){
     if (configmqtt.JEEDOM || configmqtt.HA) {
-      String topic = "Xlyric/"+ node_id +"/sensors/";
-      String message = "  { \""+object_id+"\" : \"" + value.c_str() + "\"  } ";
+      const String topic = "Xlyric/"+ node_id +"/sensors/";
+      const String message = "  { \""+object_id+"\" : \"" + value.c_str() + "\"  } ";
       client.publish(String(topic + object_id + "/state").c_str() ,1, retain_flag , message.c_str());
     }
   } 

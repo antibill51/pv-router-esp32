@@ -26,14 +26,14 @@ extern Mqtt configmqtt;
 extern Logs logging;
 
 #ifndef LIGHT_FIRMWARE
-String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
+const String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
 // String node_ids = WiFi.macAddress().substring(0,2)+ WiFi.macAddress().substring(4,6)+ WiFi.macAddress().substring(8,10) + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-String node_id = String("PvRouter-") + node_mac; 
-String topic_Xlyric = "Xlyric/"+ node_id +"/";
-String command_switch = String(topic_Xlyric + "command/switch");
-String command_number = String(topic_Xlyric + "command/number");
-// String command_select = String(topic_Xlyric + "command/select");
-// String command_button = String(topic_Xlyric + "command/button");
+const String node_id = String("PvRouter-") + node_mac; 
+const String topic_Xlyric = "Xlyric/"+ node_id +"/";
+const String command_switch = String(topic_Xlyric + "command/switch");
+const String command_number = String(topic_Xlyric + "command/number");
+// const String command_select = String(topic_Xlyric + "command/select");
+// const String command_button = String(topic_Xlyric + "command/button");
 // void Mqtt_HA_hello(); // non utilisé maintenant 
 void reconnect();
 /***
@@ -41,14 +41,17 @@ void reconnect();
  */
 
     void reconnect() {
-      String pvname = String("PvRouter-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
-      // String topic = "homeassistant/sensor/"+ pvname +"/status";
+      // const String pvname = String("PvRouter-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
+      // const String topic = "homeassistant/sensor/"+ pvname +"/status";
       // Loop until we're reconnected
       // while (!client.connected()) {
         Serial.println("-----------------------------");
         Serial.println("Attempting MQTT reconnection...");
         logging.Set_log_init(loguptime2());
-        logging.Set_log_init("MQTT reconnect : attempting reconnection\r\n");
+        logging.Set_log_init("MQTT attempting reco \r\n");
+        //affichage du RSSI
+        logging.Set_log_init(String(WiFi.RSSI())+" dBm\r\n");
+
         // Attempt to connect
         // client.publish(String(topic_Xlyric +"status").c_str() ,0,true, "online"); // status Online
 
@@ -58,7 +61,7 @@ void reconnect();
       client.subscribe((command_number + "/#").c_str(),1);
       if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
 
-      Serial.println("MQTT reconnect : connected");
+      // Serial.println("MQTT reconnect : connected");
     // } else {
     //   Serial.print("MQTT reconnect : failed, retcode="); 
     //   Serial.print(client.state());

@@ -29,7 +29,6 @@
  
   //#include "tasks/mqtt-aws.h"
   #include "tasks/wifi-connection.h"
-  //#include "tasks/wifi-update-signalstrength.h"
   #include "tasks/measure-electricity.h"
   //#include "tasks/mqtt-home-assistant.h"
   #include "tasks/Dimmer.h"
@@ -229,7 +228,10 @@ void setup()
   Serial.println(F("Loading configuration..."));
   loadConfiguration(filename_conf, config);
 
-  ///define if AP mode or load configuration
+  // récup des logs
+  loadlogs();
+    
+    ///define if AP mode or load configuration
   /*if (loadwifi(wifi_conf, configwifi)) {
     AP=false; 
   }*/
@@ -372,7 +374,7 @@ Dimmer_setup();
     xTaskCreate(
       watchdog_memory,
       "watchdog_memory",  // Task name
-      5000,            // Stack size (bytes)
+      6000,            // Stack size (bytes)
       NULL,             // Parameter
       5,                // Task priority
       NULL          // Task handle
@@ -383,7 +385,7 @@ Dimmer_setup();
     xTaskCreate(
       keepWiFiAlive2,
       "keepWiFiAlive",  // Task name
-      5000,            // Stack size (bytes)
+      6000,            // Stack size (bytes)
       NULL,             // Parameter
       5,                // Task priority
       NULL          // Task handle
@@ -399,7 +401,7 @@ Dimmer_setup();
     xTaskCreate(
       serial_read_task,
       "Serial Read",      // Task name
-      3000,            // Stack size (bytes)
+      4000,            // Stack size (bytes)
       NULL,             // Parameter
       1,                // Task priority
       NULL              // Task handle
@@ -415,7 +417,7 @@ Dimmer_setup();
   xTaskCreatePinnedToCore(
     updateDisplay,
     "UpdateDisplay",  // Task name
-    10000,            // Stack size (bytes)
+    5000,            // Stack size (bytes)
     NULL,             // Parameter
     2,                // Task priority
     NULL,             // Task handle
@@ -430,7 +432,7 @@ Dimmer_setup();
   xTaskCreate(
     dallasread,
     "Dallas local temp",  // Task name
-    4000,                  // Stack size (bytes)
+    5000,                  // Stack size (bytes)
     NULL,                   // Parameter
     2,                      // Task priority
     NULL                    // Task handle
@@ -447,7 +449,7 @@ Dimmer_setup();
   xTaskCreate( 
     switchDisplay,
     "Swith Oled",  // Task name
-    4000,                  // Stack size (bytes)
+    5000,                  // Stack size (bytes)
     NULL,                   // Parameter
     2,                      // Task priority
     NULL                    // Task handle
@@ -463,7 +465,7 @@ Dimmer_setup();
   xTaskCreate(
     measureElectricity,
     "Measure electricity",  // Task name
-    5000,                  // Stack size (bytes)
+    6000,                  // Stack size (bytes)
     NULL,                   // Parameter
     7,                      // Task priority
     NULL                    // Task handle
@@ -491,7 +493,7 @@ Dimmer_setup();
     xTaskCreate(
     GetDImmerTemp,
     "Update temp",  // Task name
-    5000,                  // Stack size (bytes)
+    6000,                  // Stack size (bytes)
     NULL,                   // Parameter
     4,                      // Task priority
     NULL                    // Task handle
@@ -504,9 +506,9 @@ Dimmer_setup();
     xTaskCreate(
     send_to_mqtt,
     "Update MQTT",  // Task name
-    7000,                  // Stack size (bytes)
+    8000,                  // Stack size (bytes)
     NULL,                   // Parameter
-    4,                      // Task priority
+    5,                      // Task priority
     NULL                    // Task handle
   );  //pdMS_TO_TICKS(10000)
 
@@ -581,9 +583,9 @@ esp_register_shutdown_handler( handler_before_reset );
 logging.power=true; logging.sct=true; logging.sinus=true; 
 
 /// affichage de l'heure  GMT +1 dans la log
-logging.Set_log_init("fin du demarrage: ");
+logging.Set_log_init("-- fin du demarrage: ");
 logging.Set_log_init(timeClient.getFormattedTime());
-logging.Set_log_init("\r\n");
+logging.Set_log_init(" --\r\n");
 
 
 //WebSerial.begin(&server);
@@ -604,6 +606,7 @@ void loop()
   if (config.restart) {
     //delay(5000);
     Serial.print(PV_RESTART);
+    savelogs(timeClient.getFormattedTime() + "-- reboot demande par l'utilisateur -- ");
     ESP.restart();
   }
 
@@ -823,22 +826,18 @@ void connect_to_wifi() {
       #endif
   }
 }
-/*
-String loguptime() {
-  String uptime_stamp;
-  uptime::calculateUptime();
-  uptime_stamp = String(uptime::getDays())+":"+String(uptime::getHours())+":"+String(uptime::getMinutes())+":"+String(uptime::getSeconds())+ "\t";
-  return uptime_stamp;
-} */
 
 
 char *loguptime2() {
   static char uptime_stamp[20]; // Vous devrez définir une taille suffisamment grande pour stocker votre temps
-
+/*
   uptime::calculateUptime();
 
   // Utilisez snprintf pour formater le texte dans le tableau de caractères
   snprintf(uptime_stamp, sizeof(uptime_stamp), "%d:%d:%d:%d\t", uptime::getDays(), uptime::getHours(), uptime::getMinutes(), uptime::getSeconds());
+*/
+  
+  snprintf(uptime_stamp, sizeof(uptime_stamp), "%s\t", timeClient.getFormattedTime().c_str());
 
   return uptime_stamp;
 }

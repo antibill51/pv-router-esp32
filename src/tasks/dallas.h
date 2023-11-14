@@ -13,11 +13,11 @@ extern Dallas dallas ;
 // extern HA temperature;
 
 /**
- * Task: Modifier le dimmer en fonction de la production
+ * Task: Lecture de la sonde de température Dallas toute les 10s
  * 
- * récupère les informations, conso ou injection et fait varier le dimmer en conséquence
- * 
- */
+  */
+extern Memory task_mem; 
+
 void dallasread(void * parameter){
   for (;;){
     if (dallas.detect) {
@@ -36,10 +36,11 @@ void dallasread(void * parameter){
       Serial.println(gDisplayValues.temperature);
       logging.Set_log_init("temp :");
       logging.Set_log_init(String(gDisplayValues.temperature).c_str());
-      logging.Set_log_init(" \r\n");
+      logging.Set_log_init("\r\n");
     }
 
    } 
+   task_mem.task_dallas_read = uxTaskGetStackHighWaterMark(NULL);
    // Sleep for 5 seconds, avant de refaire une analyse
     vTaskDelay(pdMS_TO_TICKS(10000));
   }

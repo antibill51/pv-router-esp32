@@ -11,6 +11,7 @@
 #endif
 
 #include <Preferences.h> 
+#include <TimeLib.h>
 
 #define SECURITEPASS "MyPassword"
 
@@ -55,7 +56,7 @@ struct DisplayValues {
   double enp_current_power_production;
   int puissance_route=0;
   bool dimmer_disengaged=false;
-  String pvname = "PV ROUTER " + WiFi.macAddress().substring(12,14) + WiFi.macAddress().substring(15,17);
+  const String pvname = "PV ROUTER " + WiFi.macAddress().substring(12,14) + WiFi.macAddress().substring(15,17);
 };
 
 struct Config {
@@ -179,9 +180,15 @@ struct Logs {
 
   //clean log_init
   public:void clean_log_init() {
-      if (strlen(log_init) > (LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/10)) ) {
+      if (strlen(log_init) > (LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/20)) ) {
       log_init[0] = '\0';
       strcat(log_init,"197}11}1");
+      }
+
+      ///si risque de fuite mémoire
+      if (strlen(log_init) >(LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/5)) ) {
+      //savelogs("-- reboot Suite problème de taille logs -- ");   //--> vu que dans une struc, c'est compliqué à mettre en place
+      ESP.restart();  
       }
   }
 

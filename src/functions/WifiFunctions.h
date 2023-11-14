@@ -192,10 +192,8 @@ String ipToString(IPAddress ip){
 }
 
 bool dimmeradress(IPAddress dimmertemp ){
-  String baseurl; 
-  baseurl = "/state" ; 
+  const String baseurl = "/state" ; 
   String ipaddress= ipToString(dimmertemp);
-
 
   httpdimmer.begin(ipaddress,80,baseurl);   
   int httpResponseCode = httpdimmer.GET();  
@@ -261,6 +259,7 @@ void search_wifi_ssid(){
           if (WiFi.SSID() == configwifi.SID) {
           Serial.println("WiFi connecté");
           WiFi.softAPdisconnect(true);
+          savelogs("-- reboot Wifi retrouvé -- ");
           ESP.restart();
           }    
         }

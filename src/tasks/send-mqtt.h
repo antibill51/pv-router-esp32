@@ -122,7 +122,7 @@ void send_to_mqtt(void * parameter){
                               if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDXdallas), String(gDisplayValues.temperature),"","Dallas" );} //  bug#11  remonté domoticz
                               if ((configmqtt.HA) || (configmqtt.JEEDOM)) {
                                     temperature.send(String(gDisplayValues.temperature));
-                                    device_alarm_temp.send(stringboolMQTT(security));
+                                    device_alarm_temp.send(stringboolMQTT(dallas.security));
                               }
                         }
             #endif
@@ -192,7 +192,7 @@ void send_to_mqtt(void * parameter){
       } 
       task_mem.task_send_mqtt = uxTaskGetStackHighWaterMark(NULL);
    // Sleep for 10 seconds
-    vTaskDelay(pdMS_TO_TICKS(10000));
+    vTaskDelay(pdMS_TO_TICKS(4500));
   }
 }
 

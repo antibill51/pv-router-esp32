@@ -161,9 +161,18 @@ bool start_progr() {
         return true; 
     }
   }
+
+  // protection fuite mémoire 
+  if (temperature > 500) {
+    savelogs(timeClient.getFormattedTime() +"-- reboot problème de fuite memoire -- ");
+    ESP.restart(); 
+  }
+
 return false; 
 }
 
+/// @brief  stop du programme
+/// @return 
 bool stop_progr() {
   int heures, minutes;
   /// sécurité temp
@@ -215,6 +224,7 @@ bool stop_progr() {
 void time_reboot() {
   if(timeClient.isTimeSet()) {
     if (timeClient.getDay() == 1 && timeClient.getHours() == 0 && timeClient.getMinutes() == 0 && timeClient.getSeconds() <= 15) {
+      savelogs(timeClient.getFormattedTime() +"-- reboot fuite mémoire time -- ");
       ESP.restart();
     }
   }
