@@ -342,9 +342,9 @@ if ( zero > 75 ) {
     bool lastVCross; 
     bool checkVCross;                  //Used to measure number of times threshold is crossed.
 
-    Irms = 0;
-    Vrms = 0;
-    PW = 0;
+    double Irms_temp = 0;
+    double Vrms_temp = 0;
+    double PW_temp = 0;
 
     frontmod();
 
@@ -362,12 +362,12 @@ if ( zero > 75 ) {
         if (crossCount>0) // On oublie volontairement le 1er cycle
         {
           temp_read = temp_read / config.facteur ; 
-          Irms += sq(temp_read);
+          Irms_temp += sq(temp_read);
 
           temp_tension = temp_tension / config.voltage;
-          Vrms += sq(temp_tension); // carré des mesures
+          Vrms_temp += sq(temp_tension); // carré des mesures
 
-          PW += temp_tension * temp_read;
+          PW_temp += temp_tension * temp_read;
         }
 
         lastVCross = checkVCross;
@@ -387,17 +387,17 @@ if ( zero > 75 ) {
       }
       ///// fin  construction du tableau de mesures  /////
 
-    Vrms = Vrms / numberOfSamples;
-    Vrms = sqrt(Vrms);
-    Vrms = VrmsOLD + PHASECAL * (Vrms - VrmsOLD); // Lissage des valeurs
+    Vrms_temp = Vrms_temp / numberOfSamples;
+    Vrms_temp = sqrt(Vrms_temp);
+    Vrms = VrmsOLD + PHASECAL * (Vrms_temp - VrmsOLD); // Lissage des valeurs
     VrmsOLD = Vrms;
 
-    Irms = Irms / numberOfSamples;
-    Irms = sqrt(Irms);
+    Irms_temp = Irms_temp / numberOfSamples;
+    Irms = sqrt(Irms_temp);
 
     PVA = floor(Vrms * Irms);
 
-    PW =  (PW/numberOfSamples) + config.offset ; 
+    PW =  (PW_temp/numberOfSamples) + config.offset ; 
 
     PowerFactor = floor(100 * abs(PW) / PVA) / 100;
 

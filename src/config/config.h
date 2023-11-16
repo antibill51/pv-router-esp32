@@ -13,12 +13,12 @@
     int value0=1840; // Valeur de référence, s'ajuste avec la tension mesurée en fonction du coef PHASECAL
 
 
-    float PVA;  //Puissance active en  VA
-    double PW;   //Puissance en Watt
-    float PowerFactor; // Facteur de puissance
+    float PVA =0 ;  //Puissance active en  VA
+    double PW = 0;   //Puissance en Watt
+    float PowerFactor = 0; // Facteur de puissance
     int startV; // Mesure ADC AC en début de cycle
-    double Vrms; // Tension secteur RMS
-    double Irms; // Intensité secteur RMS
+    double Vrms = 225; // Tension secteur RMS
+    double Irms = 0; // Intensité secteur RMS
 #endif
 
 /**
