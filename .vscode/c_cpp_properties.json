@@ -522,6 +522,7 @@
                 "SMOOTH_FONT",
                 "SPI_FREQUENCY=40000000",
                 "SPI_READ_FREQUENCY=6000000",
+                "CONFIG_COMPILER_STACK_CHECK_MODE_STRONG",
                 "NORMAL_FIRMWARE",
                 "COMPILE_NAME=\"MQTT\"",
                 "HAVE_CONFIG_H",

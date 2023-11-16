@@ -41,8 +41,8 @@ void loadConfiguration(const char *filename, Config &config) {
   DeserializationError error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println(F("Failed to read, using default configuration in function loadConfiguration"));
-    logging.Set_log_init(loguptime2());
-    logging.Set_log_init("Failed to read, using default configuration in function loadConfiguration\r\n");
+    
+    logging.Set_log_init("Failed to read, using default configuration in function loadConfiguration\r\n",true);
 
 
   }
@@ -79,7 +79,7 @@ void loadConfiguration(const char *filename, Config &config) {
   config.resistance = doc["resistance"] | 1000;
   config.sending = doc["sending"] | true;
   config.autonome = doc["autonome"] | true;
-  config.mqtt = doc["mqtt"] | true;
+  config.mqtt = doc["mqtt"] | false;
   config.mqttport = doc["mqttport"] | 1883;
   
   config.dimmerlocal = doc["dimmerlocal"] | false;
@@ -109,8 +109,8 @@ void loadConfiguration(const char *filename, Config &config) {
           sizeof(config.topic_Shelly));
 
   configFile.close();
-  logging.Set_log_init(loguptime2());
-  logging.Set_log_init("config file loaded\r\n");
+  
+  logging.Set_log_init("config file loaded\r\n",true);
 }
 
 //***********************************
@@ -123,8 +123,8 @@ void saveConfiguration(const char *filename, const Config &config) {
    File configFile = SPIFFS.open(filename_conf, "w");
   if (!configFile) {
     Serial.println(F("Failed to open config file for writing in function Save configuration"));
-    logging.Set_log_init(loguptime2());
-    logging.Set_log_init("Failed to open config file for writing in function Save configuration\r\n");
+    
+    logging.Set_log_init("Failed to open config file for writing in function Save configuration\r\n",true);
     return;
   } 
 
@@ -205,8 +205,8 @@ bool loadmqtt(const char *filename, Mqtt &configmqtt) {
   DeserializationError error = deserializeJson(doc, configFile);
   if (error) {
     Serial.println(F("Failed to read MQTT config "));
-    logging.Set_log_init(loguptime2());
-    logging.Set_log_init("Failed to read MQTT config\r\n");
+    
+    logging.Set_log_init("Failed to read MQTT config\r\n",true);
     return false;
   }
 
@@ -226,8 +226,8 @@ bool loadmqtt(const char *filename, Mqtt &configmqtt) {
   configmqtt.HTTP = doc["HTTP"] | true;
 
   configFile.close();
-  logging.Set_log_init(loguptime2());
-  logging.Set_log_init("MQTT config loaded\r\n");
+  
+  logging.Set_log_init("MQTT config loaded\r\n",true);
 
 return true;    
 }
@@ -238,8 +238,8 @@ void savemqtt(const char *filename, const Mqtt &configmqtt) {
    File configFile = SPIFFS.open(mqtt_conf, "w");
   if (!configFile) {
     Serial.println(F("Failed to open config file for writing in function mqtt configuration"));
-    logging.Set_log_init(loguptime2());
-    logging.Set_log_init("Failed to open config file for writing in function mqtt configuration\r\n");
+    
+    logging.Set_log_init("Failed to open config file for writing in function mqtt configuration\r\n",true);
     return;
   } 
 
@@ -259,8 +259,8 @@ void savemqtt(const char *filename, const Mqtt &configmqtt) {
   // Serialize JSON to file
   if (serializeJson(doc, configFile) == 0) {
     Serial.println(F("Failed to write to file in function Save configuration "));
-    logging.Set_log_init(loguptime2());
-    logging.Set_log_init("Failed to write to file in function Save configuration\r\n");
+    
+    logging.Set_log_init("Failed to write to file in function Save configuration\r\n",true);
     
   }
 
@@ -277,8 +277,8 @@ void savelogs(String log) {
    File configFile = SPIFFS.open(log_conf, "w");
   if (!configFile) {
     Serial.println(F("Failed to open config file for logs"));
-    logging.Set_log_init(loguptime2());
-    logging.Set_log_init("Failed to open config file for logs\r\n");
+    
+    logging.Set_log_init("Failed to open config file for logs\r\n",true);
     return;
   } 
 
@@ -299,8 +299,8 @@ void loadlogs() {
     logging.Set_log_init(configFile.readStringUntil('\n'));
   }
   configFile.close();
-  logging.Set_log_init(loguptime2());
-  logging.Set_log_init("logs loaded\r\n");
+  
+  logging.Set_log_init("logs loaded\r\n",true);
    
 
 }

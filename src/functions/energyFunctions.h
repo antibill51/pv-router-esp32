@@ -285,7 +285,7 @@ while (loop < freqmesure ) {
     //positive = ( positive / ( FACTEURPUISSANCE  * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
     positive = ( ( positive * config.voltage ) / ( config.facteur  * nombre_cycle * 230 ) ) + config.offset ; 
 
-
+logging.clean_log_init();
 if ( zero > 75 ) { 
   if (logging.sct) {    
     logging.Set_log_init("--> SCT013 Prob not connected  ?\r\n");
