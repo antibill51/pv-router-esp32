@@ -20,6 +20,7 @@ NTPClient timeClient(ntpUDP, NTP_SERVER, NTP_OFFSET_SECONDS, NTP_UPDATE_INTERVAL
 
 #define SECURITEPASS "MyPassword"
 
+
 // The state in which the device can be. This mainly affects what
 // is drawn on the display.
 enum DEVICE_STATE {
