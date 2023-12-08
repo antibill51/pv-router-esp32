@@ -164,7 +164,7 @@ String getServermode(String Servermode) {
   if ( Servermode == "MQTT" ) {   config.mqtt = !config.mqtt; }
   if ( Servermode == "polarity" ) {   config.polarity = !config.polarity; }
   if ( Servermode == "envoy" ) {   configmodule.enphase_present = !configmodule.enphase_present; }
-  if ( Servermode == "frontius" ) {   configmodule.Fronius_present = !configmodule.Fronius_present; }
+  if ( Servermode == "fronius" ) {   configmodule.Fronius_present = !configmodule.Fronius_present; }
 
   #ifndef LIGHT_FIRMWARE
 

@@ -560,6 +560,7 @@
                         </div>
                     </div>
                     <!-- Content Row -->
+                    <script src="jquery.min.js"></script>	
                     <script type="text/javascript"> 
       //<!-- rafraichissement valeurs -->
       setInterval(function refreshsend( ) {
@@ -570,8 +571,8 @@
             var version = data.version;
             var rssi = data.RSSI;
             var name = data.name;
-          document.getElementById("state").innerHTML = state;
-          if (state == 'Reseau') {state = 'Réseau' ; }
+          document.getElementById("state").innerHTML = state; 
+                  if (state == 'Reseau') {state = 'Réseau' ; }
           document.getElementById("sigma").innerHTML = watt;
           document.getElementById("version").innerHTML = version;
           document.getElementById("RSSI").innerHTML = 'RSSI : ' + rssi  + ' dBm';
@@ -610,8 +611,7 @@ function save () {
            
 
 
-<script src="jquery.min.js">
-                    </script>
+
                     <!-- de la doc -->
                     <script>
           $( "div.delta" )
