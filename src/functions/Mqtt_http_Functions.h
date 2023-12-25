@@ -24,6 +24,7 @@ extern Config config;
 extern DisplayValues gDisplayValues;
 extern Mqtt configmqtt;
 extern Logs logging;
+extern Dallas dallas;
 
 #ifndef LIGHT_FIRMWARE
 const String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
@@ -34,60 +35,62 @@ const String command_switch = String(topic_Xlyric + "command/switch");
 const String command_number = String(topic_Xlyric + "command/number");
 // const String command_select = String(topic_Xlyric + "command/select");
 // const String command_button = String(topic_Xlyric + "command/button");
+const String HA_status = String("homeassistant/status");
+
 // void Mqtt_HA_hello(); // non utilisé maintenant 
-void reconnect();
+// void reconnect();
 /***
  *  reconnexion au serveur MQTT
  */
 
-    void reconnect() {
+//     void reconnect() {
       
-        if ((strcmp(config.mqttserver,"none") == 0) || (strcmp(config.mqttserver,"") == 0) || !(config.mqtt)) {
-        Serial.println("MQTT_init : MQTT désactivé");
-        return;
-        }
+//         if ((strcmp(config.mqttserver,"none") == 0) || (strcmp(config.mqttserver,"") == 0) || !(config.mqtt)) {
+//         Serial.println("MQTT_init : MQTT désactivé");
+//         return;
+//         }
 
-      // const String pvname = String("PvRouter-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
-      // const String topic = "homeassistant/sensor/"+ pvname +"/status";
-      // Loop until we're reconnected
-      // while (!client.connected()) {
-        logging.clean_log_init();
-        Serial.println("-----------------------------");
-        Serial.println("Attempting MQTT reconnection...");
+//       // const String pvname = String("PvRouter-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
+//       // const String topic = "homeassistant/sensor/"+ pvname +"/status";
+//       // Loop until we're reconnected
+//       // while (!client.connected()) {
+//         logging.clean_log_init();
+//         Serial.println("-----------------------------");
+//         Serial.println("Attempting MQTT reconnection...");
         
-        logging.Set_log_init("MQTT attempting reco \r\n",true);
-        //affichage du RSSI
-        logging.Set_log_init(String(WiFi.RSSI())+" dBm\r\n");
+//         logging.Set_log_init("MQTT attempting reco \r\n",true);
+//         //affichage du RSSI
+//         logging.Set_log_init(String(WiFi.RSSI())+" dBm\r\n");
 
-        // Attempt to connect
-        // client.publish(String(topic_Xlyric +"status").c_str() ,0,true, "online"); // status Online
+//         // Attempt to connect
+//         // client.publish(String(topic_Xlyric +"status").c_str() ,0,true, "online"); // status Online
 
-    // if (client.connect(node_id.c_str(), configmqtt.username, configmqtt.password, String(topic_Xlyric +"status").c_str(), 2, true, "offline", false)) {       //Connect to MQTT server
-      client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
-      client.subscribe((command_switch + "/#").c_str(),1);
-      client.subscribe((command_number + "/#").c_str(),1);
-      if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
+//     // if (client.connect(node_id.c_str(), configmqtt.username, configmqtt.password, String(topic_Xlyric +"status").c_str(), 2, true, "offline", false)) {       //Connect to MQTT server
+//       // client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
+//       // client.subscribe((command_switch + "/#").c_str(),1);
+//       // client.subscribe((command_number + "/#").c_str(),1);
+//       // if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
 
-      // Serial.println("MQTT reconnect : connected");
-    // } else {
-    //   Serial.print("MQTT reconnect : failed, retcode="); 
-    //   Serial.print(client.state());
-    //   Serial.println(" try again in 2 seconds");
-          ///dans le doute si le mode AP est actif on le coupe
-          Serial.println(WiFi.status());
+//       // Serial.println("MQTT reconnect : connected");
+//     // } else {
+//     //   Serial.print("MQTT reconnect : failed, retcode="); 
+//     //   Serial.print(client.state());
+//     //   Serial.println(" try again in 2 seconds");
+//           ///dans le doute si le mode AP est actif on le coupe
+//           Serial.println(WiFi.status());
 
-          ////la suite causait un bug si MQTT mal configuré ( reboot toute les 2 secondes.)
-         /* if((WiFi.softAPIP() == IPAddress(192,168,4,1)) && (WiFi.status() == WL_IDLE_STATUS ) ) {
-            Serial.println("MQTT reconnect : AP encore actif, on redémarre l'ESP");
-            Serial.println(WiFi.softAPIP());
-            ESP.restart();
-          }*/
+//           ////la suite causait un bug si MQTT mal configuré ( reboot toute les 2 secondes.)
+//          /* if((WiFi.softAPIP() == IPAddress(192,168,4,1)) && (WiFi.status() == WL_IDLE_STATUS ) ) {
+//             Serial.println("MQTT reconnect : AP encore actif, on redémarre l'ESP");
+//             Serial.println(WiFi.softAPIP());
+//             ESP.restart();
+//           }*/
 
-      // Wait 2 seconds before retrying
-      // delay(2000);  // 24/01/2023 passage de 5 à 2s 
-    // }
-  // }
-}
+//       // Wait 2 seconds before retrying
+//       // delay(2000);  // 24/01/2023 passage de 5 à 2s 
+//     // }
+//   // }
+// }
 
 
 char arrayWill[64];
@@ -116,6 +119,7 @@ void async_mqtt_init() {
 
 void connectToMqtt() {
   DEBUG_PRINTLN("Connecting to MQTT...");
+  logging.Set_log_init("Connecting to MQTT... \r\n",true);
   client.connect();
 }
 
@@ -124,12 +128,17 @@ void onMqttConnect(bool sessionPresent) {
   Serial.print("Session present: ");
   Serial.println(sessionPresent);
   client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
-
+  client.subscribe((command_switch + "/#").c_str(),1);
+  client.subscribe((command_number + "/#").c_str(),1);
+  if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
+  logging.Set_log_init("MQTT connected \r\n",true);
 
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   Serial.println("Disconnected from MQTT.");
+  logging.Set_log_init("MQTT disconnected \r\n",true);
+
   if (WiFi.isConnected()) {
     connectToMqtt();
   }
@@ -197,6 +206,9 @@ Fonction MQTT callback
 
 // void callback(char* Subscribedtopic, byte* message, unsigned int length) {
 void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
+  // logging.Set_log_init("Subscribedtopic : " + String(Subscribedtopic)+ "\r\n");
+  String fixedpayload = ((String)payload).substring(0,len);
+  // logging.Set_log_init("Payload : " + String(fixedpayload)+ "\r\n");
   StaticJsonDocument<64> doc2;
   deserializeJson(doc2, payload);
   // if (strcmp( Subscribedtopic, command_switch.c_str() ) == 0) { 
@@ -225,6 +237,34 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
       if (config.resistance != resistance ) {
         config.resistance = resistance;
         device_resistance.send(String(resistance));
+      }
+    }
+  }
+
+  if (strcmp( Subscribedtopic, HA_status.c_str() ) == 0) { 
+    logging.Set_log_init("MQTT HA_status ");
+    logging.Set_log_init(fixedpayload);
+    logging.Set_log_init("\r\n");
+    if (strcmp( fixedpayload.c_str(), "online" ) == 0) { 
+      logging.Set_log_init("MQTT resend HA discovery \r\n");
+      HA_discover();
+      logging.Set_log_init("MQTT resend all exeptionnals values\r\n");
+
+      #ifdef RELAY1
+        int relaystate = digitalRead(RELAY1); 
+        switch_1.send(String(relaystate));
+      #endif
+      #ifdef RELAY2
+        relaystate = digitalRead(RELAY2); 
+        switch_2.send(String(relaystate));
+      #endif
+      device_grid.send(String("0"));
+      device_inject.send(String("0"));
+      device_resistance.send(String(config.resistance));
+
+      if (discovery_temp) {
+        temperature.send(String(gDisplayValues.temperature));
+        device_alarm_temp.send(stringboolMQTT(dallas.security));
       }
     }
   }

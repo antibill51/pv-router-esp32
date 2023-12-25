@@ -574,7 +574,7 @@ Dimmer_setup();
             async_mqtt_init();
             connectToMqtt();
             delay(1000); 
-            reconnect();
+            // reconnect();
             init_MQTT_sensor(); // utile pour jeedom et HA
             // HA autoconf
             if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA

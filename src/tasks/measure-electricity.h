@@ -164,7 +164,7 @@ long end = millis();
       }
       else
       {      
-            vTaskDelay(pdMS_TO_TICKS(3000));
+            vTaskDelay(pdMS_TO_TICKS(2000));
       }
 
     }    

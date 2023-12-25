@@ -112,6 +112,44 @@ void init_MQTT_sensor(){
         #endif
 
 }
+
+
+
+void HA_discover(){
+        if (configmqtt.HA){
+        device_routeur.HA_discovery();
+        device_dimmer.HA_discovery();
+        device_dimmer_routed_power.HA_discovery();
+        device_grid.HA_discovery();
+        device_inject.HA_discovery();
+        // surplus_routeur.HA_discovery();
+        compteur_inject.HA_discovery();
+        compteur_grid.HA_discovery();
+        switch_1.HA_discovery(); 
+        switch_2.HA_discovery(); 
+        device_resistance.HA_discovery(); 
+        compteur_route.HA_discovery(); 
+        
+        if (configmodule.enphase_present == true) {
+                enphase_cons_whLifetime.HA_discovery();
+                enphase_prod_whLifetime.HA_discovery();
+                enphase_current_power_consumption.HA_discovery();
+                enphase_current_power_production.HA_discovery();
+        }
+
+
+        }
+        #ifdef HARDWARE_MOD
+                if (configmqtt.HA){
+                        power_factor.HA_discovery();
+                        power_vrms.HA_discovery();
+                        power_irms.HA_discovery();
+                        power_apparent.HA_discovery();
+                }
+                
+        #endif
+}
+
 void init_HA_sensor(){
         // init_MQTT_sensor();
         device_dimmer.Set_name("Consigne");
@@ -322,40 +360,10 @@ void init_HA_sensor(){
 
 
         // client.setBufferSize(1024);
-        if (configmqtt.HA){
-        device_routeur.HA_discovery();
-        device_dimmer.HA_discovery();
-        device_dimmer_routed_power.HA_discovery();
-        device_grid.HA_discovery();
-        device_inject.HA_discovery();
-        // surplus_routeur.HA_discovery();
-        compteur_inject.HA_discovery();
-        compteur_grid.HA_discovery();
-        switch_1.HA_discovery(); 
-        switch_2.HA_discovery(); 
-        device_resistance.HA_discovery(); 
-        compteur_route.HA_discovery(); 
-        
-        if (configmodule.enphase_present == true) {
-                enphase_cons_whLifetime.HA_discovery();
-                enphase_prod_whLifetime.HA_discovery();
-                enphase_current_power_consumption.HA_discovery();
-                enphase_current_power_production.HA_discovery();
-        }
-
-
-        }
-        #ifdef HARDWARE_MOD
-                if (configmqtt.HA){
-                        power_factor.HA_discovery();
-                        power_vrms.HA_discovery();
-                        power_irms.HA_discovery();
-                        power_apparent.HA_discovery();
-                }
-                
-        #endif
+        HA_discover();
 
 }
+
 String stringboolMQTT(bool mybool){
 String truefalse = "true";
 if (mybool == false ) {truefalse = "false";}
