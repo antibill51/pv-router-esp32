@@ -668,7 +668,8 @@ void loop()
           if (config.mqtt) {
             if (!client.connected() && (WiFi.status() == WL_CONNECTED )) { 
               connectToMqtt();
-              // delay (1000); 
+              delay(1000);
+              HA_discover();
               }
           // client.loop();
           
