@@ -40,7 +40,7 @@ struct DisplayValues {
   String IP;
   String time;
   bool injection; 
-  int dimmer;
+  float dimmer;
   int security; 
   int change;
   bool task;

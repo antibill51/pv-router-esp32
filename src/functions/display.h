@@ -156,7 +156,7 @@ void affichage_normal(){
                       drawtext16TTGO(0, 70, "9999", TFT_GREEN);
                       }
                     #else
-                      drawtext16TTGO(0, 70, String(gDisplayValues.dimmer), TFT_GREEN);
+                      drawtext10TTGO(0, 70, String(gDisplayValues.dimmer), TFT_GREEN);
                       // display.setCursor(0, 120, 2);
                       // display.setTextColor(TFT_WHITE, TFT_BLACK);
                       // display.setTextSize(1);

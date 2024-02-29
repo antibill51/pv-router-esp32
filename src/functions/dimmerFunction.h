@@ -48,7 +48,7 @@ extern Dallas dallas ;
 *   fonction d'envoie de commande au dimmer
 */
 #define FACTEUR_REGULATION 0.9 
-void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puissance_dispo) {
+void dimmer_change(char dimmerurl[15], int dimmerIDX, float dimmervalue, int puissance_dispo) {
 
   puissance_dispo= int(puissance_dispo*FACTEUR_REGULATION);
     /// envoyer la commande avec la valeur gDisplayValues.dimmer vers le dimmer config.dimmer
