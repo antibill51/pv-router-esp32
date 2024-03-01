@@ -160,11 +160,11 @@ long end = millis();
       // Schedule the task to run again in 1 second (while
       // taking into account how long measurement took) ///&& configmodule.pilote
       if (mode != 0 ) {
-            vTaskDelay(pdMS_TO_TICKS(5000));
+            vTaskDelay(pdMS_TO_TICKS(7000));
       }
       else
       {      
-            vTaskDelay(pdMS_TO_TICKS(2000));
+            vTaskDelay(pdMS_TO_TICKS(3000));
       }
 
     }    
