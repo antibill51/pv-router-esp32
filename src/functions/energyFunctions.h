@@ -333,7 +333,7 @@ if ( zero > 75 ) {
     double temp_tension;
     unsigned int crossCount = 0;                             //Used to measure number of times threshold is crossed.
     unsigned int numberOfSamples = 0;                        //This is now incremented
-    const int nombre_cycle  = 10 ; /// nombre de cycle pour affiner la mesure
+    const int nombre_cycle  = 8 ; /// nombre de cycle pour affiner la mesure
 
     int wait_time = 277 ; //  --> 1/50Hz -> /2 -> 10ms --> 18 mesures --> 555 us 
     unsigned long startMillis;

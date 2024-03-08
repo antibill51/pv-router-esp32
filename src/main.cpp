@@ -603,8 +603,8 @@ esp_register_shutdown_handler( handler_before_reset );
 logging.power=true; logging.sct=true; logging.sinus=true; 
 
 /// affichage de l'heure  GMT +1 dans la log
-logging.Set_log_init("-- fin du demarrage: ");
 logging.Set_log_init(timeClient.getFormattedTime());
+logging.Set_log_init("-- fin du demarrage: ");
 logging.Set_log_init(" --\r\n");
 savelogs(timeClient.getFormattedTime() + "-- fin du précédent reboot -- ");
 
