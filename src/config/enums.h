@@ -196,12 +196,12 @@ struct Logs {
 
   //clean log_init
   public:void clean_log_init() {
-      if (strlen(log_init) > ((LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/5)))) {
+      if (strlen(log_init) > (LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/5)) ) {
       reset_log_init();
       }
 
       ///si risque de fuite mémoire
-      if (strlen(log_init) >((LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/10)))) {
+      if (strlen(log_init) > (LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/10)) ) {
       //savelogs("-- reboot Suite problème de taille logs -- ");   //--> vu que dans une struc, c'est compliqué à mettre en place
       ESP.restart();  
       }
@@ -407,5 +407,8 @@ struct epoc {
   public:int mois;
   public:int annee;
 };
+
+#define TABLEAU_SIZE 7
+int tableaudemo[TABLEAU_SIZE] = {180, 3, -150, 4, 150, 5, -180};
 
 #endif

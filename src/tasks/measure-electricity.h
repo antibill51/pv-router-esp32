@@ -50,6 +50,7 @@ int slowlog = TEMPOLOG - 1 ;
 
 // int Pow_mqtt_send = 0;
 extern Memory task_mem; 
+int demoloop = 0;
 
 void measureElectricity(void * parameter)
 {
@@ -64,7 +65,7 @@ void measureElectricity(void * parameter)
       
 
       //// recherche du mode de fonctionnement
-      int mode = 0;   /// 0 = porteuse  ; 1 = shelly , 2 = enphase 3 = fronius
+      int mode = 0;   /// 0 = porteuse  ; 1 = shelly , 2 = enphase 3 = fronius  , 4 = demo 
       if ((strcmp(config.topic_Shelly,"none") != 0) && (strcmp(config.topic_Shelly,"") != 0)) {
             mode = 1; 
       }
@@ -98,6 +99,20 @@ void measureElectricity(void * parameter)
                   serial_println(int(gDisplayValues.watt)) ;
                 
                   }
+      }
+
+      if (mode == 4 ) {
+                        //// mode demo
+
+            gDisplayValues.porteuse = true;
+            
+            if (demoloop < TABLEAU_SIZE ) {
+                  gDisplayValues.watt = tableaudemo[demoloop];
+                  demoloop++;
+            } 
+            else {
+                  demoloop = 0;
+            }
       }
 
       /// que dans les cas sans mode AP
