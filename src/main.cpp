@@ -750,7 +750,7 @@ if (config.dimmerlocal) {
             device_dimmer.send(String(instant_power * config.resistance/100));
           } 
         #endif
-        offset_heure_ete(); // on corrige l'heure d'été si besoin
+        // offset_heure_ete(); // on corrige l'heure d'été si besoin
       }
     }
 }
