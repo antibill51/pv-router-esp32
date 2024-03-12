@@ -28,7 +28,7 @@ extern char *loguptime2();
 
   while ( micros() <= ( startmicro + timer ) )  /// a vérifier si < permetrait encore d'affiner la mesure 
       {
-      delayMicroseconds(3);  // J'ai lu qu'en dessous de 3, les délais ne sont pas respecté.
+      delayMicroseconds(3);  // J'ai lu qu'en dessous de 3, les délais ne sont pas respectés.
       }
 
   

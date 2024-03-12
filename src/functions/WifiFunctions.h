@@ -258,7 +258,7 @@ void search_wifi_ssid(){
         AP=false;
         WiFi.begin(configwifi.SID, configwifi.passwd); 
         delay(1500);
-        /// test si le wifi est connecté sur le mon SSID, on déconnecte le mode AP  
+        /// test si le wifi est connecté sur le bon SSID, on déconnecte le mode AP  
         if(WiFi.status() == WL_CONNECTED) { 
         
           if (WiFi.SSID() == configwifi.SID) {
