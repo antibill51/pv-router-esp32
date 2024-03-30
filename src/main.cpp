@@ -135,6 +135,8 @@ char *loguptime2();
   MQTT device_dimmer;
   MQTT device_dimmer_routed_power;
   MQTT device_routeur; 
+  MQTT device_routed; // Ajout envoi MQTT puissance routée totale (local + distants)
+  MQTT device_dimmer_power; // Ajout MQTT envoi puissance du dimmer local
   MQTT device_grid;
   MQTT device_inject;
   MQTT compteur_inject;
@@ -157,8 +159,7 @@ char *loguptime2();
     MQTT enphase_current_power_consumption;
     MQTT enphase_current_power_production;
     // MQTT surplus_routeur;
-  
-    // HA device_state; 
+    // MQTT device_state; 
 #endif
 
 /***************************
@@ -606,8 +607,15 @@ logging.power=true; logging.sct=true; logging.sinus=true;
 logging.Set_log_init(timeClient.getFormattedTime());
 logging.Set_log_init("-- fin du demarrage: ");
 logging.Set_log_init(" --\r\n");
-savelogs(timeClient.getFormattedTime() + "-- fin du précédent reboot -- ");
+//savelogs(timeClient.getDay() + " " + timeClient.getFormattedTime() + " -- fin du précédent reboot -- ");
 
+/// envoie de l'info de reboot
+const int bufferSize = 150; // Taille du tampon pour stocker le message
+char raison[bufferSize];
+            
+snprintf(raison, bufferSize, "restart : %s", timeClient.getFormattedTime().c_str()); 
+  
+client.publish((topic_Xlyric+"panic").c_str(),1,true,raison, true);
 
 //WebSerial.begin(&server);
 //WebSerial.msgCallback(recvMsg);
@@ -694,12 +702,7 @@ void loop()
 
 #endif
 
-  /// synchrisation de l'information entre le dimmer et l'affichage 
-  int dimmer1_state = dimmer_getState();
-  /// application uniquement si le dimmer est actif (Tmax non atteint)    
-  if (dimmer1_state != 0 ) {  
-  gDisplayValues.dimmer = dimmer1_state; 
-  }
+ 
 
 
 if (config.dimmerlocal) {
@@ -871,7 +874,11 @@ char *loguptime2() {
 
 void handler_before_reset() {
   #ifndef LIGHT_FIRMWARE
-  client.publish((topic_Xlyric+"panic").c_str(),1,true," ESP reboot" ) ;
+  const int bufferSize = 150; // Taille du tampon pour stocker le message
+  char raison[bufferSize];
+  snprintf(raison, bufferSize, "reboot handler: %s ",timeClient.getFormattedTime().c_str()); 
+  
+  client.publish((topic_Xlyric+"panic").c_str(),1,true,raison, true);
   #endif
 }
 

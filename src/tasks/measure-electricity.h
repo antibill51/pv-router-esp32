@@ -66,7 +66,8 @@ void measureElectricity(void * parameter)
 
       //// recherche du mode de fonctionnement
       int mode = 0;   /// 0 = porteuse  ; 1 = shelly , 2 = enphase 3 = fronius  , 4 = demo 
-      if ((strcmp(config.topic_Shelly,"none") != 0) && (strcmp(config.topic_Shelly,"") != 0)) {
+
+      if (strcmp(config.topic_Shelly,"none") != 0 && strcmp(config.topic_Shelly,"") != 0) {
             mode = 1; 
       }
       else if (configmodule.enphase_present && String(configmodule.envoy) == "S") {
@@ -75,10 +76,6 @@ void measureElectricity(void * parameter)
       else if (configmodule.Fronius_present) {
             mode = 3; 
       }
-      // logging.Set_log_init("Mode calcul energie : ",true);
-      // logging.Set_log_init(String(mode));
-      // logging.Set_log_init(" \r\n");
-
             /// SCT 013 
       if (mode == 0 ) { 
                   #ifndef HARDWARE_MOD
@@ -86,8 +83,10 @@ void measureElectricity(void * parameter)
                   #else
                   injection3();
                   #endif
+                  gDisplayValues.wattIsValid = true;
             if ( gDisplayValues.porteuse == false  && configmodule.enphase_present == false && configmodule.Fronius_present == false) {
-                        gDisplayValues.watt =0 ; 
+                        gDisplayValues.watt = 0 ; 
+                        gDisplayValues.wattIsValid = false;
                         slowlog ++; 
                         if (slowlog == TEMPOLOG) {     
                               logging.Set_log_init("--> No sinus, check 12AC power \r\n");
@@ -105,6 +104,7 @@ void measureElectricity(void * parameter)
                         //// mode demo
 
             gDisplayValues.porteuse = true;
+            gDisplayValues.wattIsValid = true;
             
             if (demoloop < TABLEAU_SIZE ) {
                   gDisplayValues.watt = tableaudemo[demoloop];
@@ -122,14 +122,23 @@ void measureElectricity(void * parameter)
                   if (WiFi.status() == WL_CONNECTED )  {
                         /// on vérifie si config.topic_Shelly est une IP ou un topic mqtt
                         if (checkIP(config.topic_Shelly)) {
-                              gDisplayValues.watt = shelly_get_data(config.topic_Shelly);
+                              int temp_shellyWatt = shelly_get_data(config.topic_Shelly);
+                              if ( temp_shellyWatt == 99999 ){ // 0 me posait problème pour ceux qui souhaitent avoir delta/deltaneg au dessus ou en dessous
+                                    gDisplayValues.wattIsValid = false;
+                                    gDisplayValues.watt = 0;
+                              }
+                              else {
+                                    gDisplayValues.wattIsValid = true;
+                                    gDisplayValues.watt = temp_shellyWatt;
+                              }
+
                         }
                         #ifdef NORMAL_FIRMWARE
                         else {
                               
                               // client.loop();
                               gDisplayValues.watt = gDisplayValues.Shelly ;
-                            
+                            gDisplayValues.wattIsValid = true;
                         }
                         #endif
                         //  // on met à jour
@@ -146,6 +155,7 @@ void measureElectricity(void * parameter)
                         int tempo = gDisplayValues.watt; 
                         gDisplayValues.watt = gDisplayValues.Fronius_conso ; 
                         gDisplayValues.Fronius_conso = tempo; 
+                        gDisplayValues.wattIsValid = true;
                   }
 
             }
@@ -155,6 +165,7 @@ void measureElectricity(void * parameter)
             if (mode == 3 ) { 
                   if (WiFi.status() == WL_CONNECTED )  {
                         Fronius_get();
+                        gDisplayValues.wattIsValid = true;
                   }
             }
       }
@@ -175,7 +186,8 @@ long end = millis();
       // Schedule the task to run again in 1 second (while
       // taking into account how long measurement took) ///&& configmodule.pilote
       if (mode != 0 ) {
-            vTaskDelay(pdMS_TO_TICKS(7000));
+            ///// le shelly et l'enphase sont plus lents et font des mesures à 1s ce qui peut créer des doublons de commandes
+            vTaskDelay(pdMS_TO_TICKS(4000));
       }
       else
       {      

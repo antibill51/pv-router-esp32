@@ -21,8 +21,34 @@ extern Logs Logging;
 extern Mqtt configmqtt;
 
 #ifndef LIGHT_FIRMWARE
+//   #include <PubSubClient.h>
+//   extern PubSubClient client;
+// #endif
+
+
+// #ifndef LIGHT_FIRMWARE
+      // extern HA device_routeur; 
+      // extern HA device_grid; 
+      // extern HA device_routed; // Ajout RV - 20230304
+      // extern HA device_dimmer; // Ajout RV - 20230304
+      // extern HA device_inject; 
+      // extern HA compteur_inject;
+      // extern HA compteur_grid;
+      // extern HA temperature_HA;
+
+      // extern HA power_factor;
+      // extern HA power_vrms;
+      // extern HA power_irms;
+      // extern HA power_apparent;
+      // extern HA enphase_cons_whLifetime;
+      // extern HA enphase_prod_whLifetime;
+      // extern HA enphase_current_power_consumption;
+      // extern HA enphase_current_power_production;
       extern MQTT device_routeur; 
       extern MQTT device_grid; 
+      extern MQTT device_routed; // Ajout RV - 20230304
+      extern MQTT device_dimmer_power;
+      extern MQTT device_dimmer; // Ajout RV - 20230304
       extern MQTT device_inject; 
       extern MQTT compteur_inject;
       extern MQTT compteur_grid;
@@ -80,6 +106,9 @@ void send_to_mqtt(void * parameter){
                   if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDX), String(int(gDisplayValues.watt)));  }
                   if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {
                         device_routeur.send(String(int(gDisplayValues.watt)));
+                        device_routed.send(String(gDisplayValues.puissance_route));
+                        device_dimmer_power.send(String(int((dimmer_hard.getPower()) * config.resistance/100)));
+
                         #ifdef HARDWARE_MOD
                               power_apparent.send(String(int(PVA)));
                               power_vrms.send(String(int(Vrms)));
@@ -197,7 +226,8 @@ void send_to_mqtt(void * parameter){
       } 
       task_mem.task_send_mqtt = uxTaskGetStackHighWaterMark(NULL);
    // Sleep for 10 seconds
-    vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
+//     vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
+      vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
   }
 }
 
