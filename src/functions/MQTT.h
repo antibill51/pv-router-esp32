@@ -11,7 +11,8 @@ extern Configmodule configmodule;
 extern Mqtt configmqtt; 
 
 extern MQTT device_dimmer;
-extern MQTT device_dimmer_routed_power;
+extern MQTT device_routed;
+extern MQTT device_dimmer_power;
 extern MQTT device_routeur; 
 extern MQTT device_grid;
 extern MQTT device_inject;
@@ -21,7 +22,6 @@ extern MQTT switch_1;
 extern MQTT switch_2;
 extern MQTT temperature;
 extern MQTT device_alarm_temp;
-// extern MQTT surplus_routeur;
 extern MQTT device_resistance;
 extern MQTT compteur_route;
 
@@ -41,8 +41,11 @@ void init_MQTT_sensor(){
         device_dimmer.Set_object_id("dimmer");
         device_dimmer.Set_retain_flag(true);
 
-        device_dimmer_routed_power.Set_object_id("dimmer_power");
-        device_dimmer_routed_power.Set_retain_flag(true);
+        device_routed.Set_object_id("dimmer_power");
+        device_routed.Set_retain_flag(true);
+
+        device_dimmer_power.Set_object_id("device_dimmer_power");
+        device_dimmer_power.Set_retain_flag(true);
 
         device_routeur.Set_object_id("power");
         device_routeur.Set_retain_flag(true);
@@ -61,9 +64,6 @@ void init_MQTT_sensor(){
 
         compteur_route.Set_object_id("route_Wh");
         compteur_route.Set_retain_flag(true);
-
-        // surplus_routeur.Set_object_id("surplus");
-        // surplus_routeur.Set_retain_flag(true);
 
         temperature.Set_object_id("temperature");
         temperature.Set_retain_flag(true);
@@ -84,8 +84,6 @@ void init_MQTT_sensor(){
         compteur_grid.send(String("0"));
         device_resistance.send(String(config.resistance));
 
-        // switch_1.send(String(0));
-        // switch_2.send(String(0));
         if (configmodule.enphase_present == true) {
                 enphase_cons_whLifetime.Set_object_id("enphase_cons_wh");
                 enphase_cons_whLifetime.Set_retain_flag(true);
@@ -119,10 +117,9 @@ void HA_discover(){
         if (configmqtt.HA){
         device_routeur.HA_discovery();
         device_dimmer.HA_discovery();
-        device_dimmer_routed_power.HA_discovery();
+        device_routed.HA_discovery();
         device_grid.HA_discovery();
         device_inject.HA_discovery();
-        // surplus_routeur.HA_discovery();
         compteur_inject.HA_discovery();
         compteur_grid.HA_discovery();
         switch_1.HA_discovery(); 
@@ -137,7 +134,7 @@ void HA_discover(){
                 enphase_current_power_production.HA_discovery();
         }
 
-
+        if (config.dimmerlocal) {device_dimmer_power.HA_discovery();}
         }
         #ifdef HARDWARE_MOD
                 if (configmqtt.HA){
@@ -162,24 +159,15 @@ void init_HA_sensor(){
         // device_dimmer.Set_retain_flag(true);
         // device_dimmer.Set_expire_after(true);
         
-        device_dimmer_routed_power.Set_name("Puissance routée");
-        // device_dimmer_routed_power.Set_object_id("dimmer_power");
-        device_dimmer_routed_power.Set_unit_of_meas("W");
-        device_dimmer_routed_power.Set_stat_cla("measurement");
-        device_dimmer_routed_power.Set_dev_cla("power"); // fix is using native unit of measurement '%' which is not a valid unit for the device class ('power') it is using
-        // device_dimmer_routed_power.Set_icon("mdi:percent");
-        device_dimmer_routed_power.Set_entity_type("sensor");
-        // device_dimmer_routed_power.Set_retain_flag(true);
-        // device_dimmer_routed_power.Set_expire_after(true);
-
-        // surplus_routeur.Set_name("Ecart zone neutre");
-        // surplus_routeur.Set_unit_of_meas("W");
-        // surplus_routeur.Set_stat_cla("measurement");
-        // surplus_routeur.Set_dev_cla("power");
-        // surplus_routeur.Set_entity_type("sensor");
-        // // surplus_routeur.Set_retain_flag(true);
-        // // surplus_routeur.Set_expire_after(true);
-
+        device_routed.Set_name("Puissance routée");
+        // device_routed.Set_object_id("dimmer_power");
+        device_routed.Set_unit_of_meas("W");
+        device_routed.Set_stat_cla("measurement");
+        device_routed.Set_dev_cla("power"); // fix is using native unit of measurement '%' which is not a valid unit for the device class ('power') it is using
+        // device_routed.Set_icon("mdi:percent");
+        device_routed.Set_entity_type("sensor");
+        // device_routed.Set_retain_flag(true);
+        // device_routed.Set_expire_after(true);
 
         device_routeur.Set_name("Puissance");
         // device_routeur.Set_object_id("power");
@@ -316,6 +304,19 @@ void init_HA_sensor(){
                 // power_apparent.Set_retain_flag(true);
                 // power_apparent.Set_expire_after(true);
         #endif
+
+        if (config.dimmerlocal) {
+                device_dimmer_power.Set_name("Puissance dimmer local");
+                // device_dimmer_power.Set_object_id("dimmer_power");
+                device_dimmer_power.Set_unit_of_meas("W");
+                device_dimmer_power.Set_stat_cla("measurement");
+                device_dimmer_power.Set_dev_cla("power"); // fix is using native unit of measurement '%' which is not a valid unit for the device class ('power') it is using
+                // device_dimmer_power.Set_icon("mdi:percent");
+                device_dimmer_power.Set_entity_type("sensor");
+                // device_dimmer_power.Set_retain_flag(true);
+                // device_dimmer_power.Set_expire_after(true);
+        }
+
 
         if (configmodule.enphase_present == true) {
 

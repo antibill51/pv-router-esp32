@@ -39,8 +39,6 @@ extern Dallas dallas ;
     extern Logs logging;
   #ifndef LIGHT_FIRMWARE
     extern MQTT device_dimmer; 
-    extern MQTT device_dimmer_routed_power;
-    // extern MQTT surplus_routeur;
   #endif
 
 
@@ -69,11 +67,13 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, float dimmervalue, int pui
 
 if (( strcmp(config.dimmer,"") != 0 && strcmp(config.dimmer,"") != 0) && ( configmqtt.HTTP || AP)) {
       // String baseurl; 
-        #ifndef POURCENTAGE
-      const String  baseurl = "/?POWER=" + String(dimmervalue) +"&puissance=" + String(puissance_dispo) ; 
-        #else
-      const String baseurl = "/?POWER=" + String(dimmervalue) ;
-        #endif
+      //   #ifndef POURCENTAGE
+      // const String  baseurl = "/?POWER=" + String(dimmervalue) +"&puissance=" + String(puissance_dispo) ; 
+      //   #else
+      // const String baseurl = "/?POWER=" + String(dimmervalue) ;
+      //   #endif
+        const String  baseurl = "/?POWER=" + String(dimmervalue) +"&puissance=" + String(puissance_dispo) ; 
+
         http.begin(dimmerurl,80,baseurl);   
         http.GET();
         http.end(); 
@@ -98,8 +98,6 @@ if (( strcmp(config.dimmer,"") != 0 && strcmp(config.dimmer,"") != 0) && ( confi
               // Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); 
               if ((configmqtt.HA)|| (configmqtt.JEEDOM)) {
                 device_dimmer.send(String(dimmervalue)); 
-                device_dimmer_routed_power.send(String(gDisplayValues.puissance_route)); 
-                // surplus_routeur.send(String(puissance_dispo));
                 } 
             }
         }

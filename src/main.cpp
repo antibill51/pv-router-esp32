@@ -132,21 +132,25 @@ Dallas dallas;
 //String loguptime();
 char *loguptime2();
 #ifndef LIGHT_FIRMWARE
-  MQTT device_dimmer;
-  MQTT device_dimmer_routed_power;
-  MQTT device_routeur; 
-  MQTT device_routed; // Ajout envoi MQTT puissance routée totale (local + distants)
-  MQTT device_dimmer_power; // Ajout MQTT envoi puissance du dimmer local
-  MQTT device_grid;
-  MQTT device_inject;
-  MQTT compteur_inject;
-  MQTT compteur_grid;
-  MQTT switch_1;
-  MQTT switch_2;
-  MQTT temperature;
-  MQTT device_alarm_temp;
-  MQTT device_resistance;
-  MQTT compteur_route;
+  MQTT device_dimmer; // Consine en %
+  MQTT device_resistance; // Puissance des résistances connectées
+
+  MQTT device_routed; // Ajout envoi MQTT puissance routée totale (local + distants) en W
+  MQTT device_dimmer_power; // Ajout MQTT envoi puissance du dimmer local (W)
+  // MQTT device_dimmer_routed_power; // Puissance routée local + distant en W
+  MQTT device_grid; // W réseau
+  MQTT device_inject; // W injecté
+  MQTT device_routeur; // W Général (+/-)
+
+  MQTT compteur_inject; // Wh injecté
+  MQTT compteur_grid; // Wh réseau
+  MQTT compteur_route; // Wh routés
+
+  MQTT switch_1; // Relais 1
+  MQTT switch_2; // Relais 2
+
+  MQTT temperature; // Température sonde dallas
+  MQTT device_alarm_temp; // Température max atteinte
 
   #ifdef HARDWARE_MOD
     MQTT power_factor;
@@ -158,8 +162,7 @@ char *loguptime2();
     MQTT enphase_prod_whLifetime;
     MQTT enphase_current_power_consumption;
     MQTT enphase_current_power_production;
-    // MQTT surplus_routeur;
-    // MQTT device_state; 
+
 #endif
 
 /***************************
@@ -615,7 +618,7 @@ char raison[bufferSize];
             
 snprintf(raison, bufferSize, "restart : %s", timeClient.getFormattedTime().c_str()); 
   
-client.publish((topic_Xlyric+"panic").c_str(),1,true,raison, true);
+client.publish((topic_Xlyric+"panic").c_str(),1,true,raison);
 
 //WebSerial.begin(&server);
 //WebSerial.msgCallback(recvMsg);
@@ -729,7 +732,7 @@ if (config.dimmerlocal) {
             if (configmqtt.HA) {
               int instant_power = dimmer_hard.getPower();
               device_dimmer.send(String(instant_power));
-              device_dimmer_routed_power.send(String(instant_power * config.resistance/100));
+              // device_dimmer_routed_power.send(String(instant_power * config.resistance/100));
             } 
           #endif
         } 
@@ -750,7 +753,8 @@ if (config.dimmerlocal) {
           Mqtt_send_DOMOTICZ(String(config.IDX), String(dimmer_hard.getPower()),"pourcent"); // remonté MQTT de la commande réelle
           if (configmqtt.HA) {
             int instant_power = dimmer_hard.getPower();
-            device_dimmer.send(String(instant_power * config.resistance/100));
+            device_dimmer.send(String(instant_power));
+            // device_dimmer_routed_power.send(String(instant_power * config.resistance/100)); 
           } 
         #endif
         // offset_heure_ete(); // on corrige l'heure d'été si besoin
@@ -878,7 +882,7 @@ void handler_before_reset() {
   char raison[bufferSize];
   snprintf(raison, bufferSize, "reboot handler: %s ",timeClient.getFormattedTime().c_str()); 
   
-  client.publish((topic_Xlyric+"panic").c_str(),1,true,raison, true);
+  client.publish((topic_Xlyric+"panic").c_str(),1,true,raison);
   #endif
 }
 

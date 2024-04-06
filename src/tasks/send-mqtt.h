@@ -107,7 +107,9 @@ void send_to_mqtt(void * parameter){
                   if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {
                         device_routeur.send(String(int(gDisplayValues.watt)));
                         device_routed.send(String(gDisplayValues.puissance_route));
-                        device_dimmer_power.send(String(int((dimmer_hard.getPower()) * config.resistance/100)));
+                        if (config.dimmerlocal) {
+                              device_dimmer_power.send(String(int((dimmer_hard.getPower()) * config.resistance/100)));
+                        }
 
                         #ifdef HARDWARE_MOD
                               power_apparent.send(String(int(PVA)));

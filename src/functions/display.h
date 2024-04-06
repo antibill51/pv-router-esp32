@@ -75,13 +75,13 @@ void affichage_normal(){
                         display.setTextSize(1);
                         display.setTextColor(TFT_WHITE, TFT_BLACK);
                         display.setTextFont(4);
-                        display.setCursor(30, 48, 2);
+                        display.setCursor(20, 48, 2);
                         #ifndef POURCENTAGE
-                          display.print("Routed (W)");
+                          display.print("Routage (W)");
                         #else
-                          display.print("Routed (%)");
-                        display.setCursor(150, 48, 2);
+                          display.print("Routage (%)");
                         #endif
+                        display.setCursor(160, 48, 2);
                         if (strcmp(config.topic_Shelly,"") == 0)   display.print(OLEDPOW);
                         else display.print("Shelly");
                         
