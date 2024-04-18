@@ -32,6 +32,7 @@
   #include "tasks/measure-electricity.h"
   //#include "tasks/mqtt-home-assistant.h"
   #include "tasks/Dimmer.h"
+  #include "functions/unified_dimmer.h"
   #include "tasks/gettemp.h"
 
   #include "tasks/Serial_task.h"
@@ -133,21 +134,21 @@ Dallas dallas;
 char *loguptime2();
 #ifndef LIGHT_FIRMWARE
   MQTT device_dimmer; // Consine en %
-  MQTT device_resistance; // Puissance des résistances connectées
+  MQTT device_routeur; // W Général (+/-)
 
   MQTT device_routed; // Ajout envoi MQTT puissance routée totale (local + distants) en W
   MQTT device_dimmer_power; // Ajout MQTT envoi puissance du dimmer local (W)
-  // MQTT device_dimmer_routed_power; // Puissance routée local + distant en W
   MQTT device_grid; // W réseau
   MQTT device_inject; // W injecté
-  MQTT device_routeur; // W Général (+/-)
-
   MQTT compteur_inject; // Wh injecté
   MQTT compteur_grid; // Wh réseau
-  MQTT compteur_route; // Wh routés
-
   MQTT switch_1; // Relais 1
   MQTT switch_2; // Relais 2
+
+  MQTT device_resistance; // Puissance des résistances connectées
+  MQTT compteur_route; // Wh routés
+
+
 
   MQTT temperature; // Température sonde dallas
   MQTT device_alarm_temp; // Température max atteinte
@@ -158,10 +159,10 @@ char *loguptime2();
     MQTT power_irms;
     MQTT power_apparent;
   #endif
-    MQTT enphase_cons_whLifetime;
-    MQTT enphase_prod_whLifetime;
-    MQTT enphase_current_power_consumption;
-    MQTT enphase_current_power_production;
+    // MQTT enphase_cons_whLifetime;
+    // MQTT enphase_prod_whLifetime;
+    // MQTT enphase_current_power_consumption;
+    // MQTT enphase_current_power_production;
 
 #endif
 
@@ -246,6 +247,9 @@ void setup()
      
      logging.Set_log_init("Wifi config \r\n",true);
        AP=false; 
+  } 
+  else {
+    Serial.println(F("mode AP please configure password before Wifi"));
   }
 
   configmodule.enphase_present=false; 
@@ -617,9 +621,9 @@ const int bufferSize = 150; // Taille du tampon pour stocker le message
 char raison[bufferSize];
             
 snprintf(raison, bufferSize, "restart : %s", timeClient.getFormattedTime().c_str()); 
-  
-client.publish((topic_Xlyric+"panic").c_str(),1,true,raison);
-
+#ifndef LIGHT_FIRMWARE 
+  client.publish((topic_Xlyric+"panic").c_str(),1,true,raison);
+#endif
 //WebSerial.begin(&server);
 //WebSerial.msgCallback(recvMsg);
 

@@ -32,10 +32,10 @@ extern MQTT compteur_route;
         extern MQTT power_irms;
         extern MQTT power_apparent;
 #endif
-        extern MQTT enphase_cons_whLifetime;
-        extern MQTT enphase_prod_whLifetime;
-        extern MQTT enphase_current_power_consumption;
-        extern MQTT enphase_current_power_production;
+        // extern MQTT enphase_cons_whLifetime;
+        // extern MQTT enphase_prod_whLifetime;
+        // extern MQTT enphase_current_power_consumption;
+        // extern MQTT enphase_current_power_production;
 
 void init_MQTT_sensor(){
         device_dimmer.Set_object_id("dimmer");
@@ -84,19 +84,19 @@ void init_MQTT_sensor(){
         compteur_grid.send(String("0"));
         device_resistance.send(String(config.resistance));
 
-        if (configmodule.enphase_present == true) {
-                enphase_cons_whLifetime.Set_object_id("enphase_cons_wh");
-                enphase_cons_whLifetime.Set_retain_flag(true);
+        // if (configmodule.enphase_present == true) {
+        //         enphase_cons_whLifetime.Set_object_id("enphase_cons_wh");
+        //         enphase_cons_whLifetime.Set_retain_flag(true);
 
-                enphase_prod_whLifetime.Set_object_id("enphase_prod_wh");
-                enphase_prod_whLifetime.Set_retain_flag(true);
+        //         enphase_prod_whLifetime.Set_object_id("enphase_prod_wh");
+        //         enphase_prod_whLifetime.Set_retain_flag(true);
 
-                enphase_current_power_consumption.Set_object_id("enphase_current_cons");
-                enphase_current_power_consumption.Set_retain_flag(true);
+        //         enphase_current_power_consumption.Set_object_id("enphase_current_cons");
+        //         enphase_current_power_consumption.Set_retain_flag(true);
 
-                enphase_current_power_production.Set_object_id("enphase_current_prod");
-                enphase_current_power_production.Set_retain_flag(true);
-        }
+        //         enphase_current_power_production.Set_object_id("enphase_current_prod");
+        //         enphase_current_power_production.Set_retain_flag(true);
+        // }
 
         #ifdef HARDWARE_MOD
                 power_factor.Set_object_id("PowerFactor");
@@ -127,13 +127,12 @@ void HA_discover(){
         device_resistance.HA_discovery(); 
         compteur_route.HA_discovery(); 
         
-        if (configmodule.enphase_present == true) {
-                enphase_cons_whLifetime.HA_discovery();
-                enphase_prod_whLifetime.HA_discovery();
-                enphase_current_power_consumption.HA_discovery();
-                enphase_current_power_production.HA_discovery();
-        }
-
+        // if (configmodule.enphase_present == true) {
+        //         enphase_cons_whLifetime.HA_discovery();
+        //         enphase_prod_whLifetime.HA_discovery();
+        //         enphase_current_power_consumption.HA_discovery();
+        //         enphase_current_power_production.HA_discovery();
+        // }
         if (config.dimmerlocal) {device_dimmer_power.HA_discovery();}
         }
         #ifdef HARDWARE_MOD
@@ -318,44 +317,44 @@ void init_HA_sensor(){
         }
 
 
-        if (configmodule.enphase_present == true) {
+        // if (configmodule.enphase_present == true) {
 
-                enphase_cons_whLifetime.Set_name("ENPHASE Consommation totale");
-                // enphase_cons_whLifetime.Set_object_id("cons_enphase_cons_whLifetime");
-                enphase_cons_whLifetime.Set_unit_of_meas("Wh");
-                enphase_cons_whLifetime.Set_stat_cla("total_increasing");
-                enphase_cons_whLifetime.Set_dev_cla("energy");      
-                enphase_cons_whLifetime.Set_entity_type("sensor");
-                // enphase_cons_whLifetime.Set_retain_flag(true);
-                // enphase_cons_whLifetime.Set_expire_after(true);
+        //         enphase_cons_whLifetime.Set_name("ENPHASE Consommation totale");
+        //         // enphase_cons_whLifetime.Set_object_id("cons_enphase_cons_whLifetime");
+        //         enphase_cons_whLifetime.Set_unit_of_meas("Wh");
+        //         enphase_cons_whLifetime.Set_stat_cla("total_increasing");
+        //         enphase_cons_whLifetime.Set_dev_cla("energy");      
+        //         enphase_cons_whLifetime.Set_entity_type("sensor");
+        //         // enphase_cons_whLifetime.Set_retain_flag(true);
+        //         // enphase_cons_whLifetime.Set_expire_after(true);
 
-                enphase_prod_whLifetime.Set_name("ENPHASE Production totale");
-                // enphase_prod_whLifetime.Set_object_id("cons_enphase_prod_whLifetime");
-                enphase_prod_whLifetime.Set_unit_of_meas("Wh");
-                enphase_prod_whLifetime.Set_stat_cla("total_increasing");
-                enphase_prod_whLifetime.Set_dev_cla("energy");      
-                enphase_prod_whLifetime.Set_entity_type("sensor");
-                // enphase_prod_whLifetime.Set_retain_flag(true);
-                // enphase_prod_whLifetime.Set_expire_after(true);
+        //         enphase_prod_whLifetime.Set_name("ENPHASE Production totale");
+        //         // enphase_prod_whLifetime.Set_object_id("cons_enphase_prod_whLifetime");
+        //         enphase_prod_whLifetime.Set_unit_of_meas("Wh");
+        //         enphase_prod_whLifetime.Set_stat_cla("total_increasing");
+        //         enphase_prod_whLifetime.Set_dev_cla("energy");      
+        //         enphase_prod_whLifetime.Set_entity_type("sensor");
+        //         // enphase_prod_whLifetime.Set_retain_flag(true);
+        //         // enphase_prod_whLifetime.Set_expire_after(true);
 
-                enphase_current_power_consumption.Set_name("ENPHASE Puissance consommation");
-                // enphase_current_power_consumption.Set_object_id("enphase_current_power_consumtion");
-                enphase_current_power_consumption.Set_unit_of_meas("W");
-                enphase_current_power_consumption.Set_stat_cla("measurement");
-                enphase_current_power_consumption.Set_dev_cla("power");
-                enphase_current_power_consumption.Set_entity_type("sensor");
-                // enphase_current_power_consumption.Set_retain_flag(true);
-                // enphase_current_power_consumption.Set_expire_after(true);
+        //         enphase_current_power_consumption.Set_name("ENPHASE Puissance consommation");
+        //         // enphase_current_power_consumption.Set_object_id("enphase_current_power_consumtion");
+        //         enphase_current_power_consumption.Set_unit_of_meas("W");
+        //         enphase_current_power_consumption.Set_stat_cla("measurement");
+        //         enphase_current_power_consumption.Set_dev_cla("power");
+        //         enphase_current_power_consumption.Set_entity_type("sensor");
+        //         // enphase_current_power_consumption.Set_retain_flag(true);
+        //         // enphase_current_power_consumption.Set_expire_after(true);
 
-                enphase_current_power_production.Set_name("ENPHASE Puissance production");
-                // enphase_current_power_production.Set_object_id("enphase_current_power_production");
-                enphase_current_power_production.Set_unit_of_meas("W");
-                enphase_current_power_production.Set_stat_cla("measurement");
-                enphase_current_power_production.Set_dev_cla("power");
-                enphase_current_power_production.Set_entity_type("sensor");
-                // enphase_current_power_production.Set_retain_flag(true);
-                // enphase_current_power_production.Set_expire_after(true);
-        }
+        //         enphase_current_power_production.Set_name("ENPHASE Puissance production");
+        //         // enphase_current_power_production.Set_object_id("enphase_current_power_production");
+        //         enphase_current_power_production.Set_unit_of_meas("W");
+        //         enphase_current_power_production.Set_stat_cla("measurement");
+        //         enphase_current_power_production.Set_dev_cla("power");
+        //         enphase_current_power_production.Set_entity_type("sensor");
+        //         // enphase_current_power_production.Set_retain_flag(true);
+        //         // enphase_current_power_production.Set_expire_after(true);
+        // }
 
 
 

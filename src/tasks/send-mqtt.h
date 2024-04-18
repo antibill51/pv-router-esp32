@@ -62,10 +62,10 @@ extern Mqtt configmqtt;
             extern MQTT power_irms;
             extern MQTT power_apparent;
       #endif
-      extern MQTT enphase_cons_whLifetime;
-      extern MQTT enphase_prod_whLifetime;
-      extern MQTT enphase_current_power_consumption;
-      extern MQTT enphase_current_power_production;
+      // extern MQTT enphase_cons_whLifetime;
+      // extern MQTT enphase_prod_whLifetime;
+      // extern MQTT enphase_current_power_consumption;
+      // extern MQTT enphase_current_power_production;
 
 #endif
 
@@ -117,12 +117,12 @@ void send_to_mqtt(void * parameter){
                               power_irms.send(String(Irms));
                               power_factor.send(String(PowerFactor));
                         #endif
-                         if (configmodule.enphase_present ) {
-                              enphase_cons_whLifetime.send(String(int(gDisplayValues.enp_cons_whLifetime)));
-                              enphase_prod_whLifetime.send(String(int(gDisplayValues.enp_prod_whLifetime)));
-                              enphase_current_power_consumption.send(String(int(gDisplayValues.enp_current_power_consumption)));
-                              enphase_current_power_production.send(String(int(gDisplayValues.enp_current_power_production)));
-                         }
+                        //  if (configmodule.enphase_present ) {
+                              //enphase_cons_whLifetime.send(String(int(gDisplayValues.enp_cons_whLifetime)));
+                              //enphase_prod_whLifetime.send(String(int(gDisplayValues.enp_prod_whLifetime)));
+                              //enphase_current_power_consumption.send(String(int(gDisplayValues.enp_current_power_consumption)));
+                              //enphase_current_power_production.send(String(int(gDisplayValues.enp_current_power_production)));
+                        //  }
                   }
 
                   // send if injection
@@ -229,7 +229,7 @@ void send_to_mqtt(void * parameter){
       task_mem.task_send_mqtt = uxTaskGetStackHighWaterMark(NULL);
    // Sleep for 10 seconds
 //     vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
-      vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
+      vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 

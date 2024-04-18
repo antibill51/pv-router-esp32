@@ -162,9 +162,10 @@ String getServermode(String Servermode) {
                     
   }
   if ( Servermode == "MQTT" ) {   config.mqtt = !config.mqtt; }
-  if ( Servermode == "polarity" ) {   config.polarity = !config.polarity; }
+  if ( Servermode == "polarité" ) {   config.polarity = !config.polarity; config.sauve_polarity();}
   if ( Servermode == "envoy" ) {   configmodule.enphase_present = !configmodule.enphase_present; }
   if ( Servermode == "fronius" ) {   configmodule.Fronius_present = !configmodule.Fronius_present; }
+  if ( Servermode == "TRI" ) {   config.Shelly_tri = !config.Shelly_tri; }
 
   #ifndef LIGHT_FIRMWARE
 
@@ -229,6 +230,7 @@ String getconfig() {
   doc["flip"] = config.flip;
   doc["relaystart"] = config.relayon;
   doc["relaystop"] = config.relayoff;
+  doc["SCT_13"] = config.SCT_13;
   
   
   serializeJson(doc, configweb);
@@ -244,7 +246,7 @@ String getenvoy() {
 String getchart() {
   String retour ="" ;
   //ne sert à rien si enphase en route
-  if (configmodule.enphase_present == false) {
+  if (configmodule.enphase_present == false && configmodule.Fronius_present == false && ( strcmp(config.topic_Shelly,"none") == 0 || strcmp(config.topic_Shelly,"") == 0 )  ) {
     retour = oscilloscope() ;
   }
         return String(retour);
@@ -273,6 +275,7 @@ String getmqtt() {
   doc["HTTP"] = configmqtt.HTTP;
   doc["EM"] = config.topic_Shelly;
   doc["IDXDALLAS"] = config.IDXdallas;
+  doc["TRI"] = config.Shelly_tri;
   serializeJson(doc, retour);
   return String(retour) ;
 }
@@ -435,6 +438,20 @@ void processMessage(String message_get ) {
 }
 
 */
+
+bool detecterEspace(const char* chaine) {
+    // Parcourir chaque caractère de la chaîne
+    for (int i = 0; chaine[i] != '\0'; ++i) {
+        // Vérifier si le caractère actuel est un espace
+        if (chaine[i] == ' ') {
+            // Un espace a été détecté, retourner vrai
+            return true;
+        }
+    }
+    // Aucun espace détecté, retourner faux
+    return false;
+}
+
 void serial_read() {
   String message_get =""; 
   int watchdog; 
@@ -467,6 +484,15 @@ void serial_read() {
         char ssidArray[51];  
         int ssidLength = message_get.length() - 4;  // Longueur du SSID à partir de l'index 5
         message_get.toCharArray(ssidArray, ssidLength, 5);
+        // protection chaine vide ou négative >> SSID "AP" par defaut
+        if (ssidLength <= 4 || detecterEspace(ssidArray)) { 
+          Serial.println("SSID Mis en AP" );
+          strcpy(configwifi.SID, "AP");
+          configwifi.sauve_wifi();
+          return; 
+        }
+
+        Serial.println(ssidLength);
         Serial.println("ssid enregistré: " + String(ssidArray));
         strcpy(configwifi.SID, ssidArray);
         configwifi.sauve_wifi(); 
@@ -478,6 +504,12 @@ void serial_read() {
       if (index != -1 ){
         char passArray[60];  
         int passLength = message_get.length() - 4;  // Longueur du PASS à partir de l'index 5
+        /// protection contre chaine vide ou négative
+        if (passLength <= 0) { 
+          Serial.println("password vide" );
+          return; 
+        }
+
         message_get.toCharArray(passArray, passLength, 5);
         Serial.println("password enregistré ");
         strcpy(configwifi.passwd, passArray);
@@ -504,8 +536,8 @@ void serial_read() {
       if (message_get.length() !=0){
         Serial.println("Commande disponibles :");
         Serial.println("'reboot' pour redémarrer le routeur ");
+        Serial.println("'pass' pour changer le mdp wifi ( doit être configuré avant le SSID )");
         Serial.println("'ssid' pour changer le SSID wifi");
-        Serial.println("'pass' pour changer le mdp wifi");
         Serial.println("'log' pour afficher les logs serial");
         Serial.println("'flip' pour retourner l'ecran");
 

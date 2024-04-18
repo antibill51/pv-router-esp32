@@ -94,10 +94,10 @@ if (( strcmp(config.dimmer,"") != 0 && strcmp(config.dimmer,"") != 0) && ( confi
             if (config.mqtt)  {
             /// A vérifier que c'est necessaire ( envoie double ? )
             /// la valeur 0 doit quand meme être envoyé 
-              // if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); }
-              // Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); 
+              //  if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); }
+              Mqtt_send_DOMOTICZ(String(dimmerIDX), String(dimmervalue),"","dimmer"); 
               if ((configmqtt.HA)|| (configmqtt.JEEDOM)) {
-                device_dimmer.send(String(dimmervalue)); 
+                // device_dimmer.send(String(dimmervalue)); 
                 } 
             }
         }

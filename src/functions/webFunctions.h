@@ -95,11 +95,13 @@ else {
 
   server.on("/config.html", HTTP_GET, [](AsyncWebServerRequest *request){
     if(SPIFFS.exists("/config.html.gz")){
-    #ifndef LIGHT_FIRMWARE
-       compress_html(request,"/config.html.gz", "text/html");
-    #else
+    #ifdef LIGHT_FIRMWARE
        compress_html(request,"/config-light.html.gz", "text/html");
-    #endif
+    #elif ESP32D1MINI_FIRMWARE
+      compress_html(request,"/config-dimmer.html.gz", "text/html");
+    #else
+      compress_html(request,"/config.html.gz", "text/html");
+   #endif
 
     }
     else {
@@ -318,6 +320,7 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
    #endif
    request->redirect("/");
    config.restart = true;
+   ESP.restart();
   });
 
 server.onNotFound(notFound);
@@ -449,6 +452,11 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
     }
     if (request->hasParam("relaystart")) { config.relayon = request->getParam("relaystart")->value().toInt();}
     if (request->hasParam("relaystop")) { config.relayoff = request->getParam("relaystop")->value().toInt();}
+    if (request->hasParam("SCT_13")) { config.SCT_13 = request->getParam("SCT_13")->value().toInt();  
+        /// la valeur de la sonde doit être entre 20 et 100 ( )
+        if (config.SCT_13 < 20) config.SCT_13 = 20;
+        if (config.SCT_13 > 100) config.SCT_13 = 100;
+    }
 
     //// minuteur 
    if (request->hasParam("heure_demarrage")) { request->getParam("heure_demarrage")->value().toCharArray(programme.heure_demarrage,6);  }

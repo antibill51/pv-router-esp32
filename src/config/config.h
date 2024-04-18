@@ -182,7 +182,7 @@ bool discovery_temp = false;
   //  #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define RELEASE "Version 20240315"
+#define RELEASE "Version 20240330"
     #ifdef LIGHT_FIRMWARE
         #define VERSION "Light " RELEASE
         #else
@@ -227,7 +227,24 @@ bool AP=true;
     #define DEBUG_PRINTLN(x)
   #endif
 
+/// Configuration pour ESP32D1MINI sur carte dimmer + récupération Shelly
+#ifdef ESP32D1MINI_FIRMWARE
+  #if DIMMERLOCAL
+      #define outputPin  18 // PSM on board
+      #define zerocross  19 // for boards with CHANGEBLE input pins // ZC on board
+      #define COOLER 5 // Pin for COOLER. (switch on dimmer)
+  #endif
 
+  #if DALLAS
+      #define ONE_WIRE_BUS  23
+      #define TEMPERATURE_PRECISION 10
+      #define TRIGGER 5   /// Trigger % for max temp protection. max temp configuration is in config.json
+   #endif
+   
+  #define OLED_ON false
+  #define RELAY1 17
+  #define RELAY2 21
+#endif
 
 
 #endif

@@ -90,6 +90,7 @@ void loadConfiguration(const char *filename, Config &config) {
   config.offset = doc["offset"] | -10;
   config.relayoff = doc["relayoff"] | 95;
   config.relayon = doc["relayon"] | 100;
+  config.SCT_13 = doc["SCT_13"] | 30;
 
   config.polarity = doc["polarity"] | false;
   strlcpy(config.dimmer,                  // <- destination
@@ -108,7 +109,10 @@ void loadConfiguration(const char *filename, Config &config) {
           doc["topic_Shelly"] | "", // <- source
           sizeof(config.topic_Shelly));
 
+  config.Shelly_tri = doc["Shelly_tri"] | false; /// récupération shelly mode triphasé ou monophasé
   configFile.close();
+
+  config.recup_polarity();
   
   logging.Set_log_init("config file loaded\r\n",true);
 }
@@ -172,6 +176,8 @@ void saveConfiguration(const char *filename, const Config &config) {
   doc["relayon"] = config.relayon; 
   doc["relayoff"] = config.relayoff; 
   doc["topic_Shelly"] = config.topic_Shelly; 
+  doc["Shelly_tri"] = config.Shelly_tri;
+  doc["SCT_13"] = config.SCT_13;
 
 
   // Serialize JSON to file
