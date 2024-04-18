@@ -106,7 +106,12 @@ struct Config {
   char topic_Shelly[100]; 
   bool Shelly_tri;
   int SCT_13=30;
-
+/// @brief  // Puissance de la charge 2 déclarée dans la page web
+  int charge2; 
+/// @brief  // Puissance de la charge 3 déclarée dans la page web
+  int charge3;
+/// @brief  // Somme des 3 charges déclarées dans la page web
+  int charge;
   Preferences preferences;
 
   public:bool sauve_polarity() {

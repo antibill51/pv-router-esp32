@@ -78,7 +78,7 @@ void updateDimmer(void * parameter){
         int local_power = 0 ;
         int child_power = 0 ;
     // si dimmer local alors calcul de puissance routée 
-    if (config.dimmerlocal) { // Pas besoin de ce if, ça répond bien même si pas d'enfant configuré
+    if (config.dimmerlocal && config.resistance > 0) { // Pour éviter le bootloop si config.resistance = 0 // Pas besoin de ce if, ça répond bien même si pas d'enfant configuré
         local_power =  dimmer_hard.getPower() * config.resistance/100; // watts
         }
         else { 

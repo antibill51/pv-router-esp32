@@ -198,7 +198,8 @@
               Password :<input type="password" autocomplete="current-password" class="form-control form-control-user" id="password" placeholder="%PASSWORD%">
             </div>
           <!-- </div> -->
-        <!-- </div> -->
+          <!-- </div> -->
+
         <br>
         
         <div class="card position-relative">
@@ -208,40 +209,58 @@
             </div>
             <div class="card-body">
                 <div class="col-lg-12">
-                    <div class="form-group row">
-                        <div class="col-sm-3">
-                            <div class="custom-control custom-checkbox small">
-                                MQTT
-                                <br>
-                                <input type="checkbox" class="custom-control-input" id="HA">
-                                <label class="custom-control-label" for="HA" onclick="sendservermode(this.innerHTML);">HA</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="custom-control custom-checkbox small">
-                                MQTT
-                                <br>
-                                <input type="checkbox" class="custom-control-input" id="JEEDOM">
-                                <label class="custom-control-label" for="JEEDOM" onclick="sendservermode(this.innerHTML);">JEEDOM</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="custom-control custom-checkbox small">
-                                MQTT
-                                <br>
-                                <input type="checkbox" class="custom-control-input" id="DOMOTICZ">
-                                <label class="custom-control-label" for="DOMOTICZ" onclick="sendservermode(this.innerHTML);">DOMOTICZ</label>
-                            </div>
-                        </div>
-                        <div class="col-sm-3">
-                            <div class="custom-control custom-checkbox small">
-                                DIMMER
-                                <br>
-                                <input type="checkbox" class="custom-control-input" id="HTTP">
-                                <label class="custom-control-label" for="HTTP" onclick="sendservermode(this.innerHTML);">HTTP</label>
-                            </div>
-                        </div>
+                    <!-- <div class="form-group row">
+                        <div class="col-sm-4"> -->
+
+                  <div class="form-group row">
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers HA">MQTT HA ℹ</div>
+                    <div class="col-sm-3">
+                    <div class="custom-control custom-checkbox small">
+                        <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers HA">MQTT HA ℹ</a>
+                        <br> -->
+                        <input type="checkbox" class="custom-control-input" id="HA">
+                        <label class="custom-control-label" for="HA" onclick="sendservermode(this.innerHTML);"></label>  
                     </div>
+                  </div>
+                </div>
+
+                  <div class="form-group row">
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers JEEDOM">MQTT JEEDOM ℹ</div>
+                    <div class="col-sm-3">
+                    <div class="custom-control custom-checkbox small">
+                        <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers JEEDOM">MQTT JEEDOM ℹ</a>
+                        <br> -->
+                        <input type="checkbox" class="custom-control-input" id="JEEDOM">
+                        <label class="custom-control-label" for="JEEDOM" onclick="sendservermode(this.innerHTML);"></label>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers DOMOTICZ">MQTT DOMOTICZ ℹ</div>
+                    <div class="col-sm-3">
+                    <div class="custom-control custom-checkbox small">
+                        <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers DOMOTICZ">MQTT DOMOTICZ ℹ</a>
+                        <br> -->
+                        <input type="checkbox" class="custom-control-input" id="DOMOTICZ">
+                        <label class="custom-control-label" for="DOMOTICZ" onclick="sendservermode(this.innerHTML);"></label>
+                      </div>
+
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez si le routeur communique avec le dimmer enfant en HTTP. (Sinon MQTT)">DIMMER HTTP ℹ</div>
+                    <div class="col-sm-3">
+                    <div class="custom-control custom-checkbox small">
+                        <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez si le routeur communique avec le dimmer enfant en HTTP. (Sinon MQTT)">DIMMER HTTP ℹ</a>
+                        <br> -->
+                        <input type="checkbox" class="custom-control-input" id="HTTP">
+                        <label class="custom-control-label" for="HTTP" onclick="sendservermode(this.innerHTML);"></label>
+                        
+                    </div>
+                  </div>
+                </div>
+              <!-- </div> -->
 
 
             <!-- <div class="card position-relative">
@@ -294,21 +313,30 @@
               <div class="card-body">
                 <div class="form-group row">
                   <div class="col-sm-6">
-                    <a data-toggle="popover" title="Aide" data-bs-content="Si vous n'utilisez pas de Shelly laissez à 'none'. Pour le Shelly en passant par MQTT, renseignez le topic MQTT, sinon Spécifiez l'Ip du Shelly, la 1ere entrée du Shelly sera capturée">Shelly EM topic ℹ (or none): </a> <input type="text" class="form-control form-control-user" id="EM" placeholder="%EM%">
+                    <a data-toggle="popover" title="Aide" data-bs-content="Si vous n'utilisez pas de Shelly laissez vide. Pour le Shelly en passant par MQTT, renseignez le topic MQTT, sinon Spécifiez l'Ip du Shelly, la 1ere entrée du Shelly sera capturée">Shelly EM topic ℹ </a>
+                  </div>
+                  <div class="col-sm-6">
+                    <input type="text" class="form-control form-control-user" id="EM" placeholder="N/A">
                     <div class="info-text"></div>
+                 </div>
+               </div>
+
+                <div class="form-group row">
+                  <div class="col-sm-9">
+                    <!-- <div class="custom-control custom-checkbox small"> -->
+                      <a data-toggle="popover" title="Aide" data-bs-content="Cochez si vous utilisez un Shelly 3EM ( Triphasé )">Mono / Triphasé (Beta) ℹ</a>
+                    <!-- </div> -->
                   </div>
                   <div class="col-sm-3">
                     <div class="custom-control custom-checkbox small">
-                      <a data-toggle="popover" title="Aide" data-bs-content="Cochez si vous utilisez un Shelly 3EM ( Triphasé )">Mono / Triphasé (Beta) ℹ</a>
-                      <br>
-                      <input type="checkbox" class="custom-control-input" id="TRI">
-                      <label class="custom-control-label" for="TRI" onclick="sendservermode(this.innerHTML);" >TRI</label>
-                    </div>
+
+                    <input type="checkbox" class="custom-control-input" id="TRI">
+                    <label class="custom-control-label" for="TRI" onclick="sendservermode(this.innerHTML);" ></label>
                   </div>
                 </div>
               </div>
+              </div>
             </div>
-
 
           <br>
           <div class="card position-relative" id="IDXview" style="display: none">
@@ -354,8 +382,6 @@
                 </div>
               </div>
             </div>
-
-		    <!-- </div> -->
 				
       </div> 
 				
@@ -370,10 +396,10 @@
 
 
 
-              <hr>
-            </div>
-          </div>
-                </div>
+              <!-- <hr> -->
+            <!-- </div> -->
+          <!-- </div> -->
+                <!-- </div> -->
               </div>
 
             </div>
