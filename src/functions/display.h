@@ -82,7 +82,7 @@ void affichage_normal(){
                           display.print("Routage (%)");
                         #endif
                         display.setCursor(160, 48, 2);
-                        if (strcmp(config.topic_Shelly,"") == 0)   display.print(OLEDPOW);
+                        if (strcmp(config.topic_Shelly,"") == 0 || strcmp(config.topic_Shelly,"none") == 0)   display.print(OLEDPOW);
                         else display.print("Shelly");
                         
                   #endif
