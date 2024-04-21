@@ -93,10 +93,10 @@ void updateDimmer(void * parameter){
         gDisplayValues.puissance_route = local_power + child_power;
 
         /// Actualisation de gDisplayValues.dimmer à chaque requêtage du dimmer enfant
-        gDisplayValues.dimmer = gDisplayValues.puissance_route * 100/config.resistance;
+        gDisplayValues.dimmer = gDisplayValues.puissance_route * 100/config.charge;
 
         #else
-            gDisplayValues.puissance_route = config.resistance * gDisplayValues.dimmer/100; // watts
+            gDisplayValues.puissance_route = config.charge * gDisplayValues.dimmer/100; // watts
         #endif
     
 #endif

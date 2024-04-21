@@ -230,20 +230,20 @@ stopMillis = micros();
     Serial.println(voltage_read);*/
 
 
+/// synchronisation sur la porteuse 
+for(int i = 0; i < loop; i++)
+{
+  if ( start == 0 ) {  if ( porteuse[i] > 0 && i >= 1) { 
+    start = (i-1) ; 
+     //if ( voltage_read < porteuse[i] ) {voltage_read = porteuse[i] ; }
+    //Serial.println(String(tableau[i])); }
+    }   
+  //else { 
+  //Serial.println(String(tableau[i])); 
+  } 
 
-    for(int i = 0; i < loop; i++)
-    {
-      if ( start == 0 ) {  if ( porteuse[i] > 0 ) { 
-        start = i -1 ; 
-        //if ( voltage_read < porteuse[i] ) {voltage_read = porteuse[i] ; }
-        //Serial.println(String(tableau[i])); }
-        }   
-      //else { 
-      //Serial.println(String(tableau[i])); 
-      } 
-
-    }   /// stable sur la carte din entre 18 et 21 
-    ///Serial.println (voltage_read);
+}   /// stable sur la carte din entre 18 et 21 
+///Serial.println (voltage_read);
 
 // int phi = config.cosphi ;
 // if (phi > start ) { phi = start ; }
@@ -282,13 +282,14 @@ stopMillis = micros();
 
     //Serial.println(int(positive/10000*voltage_read)) ;// test de calcul de voltage
 
+/// A vide j'ai 20 ou -20 environ en fonction de comment est connecté la prise.
 
 
-    //positive = ( positive / ( FACTEURPUISSANCE  * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
-    //int base_offset = 15; offset du à la sonde et au montage ( composante continue mal filtrée) pour offset = 0 il faut mettre un condensateur de 10µF en //parallèle sur la sonde  (testé aussi avec 3.3µF)
+//positive = ( positive / ( FACTEURPUISSANCE * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
+//int base_offset = 15; offset du à la sonde et au montage ( composante continue mal filtrée) pour offset = 0 il faut mettre un condensateur de 10µF en //parallèle sur la sonde  (testé aussi avec 3.3µF)
 
 int base_offset = 0; // ( testé sur 3 sondes différentes à vide )  --> la base d'offset change de sens en fonction de la phase de la prise
-positive = ( ( positive * config.voltage  ) / ( config.facteur  * nombre_cycle * 230  ) )   ;  
+positive = ( ( positive * config.voltage  ) / ( FACTEURPUISSANCE * nombre_cycle * 230  ) )   ;  
 /// correction pour l'offset en fonction de comment est branchée la pince
 //if ( config.polarity == true ) { positive = positive - config.offset ; }
 //else { positive = positive + config.offset ; }
@@ -334,8 +335,8 @@ else {
 positive = -( ( positive - base_offset )* config.SCT_13 / 30 + config.offset )  ;
 }
 
-    gDisplayValues.watt = int(( positive )) ; 
-        // if ( config.polarity == true ) { gDisplayValues.watt = - gDisplayValues.watt ; }
+gDisplayValues.watt = int(( positive )) ; 
+
 
     }
 

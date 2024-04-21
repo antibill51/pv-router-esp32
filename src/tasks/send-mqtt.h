@@ -40,10 +40,10 @@ extern Mqtt configmqtt;
       // extern HA power_vrms;
       // extern HA power_irms;
       // extern HA power_apparent;
-      // extern HA enphase_cons_whLifetime;
-      // extern HA enphase_prod_whLifetime;
-      // extern HA enphase_current_power_consumption;
-      // extern HA enphase_current_power_production;
+     // // extern HA enphase_cons_whLifetime;
+      // //extern HA enphase_prod_whLifetime;
+      // //extern HA enphase_current_power_consumption;
+      // //extern HA enphase_current_power_production;
       extern MQTT device_routeur; 
       extern MQTT device_grid; 
       extern MQTT device_routed; // Ajout RV - 20230304
@@ -107,9 +107,9 @@ void send_to_mqtt(void * parameter){
                   if ((configmqtt.HA) || ( configmqtt.JEEDOM)) {
                         device_routeur.send(String(int(gDisplayValues.watt)));
                         device_routed.send(String(gDisplayValues.puissance_route));
-                        if (config.dimmerlocal) {
+                        // if (config.dimmerlocal) {
                               device_dimmer_power.send(String(int((dimmer_hard.getPower()) * config.resistance/100)));
-                        }
+                        // }
 
                         #ifdef HARDWARE_MOD
                               power_apparent.send(String(int(PVA)));
@@ -228,8 +228,7 @@ void send_to_mqtt(void * parameter){
       } 
       task_mem.task_send_mqtt = uxTaskGetStackHighWaterMark(NULL);
    // Sleep for 10 seconds
-//     vTaskDelay(pdMS_TO_TICKS(5000)); //4500 * Pow_mqtt_send
-      vTaskDelay(pdMS_TO_TICKS(1000));
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 

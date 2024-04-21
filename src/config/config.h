@@ -107,18 +107,17 @@ int half;
  */
 
 #define DIMMER true
-#define DIMMERLOCAL true
 #define DALLAS true
 #define TRIGGER 10   /// 
 
 ///// PVROUTER false dans le cas d'un enphase en pilote full 
 #define PVROUTER true
 
-#if DIMMERLOCAL 
+
     #define outputPin  26 // PSM on board
     #define zerocross  27 // for boards with CHANGEBLE input pins // ZC on board
     #define COOLER 12 // Pin for COOLER. (switch on dimmer)
-#endif
+
 
 #if DALLAS
     #define ONE_WIRE_BUS  25
@@ -173,7 +172,6 @@ bool discovery_temp = false;
 #define NTP_OFFSET_SECONDS 3600
 #define NTP_UPDATE_INTERVAL_MS 3600000 /// synch de l'heure toute les heures
 
-
 // Check which core Arduino is running on. This is done because updating the 
 // display only works from the Arduino core.
 #if CONFIG_FREERTOS_UNICORE
@@ -182,7 +180,8 @@ bool discovery_temp = false;
   //  #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define RELEASE "Version 20240330"
+#define RELEASE "Version 20240415"
+#define FS_RELEASE "20240415"
     #ifdef LIGHT_FIRMWARE
         #define VERSION "Light " RELEASE
         #else
@@ -205,9 +204,6 @@ bool AP=true;
 /// taille max des logs stockée
 #define LOG_MAX_STRING_LENGTH 1500 
 
-//// JOTTA 
-#define JOTTA  2
-#define GRIDFREQ 90 ///PWM frequency
 
 #ifdef S3
     #define ADC_INPUT 10
@@ -229,11 +225,13 @@ bool AP=true;
 
 /// Configuration pour ESP32D1MINI sur carte dimmer + récupération Shelly
 #ifdef ESP32D1MINI_FIRMWARE
-  #if DIMMERLOCAL
+
       #define outputPin  18 // PSM on board
       #define zerocross  19 // for boards with CHANGEBLE input pins // ZC on board
       #define COOLER 5 // Pin for COOLER. (switch on dimmer)
-  #endif
+      #define outputPin2 22 // use JOTTA/SSR2 (SSR2) output for 2nd Robotdyn/Random SSR
+      #define outputPin3 21  // (SSR3) use RELAY2/SSR3 output for 3rd Robotdyn/Random SSR ( for old boards )
+
 
   #if DALLAS
       #define ONE_WIRE_BUS  23
@@ -243,7 +241,7 @@ bool AP=true;
    
   #define OLED_ON false
   #define RELAY1 17
-  #define RELAY2 21
+  #define RELAY2 26
 #endif
 
 
