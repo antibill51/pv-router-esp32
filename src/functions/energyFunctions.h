@@ -289,7 +289,7 @@ for(int i = 0; i < loop; i++)
 //int base_offset = 15; offset du à la sonde et au montage ( composante continue mal filtrée) pour offset = 0 il faut mettre un condensateur de 10µF en //parallèle sur la sonde  (testé aussi avec 3.3µF)
 
 int base_offset = 0; // ( testé sur 3 sondes différentes à vide )  --> la base d'offset change de sens en fonction de la phase de la prise
-positive = ( ( positive * config.voltage  ) / ( FACTEURPUISSANCE * nombre_cycle * 230  ) )   ;  
+positive = ( ( positive * config.voltage  ) / ( config.facteur * nombre_cycle * 230  ) )   ;  
 /// correction pour l'offset en fonction de comment est branchée la pince
 //if ( config.polarity == true ) { positive = positive - config.offset ; }
 //else { positive = positive + config.offset ; }
