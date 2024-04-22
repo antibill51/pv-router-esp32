@@ -134,7 +134,6 @@ void HA_discover(){
         //         enphase_current_power_production.HA_discovery();
         // }
         if (config.dimmerlocal) {device_dimmer_power.HA_discovery();}
-        }
         #ifdef HARDWARE_MOD
                 if (configmqtt.HA){
                         power_factor.HA_discovery();
@@ -144,6 +143,7 @@ void HA_discover(){
                 }
                 
         #endif
+        }
 }
 
 void init_HA_sensor(){
