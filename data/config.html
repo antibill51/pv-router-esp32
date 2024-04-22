@@ -453,14 +453,16 @@
 		            </div>
 				
                 <div class="form-group row">
-                  <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="A modifier si la sonde a une légère dérive (default: 0.86)">Facteur de correction ℹ</div>
+                  <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="A modifier si la sonde a une légère dérive (default: 10.5)">Facteur de correction ℹ</div>
                   <div class="col-sm-3">
-                      <input
+                      <input type="number" step="0.01" class="form-control form-control-user" id="facteur" placeholder="%facteur%">
+
+                      <!-- <input
                           type="text"
                           class="form-control form-control-user"
                           id="facteur"
                           placeholder="%facteur%"
-                      >
+                      > -->
                   </div>                
                 </div>
                 <!-- <div class="form-group row">

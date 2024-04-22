@@ -204,7 +204,7 @@
         
         <div class="card position-relative">
             <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">Transmission MQTT/HTTP</h6>
+                <h6 class="m-0 font-weight-bold text-primary">Transmission MQTT</h6>
                 <span id="saveform"></span>
             </div>
             <div class="card-body">
@@ -213,52 +213,50 @@
                         <div class="col-sm-4"> -->
 
                   <div class="form-group row">
-                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers HA">MQTT HA ℹ</div>
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers HA">HA ℹ</div>
                     <div class="col-sm-3">
                     <div class="custom-control custom-checkbox small">
                         <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers HA">MQTT HA ℹ</a>
                         <br> -->
                         <input type="checkbox" class="custom-control-input" id="HA">
-                        <label class="custom-control-label" for="HA" onclick="sendservermode(this.innerHTML);"></label>  
+                        <label class="custom-control-label" for="HA" onclick="sendservermode('HA');"></label>  
                     </div>
                   </div>
                 </div>
 
                   <div class="form-group row">
-                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers JEEDOM">MQTT JEEDOM ℹ</div>
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers JEEDOM">JEEDOM ℹ</div>
                     <div class="col-sm-3">
                     <div class="custom-control custom-checkbox small">
                         <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers JEEDOM">MQTT JEEDOM ℹ</a>
                         <br> -->
                         <input type="checkbox" class="custom-control-input" id="JEEDOM">
-                        <label class="custom-control-label" for="JEEDOM" onclick="sendservermode(this.innerHTML);"></label>
+                        <label class="custom-control-label" for="JEEDOM" onclick="sendservermode('JEEDOM');"></label>
                       </div>
 
                     </div>
                   </div>
                   <div class="form-group row">
-                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers DOMOTICZ">MQTT DOMOTICZ ℹ</div>
+                    <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers DOMOTICZ">DOMOTICZ ℹ</div>
                     <div class="col-sm-3">
                     <div class="custom-control custom-checkbox small">
                         <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez pour activer l'envoi d'informations MQTT vers DOMOTICZ">MQTT DOMOTICZ ℹ</a>
                         <br> -->
                         <input type="checkbox" class="custom-control-input" id="DOMOTICZ">
-                        <label class="custom-control-label" for="DOMOTICZ" onclick="sendservermode(this.innerHTML);"></label>
+                        <label class="custom-control-label" for="DOMOTICZ" onclick="sendservermode('DOMOTICZ');"></label>
                       </div>
 
                     </div>
                   </div>
-                  <div class="form-group row">
+                  <!-- <div class="form-group row">
                     <div class="col-sm-9" data-toggle="popover" title="Aide" data-bs-content="Cochez si le routeur communique avec le dimmer enfant en HTTP. (Sinon MQTT)">DIMMER HTTP ℹ</div>
                     <div class="col-sm-3">
                     <div class="custom-control custom-checkbox small">
-                        <!-- <a data-toggle="popover" title="Aide" data-bs-content="Cochez si le routeur communique avec le dimmer enfant en HTTP. (Sinon MQTT)">DIMMER HTTP ℹ</a>
-                        <br> -->
                         <input type="checkbox" class="custom-control-input" id="HTTP">
                         <label class="custom-control-label" for="HTTP" onclick="sendservermode(this.innerHTML);"></label>
                         
                     </div>
-                  </div>
+                  </div> -->
                 </div>
               <!-- </div> -->
 
@@ -331,7 +329,7 @@
                     <div class="custom-control custom-checkbox small">
 
                     <input type="checkbox" class="custom-control-input" id="TRI">
-                    <label class="custom-control-label" for="TRI" onclick="sendservermode(this.innerHTML);" ></label>
+                    <label class="custom-control-label" for="TRI" onclick="sendservermode('TRI');" ></label>
                   </div>
                 </div>
               </div>

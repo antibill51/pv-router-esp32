@@ -49,23 +49,23 @@ void loadConfiguration(const char *filename, Config &config) {
 
   
   // Copy values from the JsonDocument to the Config
-  config.port = doc["port"] | 8080;
-  strlcpy(config.hostname,                  // <- destination
-          doc["hostname"] | "192.168.1.20", // <- source
-          sizeof(config.hostname));         // <- destination's capacity
+  // config.port = doc["port"] | 8080;
+  // strlcpy(config.hostname,                  // <- destination
+  //         doc["hostname"] | "192.168.1.20", // <- source
+  //         sizeof(config.hostname));         // <- destination's capacity
   
-  strlcpy(config.apiKey,                  // <- destination
-          doc["apiKey"] | "Myapikeystring", // <- source
-          sizeof(config.apiKey));         // <- destination's capacity
+  // strlcpy(config.apiKey,                  // <- destination
+  //         doc["apiKey"] | "Myapikeystring", // <- source
+  //         sizeof(config.apiKey));         // <- destination's capacity
       
-  config.UseDomoticz = doc["UseDomoticz"] | false; 
-  config.UseJeedom = doc["UseJeedom"] | false; 
+  // config.UseDomoticz = doc["UseDomoticz"] | false; 
+  // config.UseJeedom = doc["UseJeedom"] | false; 
   config.IDX = doc["IDX"] | 100; 
   config.IDXdimmer = doc["IDXdimmer"] | 110; 
   config.IDXdallas = doc["IDXdallas"] | 900; 
-  strlcpy(config.otapassword,                  // <- destination
-          doc["otapassword"] | "Pvrouteur2", // <- source
-          sizeof(config.otapassword));         // <- destination's capacity
+  // strlcpy(config.otapassword,                  // <- destination
+  //         doc["otapassword"] | "Pvrouteur2", // <- source
+  //         sizeof(config.otapassword));         // <- destination's capacity
 
 
   config.facteur = doc["facteur"] | 10.5;
@@ -74,15 +74,15 @@ void loadConfiguration(const char *filename, Config &config) {
   config.deltaneg = doc["deltaneg"] | 0; 
   config.cosphi = doc["cosphi"] | 5; 
   config.readtime = doc["readtime"] | 555;
-  config.cycle = doc["cycle"] | 72;
+  // config.cycle = doc["cycle"] | 72;
 
   config.resistance = doc["resistance"] | 1000;
   config.charge2 = doc["charge2"] | 0;
   config.charge3 = doc["charge3"] | 0;
   config.calcul_charge();
 
-  config.sending = doc["sending"] | true;
-  config.autonome = doc["autonome"] | true;
+  // config.sending = doc["sending"] | true;
+  // config.autonome = doc["autonome"] | true;
   config.mqtt = doc["mqtt"] | false;
   config.mqttport = doc["mqttport"] | 1883;
   
@@ -142,22 +142,22 @@ void saveConfiguration(const char *filename, const Config &config) {
   DynamicJsonDocument doc(1024);
 
   // Set the values in the document
-  doc["hostname"] = config.hostname;
-  doc["port"] = config.port;
-  doc["apiKey"] = config.apiKey;
-  doc["UseDomoticz"] = config.UseDomoticz;
-  doc["UseJeedom"] = config.UseJeedom;
+  // doc["hostname"] = config.hostname;
+  // doc["port"] = config.port;
+  // doc["apiKey"] = config.apiKey;
+  // doc["UseDomoticz"] = config.UseDomoticz;
+  // doc["UseJeedom"] = config.UseJeedom;
   doc["IDX"] = config.IDX;
   doc["IDXdimmer"] = config.IDXdimmer;
   doc["IDXdallas"] = config.IDXdallas;
-  doc["otapassword"] = config.otapassword;
+  // doc["otapassword"] = config.otapassword;
   doc["delta"] = config.delta;
   doc["deltaneg"] = config.deltaneg;
   doc["cosphi"] = config.cosphi;
   doc["readtime"] = config.readtime;
-  doc["cycle"] = config.cycle;
-  doc["sending"] = config.sending;
-  doc["autonome"] = config.autonome;
+  // doc["cycle"] = config.cycle;
+  // doc["sending"] = config.sending;
+  // doc["autonome"] = config.autonome;
   doc["dimmer"] = config.dimmer;
 
   doc["dimmerlocal"] = config.dimmerlocal;

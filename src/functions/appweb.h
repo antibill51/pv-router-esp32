@@ -161,8 +161,8 @@ String getSendmode() {
 //***********************************
 String getServermode(String Servermode) {
   if ( Servermode == "screen" ) {  gDisplayValues.screenstate = !gDisplayValues.screenstate; }
-  if ( Servermode == "Jeedom" ) {   config.UseJeedom = !config.UseJeedom;}
-  if ( Servermode == "Autonome" ) {   config.autonome = !config.autonome; }
+  // if ( Servermode == "Jeedom" ) {   config.UseJeedom = !config.UseJeedom;}
+  // if ( Servermode == "Autonome" ) {   config.autonome = !config.autonome; }
   if ( Servermode == "Dimmer local" ) {   
                     config.dimmerlocal = !config.dimmerlocal;  
                     /// correction bug #26 
@@ -185,7 +185,7 @@ String getServermode(String Servermode) {
                     }
   if ( Servermode == "JEEDOM" ) { configmqtt.JEEDOM = !configmqtt.JEEDOM; }
   if ( Servermode == "DOMOTICZ" ) { configmqtt.DOMOTICZ = !configmqtt.DOMOTICZ; }
-  if ( Servermode == "HTTP" ) { configmqtt.HTTP = !configmqtt.HTTP; }
+  // if ( Servermode == "HTTP" ) { configmqtt.HTTP = !configmqtt.HTTP; }
   #endif
 
   if ( Servermode == "flip" ) {   
@@ -250,11 +250,11 @@ String getconfig() {
   return String(configweb);
 }
 
-String getenvoy() {
-  String VERSION_http = String(VERSION) + " " + String(COMPILE_NAME) ; 
-  configweb = String(config.IDXdimmer) + ";" +  config.num_fuse + ";"  + String(config.IDX) + ";"  +  String(VERSION_http) +";" + "middle" +";"+ config.delta +";"+config.cycle+";"+config.dimmer+";"+config.cosphi+";"+config.readtime +";"+stringbool(config.UseDomoticz)+";"+stringbool(config.UseJeedom)+";"+stringbool(config.autonome)+";"+config.apiKey+";"+stringbool(config.dimmerlocal)+";"+config.facteur+";"+stringbool(config.mqtt)+";"+config.mqttserver+ ";"  + String(config.Publish)+";"+config.deltaneg+";"+config.resistance+";"+config.polarity+";"+config.ScreenTime+";"+config.localfuse+";"+config.tmax+";"+config.voltage+";"+config.offset+";"+stringbool(config.flip)+";"+stringbool(configmqtt.HA)+";"+config.relayon+";"+config.relayoff;
-  return String(configweb);
-}
+// String getenvoy() {
+//   String VERSION_http = String(VERSION) + " " + String(COMPILE_NAME) ; 
+//   configweb = String(config.IDXdimmer) + ";" +  config.num_fuse + ";"  + String(config.IDX) + ";"  +  String(VERSION_http) +";" + "middle" +";"+ config.delta +";"+config.cycle+";"+config.dimmer+";"+config.cosphi+";"+config.readtime +";"+stringbool(config.UseDomoticz)+";"+stringbool(config.UseJeedom)+";"+stringbool(config.autonome)+";"+config.apiKey+";"+stringbool(config.dimmerlocal)+";"+config.facteur+";"+stringbool(config.mqtt)+";"+config.mqttserver+ ";"  + String(config.Publish)+";"+config.deltaneg+";"+config.resistance+";"+config.polarity+";"+config.ScreenTime+";"+config.localfuse+";"+config.tmax+";"+config.voltage+";"+config.offset+";"+stringbool(config.flip)+";"+stringbool(configmqtt.HA)+";"+config.relayon+";"+config.relayoff;
+//   return String(configweb);
+// }
 //***********************************
 String getchart() {
   String retour ="" ;
