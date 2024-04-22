@@ -612,8 +612,12 @@
           <!-- Content Row -->
 
 
-<!-- Core plugin JavaScript avec chargement local si non dispo-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> 
+        </script >
+           
+
+
+        <!-- Core plugin JavaScript avec chargement local si non dispo-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script> 
   <script>
   if (typeof jQuery == 'undefined') {
     document.write('<script src="/jquery.min.js"><\/script>');
@@ -665,10 +669,15 @@ function save () {
 }
 </script>
 
+  <script>
+
+          $(function () {
+          $('[data-toggle="popover"]').popover()
+          })
+  </script>
+
 <script>
-$(function () {
-  $('[data-toggle="popover"]').popover()
-})
+
 
 <!--- sauvegarde de la configuration --> 
 $( "#save" ).click(function() {
@@ -768,11 +777,14 @@ $(document).ready(function(){
 
   <!-- Bootstrap core JavaScript-->
   <!-- Bootstrap core JavaScript-->
-  <script src="/jquery.min.js"></script>
-  <script src="/bootstrap.bundle.min.js"></script>
-
-  <!-- Core plugin JavaScript-->
-  <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script> --> 
+  
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" ></script>
+  
+<script>
+  if (typeof bootstrap == 'undefined') {
+    document.write('<script src="/bootstrap.bundle.min.js"><\/script>');
+  }
+</script>
 
   <!-- Custom scripts for all pages-->
   <script src="sb-admin-2.js"></script>
