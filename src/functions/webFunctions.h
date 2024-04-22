@@ -368,7 +368,7 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
    if (request->hasParam("resistance2")) { config.charge2 = request->getParam("resistance2")->value().toInt(); config.calcul_charge();}
    if (request->hasParam("resistance3")) { config.charge3 = request->getParam("resistance3")->value().toInt(); config.calcul_charge();}
    if (request->hasParam("screentime")) { config.ScreenTime = request->getParam("screentime")->value().toInt();config.calcul_charge(); } 
-   if (request->hasParam("voltage")) { config.voltage = request->getParam("voltage")->value().toInt();}
+   if (request->hasParam("voltage")) { config.voltage = request->getParam("voltage")->value().toFloat();}
    if (request->hasParam("offset")) { config.offset = request->getParam("offset")->value().toInt();}
    
    /// @brief  wifi
