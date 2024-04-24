@@ -82,7 +82,7 @@ struct Config {
   bool autonome; // si dimmer en local 
   char dimmer[16];  // adresse IP du dimmer
   bool dimmerlocal; // si dimmer en local
-  float facteur; // facteur de correction de la puissance
+  double facteur; // facteur de correction de la puissance
   int num_fuse;
   int localfuse;
   int tmax;
@@ -94,7 +94,7 @@ struct Config {
   bool polarity; 
   char Publish[100];
   int  ScreenTime;
-  float voltage; 
+  double voltage; 
   float offset; 
   bool flip;
   int relayon; 

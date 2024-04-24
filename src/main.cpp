@@ -860,7 +860,7 @@ void handler_before_reset() {
   #ifndef LIGHT_FIRMWARE
   const int bufferSize = 150; // Taille du tampon pour stocker le message
   char raison[bufferSize];
-  snprintf(raison, bufferSize, "reboot handler: %s ",timeClient.getFormattedTime().c_str()); 
+  snprintf(raison, bufferSize, "reboot handler: %s ",logging.loguptime()); 
   
   client.publish((topic_Xlyric+"panic").c_str(),1,true,raison);
   #endif
