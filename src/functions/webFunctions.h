@@ -34,6 +34,7 @@ AsyncWebServer server(80);
 		//***********************************
 
 String getMinuteur(const Programme& minuteur);
+String getMinuteur();
 String return_Memory();
 
 void notFound(AsyncWebServerRequest *request) {
@@ -313,8 +314,8 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
    #ifndef LIGHT_FIRMWARE
     const int bufferSize = 150; // Taille du tampon pour stocker le message
     char raison[bufferSize];
-            
-    snprintf(raison, bufferSize, "reboot manuel: %s", timeClient.getFormattedTime().c_str()); 
+    getLocalTime( &timeinfo );
+    snprintf(raison, bufferSize, "reboot manuel: %s", asctime(&timeinfo) ); 
   
    client.publish((topic_Xlyric+"panic").c_str(),1,true, raison, true);
    #endif
@@ -471,7 +472,7 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
 
   server.on("/getminiteur", HTTP_ANY, [] (AsyncWebServerRequest *request) {
     if (request->hasParam("dimmer")) { request->send(200, "application/json",  getMinuteur(programme));  }
- 
+    else { request->send(200, "application/json",  getMinuteur());  }
     //request->send(200, "application/json",  getminuteur(programme_relay2).c_str()); 
   });
 
@@ -495,11 +496,23 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
 
 String getMinuteur(const Programme& minuteur) {
     DynamicJsonDocument doc(128);
+    getLocalTime(&timeinfo);
     doc["heure_demarrage"] = minuteur.heure_demarrage;
     doc["heure_arret"] = minuteur.heure_arret;
     doc["temperature"] = minuteur.temperature;
-    doc["heure"] = timeClient.getHours();
-    doc["minute"] = timeClient.getMinutes();
+    doc["heure"] = timeinfo.tm_hour;
+    doc["minute"] = timeinfo.tm_min;;
+
+    String retour;
+    serializeJson(doc, retour);
+    return retour;
+}
+
+String getMinuteur() {
+    DynamicJsonDocument doc(128);
+    getLocalTime(&timeinfo);
+    doc["heure"] = timeinfo.tm_hour;
+    doc["minute"] = timeinfo.tm_min;
 
     String retour;
     serializeJson(doc, retour);

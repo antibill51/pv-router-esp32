@@ -16,8 +16,7 @@
 #include <ArduinoJson.h> // ArduinoJson : https://github.com/bblanchon/ArduinoJson
 
 
-//extern String loguptime(); 
-extern char *loguptime2();
+
 
 const char *filename_conf = "/config.json";
 const char *log_conf = "/log.txt";
@@ -286,7 +285,9 @@ void savemqtt(const char *filename, const Mqtt &configmqtt) {
 /// sauvegarde des logs avant reboot
 
 void savelogs(String log) {
-  
+ 
+        log = String(logging.loguptime(true)) + log;
+
   // Open file for writing
    File configFile = SPIFFS.open(log_conf, "w");
   if (!configFile) {

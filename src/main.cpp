@@ -115,10 +115,6 @@ void reboot_after_lost_wifi(int timeafterlost);
 void IRAM_ATTR function_off_screen();
 void IRAM_ATTR function_next_screen();
 
-//#if  NTP
-//WiFiUDP ntpUDP;
-//extern NTPClient timeClient(ntpUDP, NTP_SERVER, NTP_OFFSET_SECONDS, NTP_UPDATE_INTERVAL_MS);
-//#endif
 
 // Place to store local measurements before sending them off to AWS
 unsigned short measurements[LOCAL_MEASUREMENTS];
@@ -134,8 +130,7 @@ TaskHandle_t serialTaskHandle = NULL;
 Dallas dallas; 
 #endif
 
-//String loguptime();
-char *loguptime2();
+
 #ifndef LIGHT_FIRMWARE
   MQTT device_dimmer; // Consine en %
   MQTT device_routeur; // W Général (+/-)
@@ -557,27 +552,6 @@ ntpinit();
 #endif
 
 
-  // ----------------------------------------------------------------
-  // TASK: update time from NTP server.
-  // ----------------------------------------------------------------
-#if WIFI_ACTIVE == true
-  if (!AP) {
-    #if NTP  
-      #if NTP_TIME_SYNC_ENABLED == true
-        xTaskCreate(
-          fetchTimeFromNTP,
-          "Update NTP time",
-          5000,            // Stack size (bytes)
-          NULL,             // Parameter
-          2,                // Task priority
-          NULL              // Task handle
-        );
-        
-      #endif
-    #endif
-  }
-#endif
-
 #if WIFI_ACTIVE == true
 
 
@@ -622,16 +596,14 @@ esp_register_shutdown_handler( handler_before_reset );
 logging.power=true; logging.sct=true; logging.sinus=true; 
 
 /// affichage de l'heure  GMT +1 dans la log
-logging.Set_log_init(timeClient.getFormattedTime());
-logging.Set_log_init("-- fin du demarrage: ");
-logging.Set_log_init(" --\r\n");
-//savelogs(timeClient.getDay() + " " + timeClient.getFormattedTime() + " -- fin du précédent reboot -- ");
+logging.Set_log_init("-- fin du demarrage  \r\n",true);
+
+savelogs(" -- fin du précédent reboot -- ");
 
 /// envoie de l'info de reboot
 const int bufferSize = 150; // Taille du tampon pour stocker le message
-char raison[bufferSize];
-            
-snprintf(raison, bufferSize, "restart : %s", timeClient.getFormattedTime().c_str()); 
+char raison[bufferSize];     
+snprintf(raison, bufferSize, "restart : %s", logging.loguptime()); 
 #ifndef LIGHT_FIRMWARE 
   client.publish((topic_Xlyric+"panic").c_str(),1,true,raison);
 #endif
@@ -659,7 +631,7 @@ void loop()
   if (config.restart) {
     //delay(5000);
     Serial.print(PV_RESTART);
-    savelogs(timeClient.getFormattedTime() + "-- reboot demande par l'utilisateur -- ");
+    savelogs("-- reboot demande par l'utilisateur -- ");
     ESP.restart();
   }
 
@@ -777,7 +749,7 @@ if (config.dimmerlocal) {
             device_dimmer.send(String(instant_power * config.charge/100));
           } 
         #endif
-        // offset_heure_ete(); // on corrige l'heure d'été si besoin
+        //offset_heure_ete(); // on corrige l'heure d'été si besoin
       }
     }
 }
@@ -882,19 +854,7 @@ void connect_to_wifi() {
 }
 
 
-char *loguptime2() {
-  static char uptime_stamp[20]; // Vous devrez définir une taille suffisamment grande pour stocker votre temps
-/*
-  uptime::calculateUptime();
 
-  // Utilisez snprintf pour formater le texte dans le tableau de caractères
-  snprintf(uptime_stamp, sizeof(uptime_stamp), "%d:%d:%d:%d\t", uptime::getDays(), uptime::getHours(), uptime::getMinutes(), uptime::getSeconds());
-*/
-  
-  snprintf(uptime_stamp, sizeof(uptime_stamp), "%s\t", timeClient.getFormattedTime().c_str());
-
-  return uptime_stamp;
-}
 
 void handler_before_reset() {
   #ifndef LIGHT_FIRMWARE

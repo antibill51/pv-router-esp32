@@ -14,9 +14,6 @@
 #include <TimeLib.h>
 #include <NTPClient.h>
 
-//// NTP 
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, NTP_SERVER, NTP_OFFSET_SECONDS, NTP_UPDATE_INTERVAL_MS);
 
 #define SECURITEPASS "MyPassword"
 
@@ -203,22 +200,29 @@ struct Configmodule {
 
 /// @brief  partie délicate car pas mal d'action sur la variable log_init et donc protection de la variable ( pour éviter les pb mémoire )
 struct Logs {
-  private:char log_init[LOG_MAX_STRING_LENGTH];
+  private:
+      char log_init[LOG_MAX_STRING_LENGTH];
+      int MaxString = LOG_MAX_STRING_LENGTH * .9 ;
+
   public:bool sct;
   public:bool sinus;
   public:bool power;
   public:bool serial=false; 
 
   ///setter log_init --> ajout du texte dans la log
-  public:void Set_log_init(String setter, bool logtime=false) {
-    // vérification qu'il y ai encore de la taille pour stocker la log 
-    if (strlen(log_init) > ((LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/5)))) {
-      reset_log_init();
-    }
-    if ((strlen(setter.c_str()) + strlen(log_init) > LOG_MAX_STRING_LENGTH)) { return; } // si la taille de la log est trop grande, on ne fait rien )*
-    if (logtime) { strcat(log_init,loguptime()); }
-    strcat(log_init,setter.c_str()); 
-  }
+public:void Set_log_init(String setter, bool logtime=false) {
+        // Vérifier si la longueur de la chaîne ajoutée ne dépasse pas LOG_MAX_STRING_LENGTH
+        if ( strlen(setter.c_str()) + strlen(log_init) < static_cast<size_t>(MaxString) )  { 
+            if (logtime) { 
+              if ( strlen(setter.c_str()) + strlen(log_init) + strlen(loguptime()) < static_cast<size_t>(MaxString))  { 
+                strcat(log_init,loguptime()); }
+              }
+          strcat(log_init,setter.c_str());  
+        } else {  
+          // Si la taille est trop grande, réinitialiser le log_init
+          reset_log_init();
+        }     
+      }
 
 
   ///getter log_init
@@ -231,8 +235,7 @@ struct Logs {
       }
 
       ///si risque de fuite mémoire
-      if (strlen(log_init) > (LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/10)) ) {
-      //savelogs("-- reboot Suite problème de taille logs -- ");   //--> vu que dans une struc, c'est compliqué à mettre en place
+      if (strlen(log_init) >(LOG_MAX_STRING_LENGTH - (LOG_MAX_STRING_LENGTH/50)) ) {
       ESP.restart();  
       }
   }
@@ -243,9 +246,15 @@ struct Logs {
       strcat(log_init,"197}11}1");
   }
 
-  char *loguptime() {
+  char *loguptime(bool day=false) {
     static char uptime_stamp[20]; // Vous devrez définir une taille suffisamment grande pour stocker votre temps
-    snprintf(uptime_stamp, sizeof(uptime_stamp), "%s\t", timeClient.getFormattedTime().c_str());
+      time_t maintenant;
+      time(&maintenant);
+      if (day) {
+        strftime(uptime_stamp, sizeof(uptime_stamp), "%d/%m/%Y %H:%M:%S\t ", localtime(&maintenant));
+      } else {
+        strftime(uptime_stamp, sizeof(uptime_stamp), "%H:%M:%S\t ", localtime(&maintenant));
+      }
     return uptime_stamp;
   }
 };

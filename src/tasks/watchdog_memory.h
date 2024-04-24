@@ -87,6 +87,7 @@ void watchdog_memory(void * parameter){
      
     // si need  reboot alors reboot
     if (need_reboot) {
+      savelogs("-- reboot watchdog memoire -- ");
       ESP.restart();
     } 
     // Sleep for 10 seconds, avant de refaire une analyse
