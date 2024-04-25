@@ -145,7 +145,7 @@ struct MQTT
       const String topic_Xlyric = "Xlyric/"+ node_id +"/";
 
       const String device= "{\"name\": \""+ name + "\"," 
-            "\"obj_id\": \"PvRouter-"+ object_id +"-"+ node_mac + "\"," 
+            "\"obj_id\": \"PvRouter-"+ node_mac +"-"+ object_id + "\"," 
             "\"uniq_id\": \""+ node_mac + "-" + object_id +"\","
             "\"stat_t\": \""+ topic_Xlyric + "sensors/" + object_id +"/state\"," 
             "\"avty_t\": \""+ topic_Xlyric + "status\","
@@ -155,7 +155,7 @@ struct MQTT
             + expire_after
             + HA_device_declare() + 
             "}";
-      client.publish((String(topic+object_id+"/config")).c_str(),1,true, device.c_str()); // déclaration autoconf PvRouter
+      client.publish((String(topic+object_id+"/config")).c_str(),1,false, device.c_str()); // déclaration autoconf PvRouter
       // Serial.println(device.c_str());
 
 
