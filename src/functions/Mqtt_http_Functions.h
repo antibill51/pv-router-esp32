@@ -17,7 +17,7 @@ WiFiClient espClient;
 void onMqttConnect(bool sessionPresent);
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
 void onMqttSubscribe(uint16_t packetId, uint8_t qos);
-// void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
+void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
 #endif
 extern Config config;
@@ -130,6 +130,7 @@ void onMqttConnect(bool sessionPresent) {
   client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
   client.subscribe((command_switch + "/#").c_str(),1);
   client.subscribe((command_number + "/#").c_str(),1);
+  client.subscribe((HA_status).c_str(),1);
   if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
   logging.Set_log_init("MQTT connected \r\n",true);
 
@@ -139,9 +140,11 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   Serial.println("Disconnected from MQTT.");
   logging.Set_log_init("MQTT disconnected \r\n",true);
 
-  if (WiFi.isConnected()) {
-    connectToMqtt();
-  }
+  // if (WiFi.isConnected()) {
+  //   connectToMqtt();
+    // delay(1000);
+    // HA_discover();
+  // }
 }
 
 
@@ -242,30 +245,36 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
   }
 
   if (strcmp( Subscribedtopic, HA_status.c_str() ) == 0) { 
-    logging.Set_log_init("MQTT HA_status ");
+    logging.Set_log_init("MQTT HA_status ",true);
     logging.Set_log_init(fixedpayload);
     logging.Set_log_init("\r\n");
-    if (strcmp( fixedpayload.c_str(), "online" ) == 0) { 
-      logging.Set_log_init("MQTT resend HA discovery \r\n");
-      HA_discover();
-      logging.Set_log_init("MQTT resend all exeptionnals values\r\n");
+    if (strcmp( fixedpayload.c_str(), "online" ) == 0) {  
+      client.disconnect();
+      logging.Set_log_init("MQTT Disconnection to resend HA discovery \r\n",true);
+      // logging.Set_log_init("MQTT resend HA discovery \r\n");
+      // HA_discover();
+      // logging.Set_log_init("MQTT resend all exeptionnals values\r\n");
 
-      #ifdef RELAY1
-        int relaystate = digitalRead(RELAY1); 
-        switch_1.send(String(relaystate));
-      #endif
-      #ifdef RELAY2
-        relaystate = digitalRead(RELAY2); 
-        switch_2.send(String(relaystate));
-      #endif
-      device_grid.send(String("0"));
-      device_inject.send(String("0"));
-      device_resistance.send(String(config.resistance));
+      // #ifdef RELAY1
+      //   int relaystate = digitalRead(RELAY1); 
+      //   switch_1.send(String(relaystate));
+      // #endif
+      // #ifdef RELAY2
+      //   relaystate = digitalRead(RELAY2); 
+      //   switch_2.send(String(relaystate));
+      // #endif
+      // device_grid.send(String("0"));
+      // device_inject.send(String("0"));
+      // device_resistance.send(String(config.resistance));
 
-      if (discovery_temp) {
-        temperature.send(String(gDisplayValues.temperature));
-        device_alarm_temp.send(stringboolMQTT(dallas.security));
-      }
+      // if (discovery_temp) {
+      //   logging.Set_log_init("MQTT resend HA temperature discovery \r\n");
+      //   temperature.HA_discovery();
+      //   device_alarm_temp.HA_discovery();
+      //   logging.Set_log_init("MQTT resend HA temperature values \r\n");
+      //   temperature.send(String(gDisplayValues.temperature));
+      //   device_alarm_temp.send(stringboolMQTT(dallas.security));
+      // }
     }
   }
 
@@ -296,7 +305,7 @@ void Mqtt_init() {
   Serial.println("MQTT_init : connexion...");
   async_mqtt_init();
   connectToMqtt();
-  delay(1000);  
+  // delay(1000);
   // reconnect();
   // if (client.connect(pvname,configmqtt.username, configmqtt.password, topic.c_str(), 2, true, "offline")) {       //Connect to MQTT server
   //   client.publish(topic.c_str(), "online", true);         // Once connected, publish online to the availability topic

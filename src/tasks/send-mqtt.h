@@ -135,7 +135,13 @@ void send_to_mqtt(void * parameter){
                               device_inject.send(String(int(-gDisplayValues.watt)));
                               device_grid.send(String("0"));
                               WHtempinject += wattheure; 
-                              compteur_inject.send(String(WHtempinject));
+                              if (WHtempinject >= 0) {
+                                    compteur_inject.send(String(WHtempinject));
+                              }
+                              else {
+                                    WHtempinject = 0;
+                              }
+                              
                         }
                   
                   
@@ -151,7 +157,13 @@ void send_to_mqtt(void * parameter){
                               device_grid.send(String(int(gDisplayValues.watt)));
                               device_inject.send(String("0"));
                               WHtempgrid += wattheure;
-                              compteur_grid.send(String(WHtempgrid));
+                              if (WHtempgrid >= 0) {
+                                    compteur_grid.send(String(WHtempgrid));
+                              }
+                              else {
+                                    WHtempgrid = 0;
+                              }
+
                         }
                   }
                         if (discovery_temp) {

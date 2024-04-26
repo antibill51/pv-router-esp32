@@ -564,13 +564,14 @@ ntpinit();
           if (config.mqtt) {
             // Mqtt_init();
            /// connexion MQTT 
+            init_MQTT_sensor(); // utile pour jeedom et HA
+            // HA autoconf
+            if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
             async_mqtt_init();
             connectToMqtt();
             delay(1000); 
             // reconnect();
-            init_MQTT_sensor(); // utile pour jeedom et HA
-            // HA autoconf
-            if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
+
           }
       }
   #endif
@@ -674,6 +675,7 @@ void loop()
               connectToMqtt();
               delay(1000);
               HA_discover();
+              discovery_temp = false;
               }
           // client.loop();
           
