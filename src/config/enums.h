@@ -161,6 +161,7 @@ struct Configwifi {
 };
 
 struct Mqtt {
+public: 
   char username[50];
   char password[50];
   bool HA;
@@ -170,6 +171,7 @@ struct Mqtt {
 };
 
 struct Memory {
+public: 
   int task_keepWiFiAlive2=5000;   
   int task_serial_read_task=5000;
 
@@ -188,12 +190,12 @@ struct Memory {
 
 
 struct Configmodule {
+public: 
   char hostname[16];
   char port[5];
   bool enphase_present=false; 
   bool Fronius_present=false;
   char envoy[5];
-  //bool pilote=false; 
   char version[2];
   char token[512]; //correction suite remonté de multinet
 };
@@ -204,10 +206,11 @@ struct Logs {
       char log_init[LOG_MAX_STRING_LENGTH];
       int MaxString = LOG_MAX_STRING_LENGTH * .9 ;
 
-  public:bool sct;
-  public:bool sinus;
-  public:bool power;
-  public:bool serial=false; 
+  public:
+    bool sct;
+    bool sinus;
+    bool power;
+    bool serial=false; 
 
   ///setter log_init --> ajout du texte dans la log
 public:void Set_log_init(String setter, bool logtime=false) {
@@ -321,8 +324,7 @@ struct Dallas{
 
           
 //           private:const String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-//           //private:const String node_ids = WiFi.macAddress().substring(0,2)+ WiFi.macAddress().substring(4,6)+ WiFi.macAddress().substring(8,10) + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-//           private:const String node_id = String("PvRouter-") + node_mac; 
+// //           private:const String node_id = String("PvRouter-") + node_mac; 
 //           public:const String topic = "homeassistant/sensor/"+ node_id +"/";
 //           private:String device_declare() { 
 //                     String info =         "\"dev\": {"
@@ -339,58 +341,39 @@ struct Dallas{
 //           private:String value_template; 
 
 
-//           // private:void online(){
-//           //   client.publish(String(topic+"status").c_str() , "online", true); // status Online
-//           // } 
+          // public:void discovery(){
+          //   IPaddress =   WiFi.localIP().toString() ;
+          //   String device= "{ \"dev_cla\": \""+dev_cla+"\","
+          //         "\"unit_of_meas\": \""+unit_of_meas+"\","
+          //         "\"stat_cla\": \""+stat_cla+"\"," 
+          //         "\"name\": \""+ name +"-"+ node_mac + "\"," 
+          //         "\"state_topic\": \""+ topic +"state\","
+          //         "\"stat_t\": \""+ topic +"state"+name+"\","
+          //         "\"avty_t\": \""+ topic +"status\","
+          //         "\"uniq_id\": \""+ node_mac + "-" + name +"\", "
+          //         "\"value_template\": \"{{ value_json."+name +" }}\", "
+          //         "\"cmd_t\": \""+ topic +"command\","
+          //         "\"cmd_tpl\": \"{{ value_json."+name +" }}\", "
+          //         "\"exp_aft\": \""+ MQTT_INTERVAL +"\", "
+          //         + icon
+          //         + device_declare() + 
+          //       "}";
+          //       if (dev_cla =="" ) { dev_cla = name; }
 
-//           public:void discovery(){
-//             IPaddress =   WiFi.localIP().toString() ;
-//             String device= "{ \"dev_cla\": \""+dev_cla+"\","
-//                   "\"unit_of_meas\": \""+unit_of_meas+"\","
-//                   "\"stat_cla\": \""+stat_cla+"\"," 
-//                   "\"name\": \""+ name +"-"+ node_mac + "\"," 
-//                   "\"state_topic\": \""+ topic +"state\","
-//                   "\"stat_t\": \""+ topic +"state"+name+"\","
-//                   "\"avty_t\": \""+ topic +"status\","
-//                   "\"uniq_id\": \""+ node_mac + "-" + name +"\", "
-//                   "\"value_template\": \"{{ value_json."+name +" }}\", "
-//                   "\"cmd_t\": \""+ topic +"command\","
-//                   "\"cmd_tpl\": \"{{ value_json."+name +" }}\", "
-//                   "\"exp_aft\": \""+ MQTT_INTERVAL +"\", "
-//                   + icon
-//                   + device_declare() + 
-//                 "}";
-//                 if (dev_cla =="" ) { dev_cla = name; }
-//                 //Serial.println(strlen(name.c_str()));
-//                 if (strlen(name.c_str()) != 0 ) {
-//                 client.publish((topic+name+"/config").c_str() , device.c_str() , true); // déclaration autoconf dimmer
-//                 //Serial.println(topic+name+"/config");
-//                 }
-//                 else 
-//                 {
-//                   client.publish((topic+"config").c_str() , device.c_str() , true); // déclaration autoconf dimmer
-//                   //Serial.println(topic+"config");
-//                 }
+          //       if (strlen(name.c_str()) != 0 ) {
+          //       client.publish((topic+name+"/config").c_str() , device.c_str() , true); // déclaration autoconf dimmer
 
-//                 // online();
-//                 // send("0");
+          //       }
+          //       else 
+          //       {
+          //         client.publish((topic+"config").c_str() , device.c_str() , true); // déclaration autoconf dimmer
+
+          //       }
+
                 
-//           }
+          // }
 
-//         /*public:float get_last_mqtt_value(){
-//             /// récupération sur le serveur MQTT de la dernière valeur transmise
-//             client.publish((topic+"state"+name).c_str() , "", true); // false for exp_aft in discovery
-//             delay(1000);
-            
-//             String valueStr = client.();
-//               float value = valueStr.toFloat();
-//               Serial.print("La valeur actuelle est : ");
-//               Serial.println(value);
-              
-//             }
-//           return value; 
-//           }
-// */
+
 
 
 //           public:void send(String value){
