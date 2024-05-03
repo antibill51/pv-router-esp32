@@ -43,7 +43,7 @@ int get_dimmer_child_power (){
                 
                 return 0 ; 
             }
-            //int ptotal = doc["Ptotal"];
+
             
             Ptotal_read = doc["Ptotal"];
             return Ptotal_read;
@@ -64,15 +64,6 @@ void updateDimmer(void * parameter){
 #if WIFI_ACTIVE == true
     dimmer();
     
-    #if CLEAN
-    /*
-    /// si changement à faire
-    if  (gDisplayValues.change != 0 ) {
-        Serial.println(F("changement des valeurs dimmer-MQTT"));
-        // envoie de l'information au dimmer et au serveur MQTT ( mosquito ou autre )
-        dimmer_change(); 
-    }*/ 
-    #endif
    
     #ifndef POURCENTAGE
         int local_power = 0 ;

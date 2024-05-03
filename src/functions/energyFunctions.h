@@ -63,113 +63,29 @@ extern Logs logging;
 int middle = 0;
 int middle_count = 0; 
 int start = 0 ;
-#ifdef OLD
-void injection(){
-  //int tableau[144][144]; 
-  int injection = 0; 
-  //int margin = 1893;
-  int temp_read , temp_porteuse ;
-  int sigma_read = 0 ; 
-  String porteuse = "" ;
-  double zero =0; 
-  double positive = 0 ; 
-  int zero_count = 0; 
-  int loop = 0; 
-  int freqmesure = 144;  // 18 mesure pour la 1/2 ondulation
-  int wait_time = 277 ; //  --> 1/50Hz -> /2 -> 10ms --> 18 mesures --> 555 us 
-  unsigned long startMillis;
-  
-  front();  ///synchro porteuse.
-  
-  startMillis = micros();   //temps debut de la boucle
-
-  while (loop < freqmesure ) {
-    // temp_read =  analogRead(ADC_INPUT);
-    // temp_porteuse =  analogRead(ADC_PORTEUSE);
-    temp_read =  adc1_get_raw((adc1_channel_t)4);
-    temp_tension = adc1_get_raw((adc1_channel_t)5);
-    sigma_read += temp_read; 
-    
-    if (temp_porteuse == 0 ) {
-      zero += temp_read * temp_read ; 
-      zero_count ++; 
-      injection = 1 ;
-    }
-    else {
-      if ( injection == 1 ) { injection =2 ; break ; }
-      positive += temp_read * temp_read ;
-
-    }
-
-
-
-    //porteuse += String(temp_porteuse) + " " +  String(temp_read) + "-"; 
- 
-      //filtre bruit de fond 
-   /* if ( temp_read > middle + BRUIT || temp_read < middle - BRUIT ) {
-      if ( temp_read > middle )  { margin += ( temp_read - middle ) ; } 
-      if ( temp_read < middle )  { margin += ( middle - temp_read ) ; }
-    }*/ 
-    
-
-    ///detection injection 
-   /* if ( temp_tension == 0 )  {  
-     injection += temp - middle ;
-    }*/
-   if ( injection == 2  || loop > 500) { break ; }  
-   loop ++; 
- 
-   rt_loop( startMillis, wait_time*loop ) ; // attent le prochain top temps de mesure ( 277us * loop )
-  }
-
-  zero = sqrt(zero / float(zero_count)); 
-  positive = sqrt(positive / float( loop - zero_count )) ; 
-  //serial_print(positive) ; serial_print("  ") ; serial_print (zero) ; serial_print("  ") ; serial_println ( (zero + positive) /2  ) ;
-  gDisplayValues.watt = int(( positive - zero)*3.2) ; 
-  if ( config.polarity == true ) { gDisplayValues.watt = - gDisplayValues.watt ; }
-  
-
-  //injection = sigma_read / (loop  ); 
-  //if (injection >= ADC_MIDDLE ) 
-  //if (positive >= zero ) {gDisplayValues.injection = false ; }
-  //else {gDisplayValues.injection = true ;  serial_print(porteuse) ; serial_print("  ") ; serial_print (injection) ; serial_print("  ") ; serial_println (loop) ;}
- 
-  
-
-
-}
-#endif
 
 constexpr const int nbmesure = 72 ; /// nombre de mesure par ondulation
 constexpr const int nombre_cycle  = 4 ; /// nombre de cycle pour affiner la mesure
 const int freqmesure = nbmesure*(nombre_cycle+1) ;  // nombre total de mesures
-int tableau[freqmesure]; // mesure ADC Ampères
-int porteuse[freqmesure]; // mesure ADC Volts
+int tableau[freqmesure]; // mesure ADC Ampères // NOSONAR
+int porteuse[freqmesure]; // mesure ADC Volts // NOSONAR
 // int middle_debug ; 
 // int positive_debug ; 
-
-    //float constante_voltage = 4.33; 
-
 
     void injection2(){ 
 
 double temp_read ; 
-// int temp_porteuse ;
+
   double sigma_read = 0 ; 
-  //double voltage = 0; // test de calcul de voltage
-  //String porteuse = "" ;
+
   int zero =0; 
   double positive = 0 ; 
-  //int zero_count = 0; 
+
   int loop = 0;  int inter=0;
   
   double wait_time = 277.77 ; //  --> 1/50Hz -> /2 -> 10ms --> 18 mesures --> 555 us 
-  unsigned long startMillis,stopMillis;
-  //int injection = 0; 
- // int nbmesure=72 ;  /// nombre de mesure par ondulation
- // int nombre_cycle = 4 ;  
- // int freqmesure = nbmesure*(nombre_cycle+1) ;  // nombre total de mesures
-
+  unsigned long startMillis; 
+  unsigned long stopMillis;
 
     front();  ///synchro porteuse.
     delay (15);
@@ -180,29 +96,7 @@ while (loop < freqmesure  ) {
     tableau[loop] =  adc1_get_raw((adc1_channel_t)4);
     porteuse[loop] =  adc1_get_raw((adc1_channel_t)5);
     sigma_read += tableau[loop]; 
-    // voltage += porteuse[loop]; // test de calcul de voltage
-    
-/*    if (temp_porteuse == 0 ) { // 2eme 1/2 mesure  10ms 
-      zero += temp_read * temp_read ; 
-      zero_count ++; 
-      injection = 1 ;
-    }
-    else {  // 1ere 1/2 mesure  10ms 
-      if ( injection == 1 ) { injection =2 ; break ; }
-      positive += temp_read * temp_read ;
-      inter=loop;
-    }
-*/
-/*  if ( loop < 37 ) {
-     positive += temp_read * temp_read ;
-     inter=loop;
-  }
-  else { 
-       zero += temp_read * temp_read ; 
-      zero_count ++; 
-   //   injection = 1 ;
-  }
-*/
+ 
  
    loop ++; 
  
@@ -217,36 +111,22 @@ stopMillis = micros();
     // début des calculs 
 
     sigma_read = ( sigma_read / ( loop ) ) ;  /// calcul du sigma ( la valeur moyenne ), ne marche bien que dans le cas d'une ondulation symétrique. A voir si nouvelle méthode de calcul. ( valeur théorique : 2047 -> vcc/2)
-    // voltage = ( voltage / (loop + 1 )) ; // test de calcul de voltage
     int start=0; 
     int end=0; // utile pour calcul half automatique
-    // int voltage_read = int(voltage/constante_voltage) ; // test de calcul de voltage ... pas de réel variation 
 
-    //// test de calcul de voltage
-    /*Serial.println("voltage");
-    Serial.println(voltage);
-    Serial.println(voltage_read);*/
 
 
 /// synchronisation sur la porteuse 
 for(int i = 0; i < loop; i++)
 {
-  if ( start == 0 ) {  if ( porteuse[i] > 0 && i >= 1) { 
+  if ( start == 0 && porteuse[i] > 0 && i >= 1) { 
     start = (i-1) ; 
-     //if ( voltage_read < porteuse[i] ) {voltage_read = porteuse[i] ; }
-    //Serial.println(String(tableau[i])); }
-    }   
-  //else { 
-  //Serial.println(String(tableau[i])); 
   } 
-
 }   /// stable sur la carte din entre 18 et 21 
-///Serial.println (voltage_read);
+
 
 // int phi = config.cosphi ;
 // if (phi > start ) { phi = start ; }
-// //int retard = 0; /// 14 mesures de retard pour phi de 0.90 ( .451rad / (2Pi/72 ) ) 
-// /// 8 pour cosphi ) 
 
     for (int j = 0 ; j < nombre_cycle   ; j++) 
     {
@@ -278,19 +158,17 @@ for(int i = 0; i < loop; i++)
     }
 
 
-    //Serial.println(int(positive/10000*voltage_read)) ;// test de calcul de voltage
 
 /// A vide j'ai 20 ou -20 environ en fonction de comment est connecté la prise.
 
 
-//positive = ( positive / ( FACTEURPUISSANCE * nombre_cycle * 230 / config.voltage ) ) + config.offset ; 
-//int base_offset = 15; offset du à la sonde et au montage ( composante continue mal filtrée) pour offset = 0 il faut mettre un condensateur de 10µF en //parallèle sur la sonde  (testé aussi avec 3.3µF)
+
+// info int base_offset = 15; offset du à la sonde et au montage ( composante continue mal filtrée) pour offset = 0 il faut mettre un condensateur de 10µF en //parallèle sur la sonde  (testé aussi avec 3.3µF)
 
 int base_offset = 0; // ( testé sur 3 sondes différentes à vide )  --> la base d'offset change de sens en fonction de la phase de la prise
 positive = ( ( positive * config.voltage  ) / ( config.facteur * nombre_cycle * 230  ) )   ;  
 /// correction pour l'offset en fonction de comment est branchée la pince
-//if ( config.polarity == true ) { positive = positive - config.offset ; }
-//else { positive = positive + config.offset ; }
+
 
 logging.clean_log_init();
 if ( zero > 75 ) { 
@@ -298,19 +176,15 @@ if ( zero > 75 ) {
     logging.Set_log_init("--> SCT013 Prob not connected  ?\r\n");
     logging.sct = false; }
 }
-//logging.start += "zero detected : " + String(zero) +   "\r\n" ;
+
 
 
 bool nolog =false; 
 if (nolog) {
 Serial.println("fin tableau");
-//Serial.println("temp");
-//Serial.println(wait_time*loop);
-//Serial.println(stopMillis-startMillis);
-//Serial.println("inter");
-//Serial.println(inter*wait_time);
+
 Serial.println("middle");
-//Serial.println(loop);
+
 Serial.println(sigma_read);
 Serial.println(start);
 Serial.println(int(positive)) ;
@@ -322,8 +196,7 @@ Serial.println(tableau[21]);
 }
 middle_debug= sigma_read; 
 
-//zero = sqrt(zero / float(zero_count)); 
-// positive = sqrt(positive / float( loop - zero_count )) ;
+
 
 // correction sonde SCT
 if ( config.polarity == true ) { 
@@ -333,14 +206,13 @@ else {
 positive = -( ( positive - base_offset )* config.SCT_13 / 30 + config.offset )  ;
 }
 
-gDisplayValues.watt = int(( positive )) ; 
+gDisplayValues.watt = int( positive ) ; 
 
 
     }
 
   #else
     void frontmod(){
-      // int temp_value0 = analogRead(ADC_MIDDLE);  //Mean value. Should be at 3.3v/2
       int temp_value0 = adc1_get_raw((adc1_channel_t)3); //Mean value. Should be at 3.3v/2
       value0 = value0 + PHASECAL * (temp_value0 - value0); // Lissage des valeurs
 
@@ -375,8 +247,6 @@ gDisplayValues.watt = int(( positive )) ;
       numberOfSamples++;                       //Count number of times looped.
     ///// construction du tableau de mesures  /////
 
-        // temp_read =  analogRead(ADC_INPUT) - value0;
-        // temp_tension = analogRead(ADC_PORTEUSE) - value0;
         temp_read =  adc1_get_raw((adc1_channel_t)4) - value0;
         temp_tension = adc1_get_raw((adc1_channel_t)5) - value0;
         
@@ -431,12 +301,10 @@ else {
 
     PowerFactor = floor(100 * abs(PW) / PVA) / 100;
 
-    // positive = PW ; 
 
     middle_debug= value0; 
 
     gDisplayValues.watt = int( PW ) ; 
-    // if ( config.polarity == true ) { gDisplayValues.watt = - gDisplayValues.watt ; }
 
     }
   #endif
