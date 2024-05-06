@@ -12,6 +12,11 @@
 // #include "mqtt-home-assistant.h"
 #include "functions/Mqtt_http_Functions.h"
 #include "functions/energyFunctions.h"
+
+// #ifndef LIGHT_FIRMWARE
+//   #include <PubSubClient.h>
+//   extern PubSubClient client;
+// #endif
 #include "functions/ha.h"
 
 extern DisplayValues gDisplayValues;
@@ -20,10 +25,7 @@ extern Configmodule configmodule;
 extern Logs Logging;
 extern Mqtt configmqtt;
 
-#ifndef LIGHT_FIRMWARE
-//   #include <PubSubClient.h>
-//   extern PubSubClient client;
-// #endif
+
 
 
 // #ifndef LIGHT_FIRMWARE
@@ -40,10 +42,6 @@ extern Mqtt configmqtt;
       // extern HA power_vrms;
       // extern HA power_irms;
       // extern HA power_apparent;
-     // // extern HA enphase_cons_whLifetime;
-      // //extern HA enphase_prod_whLifetime;
-      // //extern HA enphase_current_power_consumption;
-      // //extern HA enphase_current_power_production;
       extern MQTT device_routeur; 
       extern MQTT device_grid; 
       extern MQTT device_routed; // Ajout RV - 20230304
@@ -62,11 +60,6 @@ extern Mqtt configmqtt;
             extern MQTT power_irms;
             extern MQTT power_apparent;
       #endif
-      // extern MQTT enphase_cons_whLifetime;
-      // extern MQTT enphase_prod_whLifetime;
-      // extern MQTT enphase_current_power_consumption;
-      // extern MQTT enphase_current_power_production;
-
 #endif
 
 int Pow_mqtt_send = 0;

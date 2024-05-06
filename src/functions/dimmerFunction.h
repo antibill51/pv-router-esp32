@@ -27,7 +27,7 @@ extern Dallas dallas ;
 
 
   void dimmer_on();
-  ///void dimmer_off();
+
   String dimmergetState(); 
 
 
@@ -52,8 +52,8 @@ extern Dallas dallas ;
 */
 /// Modif RV 20240219 
 /// Plus besoin !
-#define FACTEUR_REGULATION 1
-void dimmer_change(char dimmerurl[15], int dimmerIDX, float dimmervalue, int puissance_dispo) {
+#define FACTEUR_REGULATION 1 // NOSONAR
+void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puissance_dispo) { // NOSONAR
 
   puissance_dispo= int(puissance_dispo*FACTEUR_REGULATION);
     /// envoyer la commande avec la valeur gDisplayValues.dimmer vers le dimmer config.dimmer
@@ -101,7 +101,7 @@ if ( strcmp(config.dimmer,"none") != 0 && strcmp(config.dimmer,"") != 0) {
       // test suppression delay (500); peut être inutile avec la gestion par taches?
       // delay (500); // delay de transmission réseau dimmer et application de la charge } 
       /// 24/01/2023 passage de 1500 à 500ms 
-    //}
+
       #endif
 }
 
