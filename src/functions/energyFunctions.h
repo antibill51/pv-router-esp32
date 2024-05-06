@@ -209,7 +209,7 @@ positive = -( ( positive - base_offset )* config.SCT_13 / 30 + config.offset )  
 gDisplayValues.watt = int( positive ) ; 
 
 
-    }
+}
 
   #else
     void frontmod(){

@@ -168,17 +168,17 @@ void Mqtt_send_DOMOTICZ ( String idx, String value, String otherpub = "" , Strin
       message = R"( { "idx" : )" + idx + R"( , "svalue" : ")" + value + R"(",  "nvalue" : )" + nvalue + R"( } )";
     }
 
-  // String jdompub = String(config.Publish) + "/"+idx ;
-  // if (otherpub != "" ) {jdompub += "/"+otherpub; }
+  String jdompub = String(config.Publish) + "/"+idx ;
+  if (otherpub != "" ) {jdompub += "/"+otherpub; }
   
 
 
     if (client.connected() && (WiFi.status() == WL_CONNECTED ))  {
-      // client.loop();
-        if (otherpub == "" ) {
-          client.publish(config.Publish, String(message).c_str(), true);
-        }
-        client.publish(jdompub.c_str() , value.c_str(), true);
+    // client.loop();
+      if (otherpub == "" ) {
+        client.publish(config.Publish, 1, true, message.c_str());
+      }
+      client.publish(jdompub.c_str(),1 ,true, value.c_str());
     }
   }
 }

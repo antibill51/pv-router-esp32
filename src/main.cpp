@@ -241,7 +241,7 @@ void setup()
   
   // Should load default config if run for the first time
   Serial.println(F("Loading configuration..."));
-  loadConfiguration(filename_conf, config);
+  config.loadConfiguration();
 
   // récup des logs
   loadlogs();
@@ -258,24 +258,20 @@ void setup()
   configmodule.enphase_present=false; 
   configmodule.Fronius_present=false;
 
-  loadmqtt(mqtt_conf ,configmqtt);
-
-  // il suffit de cocher ou décocher la case. 
-  // On peut vouloir désactiver mqtt sans modifier tous les parametres.
-
-  // // vérification que le nom du serveur MQTT est différent de none
-  // if (strcmp(config.mqttserver,"none") == 0 ) {
-  //   config.mqtt = false; 
-  // }
-  // else {
-  //   config.mqtt = true; 
-  // }
+  configmqtt.loadmqtt();
+  // vérification que le nom du serveur MQTT est différent de none ou vide
+  if (strcmp(config.mqttserver,"none") == 0 || strcmp(config.mqttserver,"") == 0) {
+    config.mqtt = false; 
+  }
+  else {
+    config.mqtt = true; 
+  }
   
   // test if Fronius is present ( and load conf )
-  configmodule.Fronius_present = loadfronius(fronius_conf, configmodule);
+  configmodule.Fronius_present = loadfronius(fronius_conf);
 
   // test if Enphase is present ( and load conf )
-  loadenphase(enphase_conf, configmodule);
+  loadenphase(enphase_conf);
  
   /// recherche d'une sonde dallas
   #if DALLAS
@@ -344,9 +340,8 @@ ntpinit();
     logging.Set_log_init(SPIFFSNO,true);
   }
 
-  if(!SPIFFS.exists(filename_conf)){
+  if(!SPIFFS.exists(config.filename_conf)){
     Serial.println(CONFNO);  
-    
     logging.Set_log_init(CONFNO,true);
 
   }

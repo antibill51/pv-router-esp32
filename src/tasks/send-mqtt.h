@@ -28,7 +28,7 @@ extern Mqtt configmqtt;
 
 
 
-// #ifndef LIGHT_FIRMWARE
+#ifndef LIGHT_FIRMWARE
       // extern HA device_routeur; 
       // extern HA device_grid; 
       // extern HA device_routed; // Ajout RV - 20230304

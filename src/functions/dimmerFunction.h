@@ -82,7 +82,7 @@ if ( strcmp(config.dimmer,"none") != 0 && strcmp(config.dimmer,"") != 0) {
             logging.Set_log_init(String(dimmervalue).c_str());
             logging.Set_log_init("% \r\n");
 
-        }
+        
       }
       //// Mqtt send information
       #ifndef LIGHT_FIRMWARE
