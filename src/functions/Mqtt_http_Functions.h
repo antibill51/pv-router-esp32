@@ -154,31 +154,32 @@ void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
 */
 
 void Mqtt_send_DOMOTICZ ( String idx, String value, String otherpub = "" , String name = "") {
-  
-  if (idx != "0" || idx != "" ) { /// si IDX = 0 ou vide on ne fait rien
+  if (configmqtt.DOMOTICZ || configmqtt.JEEDOM ) {
+    if (idx != "0" || idx != "" ) { /// si IDX = 0 ou vide on ne fait rien
 
-    String nvalue = "0" ; 
-    
-    if ( value != "0" ) { 
-        nvalue = "2" ; 
-        }
-    
-    String message; 
-    if (otherpub == "" ) {
-      message = R"( { "idx" : )" + idx + R"( , "svalue" : ")" + value + R"(",  "nvalue" : )" + nvalue + R"( } )";
-    }
-
-  String jdompub = String(config.Publish) + "/"+idx ;
-  if (otherpub != "" ) {jdompub += "/"+otherpub; }
-  
-
-
-    if (client.connected() && (WiFi.status() == WL_CONNECTED ))  {
-    // client.loop();
+      String nvalue = "0" ; 
+      
+      if ( value != "0" ) { 
+          nvalue = "2" ; 
+          }
+      
+      String message; 
       if (otherpub == "" ) {
-        client.publish(config.Publish, 1, true, message.c_str());
+        message = R"( { "idx" : )" + idx + R"( , "svalue" : ")" + value + R"(",  "nvalue" : )" + nvalue + R"( } )";
       }
-      client.publish(jdompub.c_str(),1 ,true, value.c_str());
+
+    String jdompub = String(config.Publish) + "/"+idx ;
+    if (otherpub != "" ) {jdompub += "/"+otherpub; }
+    
+
+
+      if (client.connected() && (WiFi.status() == WL_CONNECTED ))  {
+      // client.loop();
+        if (otherpub == "" ) {
+          client.publish(config.Publish, 1, true, message.c_str());
+        }
+        client.publish(jdompub.c_str(),1 ,true, value.c_str());
+      }
     }
   }
 }

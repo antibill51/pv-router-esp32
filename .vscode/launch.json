@@ -12,21 +12,21 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "C:/Users/remik/Documents/GitHub/pv-router-esp32/.pio/build/ttgo-t-display/firmware.elf",
-            "projectEnvName": "ttgo-t-display",
+            "executable": "C:/Users/remik/Documents/GitHub/pv-router-esp32/.pio/build/ttgo-t-display-hardware-mod/firmware.elf",
+            "projectEnvName": "ttgo-t-display-hardware-mod",
             "toolchainBinDir": "C:/Users/remik/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "preLaunchTask": {
                 "type": "PlatformIO",
-                "task": "Pre-Debug"
+                "task": "Pre-Debug (ttgo-t-display-hardware-mod)"
             }
         },
         {
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "C:/Users/remik/Documents/GitHub/pv-router-esp32/.pio/build/ttgo-t-display/firmware.elf",
-            "projectEnvName": "ttgo-t-display",
+            "executable": "C:/Users/remik/Documents/GitHub/pv-router-esp32/.pio/build/ttgo-t-display-hardware-mod/firmware.elf",
+            "projectEnvName": "ttgo-t-display-hardware-mod",
             "toolchainBinDir": "C:/Users/remik/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart"
         },
@@ -34,8 +34,8 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (without uploading)",
-            "executable": "C:/Users/remik/Documents/GitHub/pv-router-esp32/.pio/build/ttgo-t-display/firmware.elf",
-            "projectEnvName": "ttgo-t-display",
+            "executable": "C:/Users/remik/Documents/GitHub/pv-router-esp32/.pio/build/ttgo-t-display-hardware-mod/firmware.elf",
+            "projectEnvName": "ttgo-t-display-hardware-mod",
             "toolchainBinDir": "C:/Users/remik/.platformio/packages/toolchain-xtensa-esp32/bin",
             "internalConsoleOptions": "openOnSessionStart",
             "loadMode": "manual"
