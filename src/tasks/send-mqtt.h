@@ -157,7 +157,7 @@ void send_to_mqtt(void * parameter){ // NOSONAR
                               if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDXdallas), String(gDisplayValues.temperature),"","Dallas" );} //  bug#11  remonté domoticz
                               if ((configmqtt.HA) || (configmqtt.JEEDOM)) {
                                     temperature.send(String(gDisplayValues.temperature));
-                                    device_alarm_temp.send(stringboolMQTT(dallas.security));
+                                    device_alarm_temp.send(stringBoolMQTT(dallas.security));
                               }
                         }
             #endif

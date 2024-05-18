@@ -11,14 +11,16 @@
 
 WiFiClient espClient;
 #ifndef LIGHT_FIRMWARE
+extern uint32_t lastDisconnect;
   // PubSubClient client(espClient);
-  AsyncMqttClient client;
+  // AsyncMqttClient client;
+  espMqttClientAsync  client;
 
 void onMqttConnect(bool sessionPresent);
-void onMqttDisconnect(AsyncMqttClientDisconnectReason reason);
-void onMqttSubscribe(uint16_t packetId, uint8_t qos);
-void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
-void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total);
+void onMqttDisconnect(espMqttClientTypes::DisconnectReason reason);
+void onMqttSubscribe(uint16_t packetId, const espMqttClientTypes::SubscribeReturncode* codes, size_t len);
+void onMqttMessage(const espMqttClientTypes::MessageProperties& properties, const char* topic, const uint8_t* payload, size_t len, size_t index, size_t total);
+void callback(const espMqttClientTypes::MessageProperties& properties, const char* Subscribedtopic, const uint8_t* payload, size_t len, size_t index, size_t total);
 #endif
 extern Config config;
 extern DisplayValues gDisplayValues;
@@ -85,24 +87,25 @@ const String HA_status = String("homeassistant/status");
 // }
 
 
-char arrayWill[64];
-
-//#define MQTT_HOST IPAddress(192, 168, 1, 20)
+char arrayWill[64];// NOSONAR
 void async_mqtt_init() {
+  String topic_Xlyric = "Xlyric/" + String(node_id) +"/";
 	const String LASTWILL_TOPIC = topic_Xlyric + "status";
 	LASTWILL_TOPIC.toCharArray(arrayWill, 64);
   IPAddress ip;
-  ip.fromString(config.mqttserver);
+  ip.fromString(config.hostname);
   DEBUG_PRINTLN(ip);
+  // node_id = String("Pv-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
   client.setClientId(node_id.c_str());
-  client.setKeepAlive(60);
+  client.setKeepAlive(30);
   client.setWill(arrayWill, 2, true, "offline");
   client.setCredentials(configmqtt.username, configmqtt.password);
   client.onDisconnect(onMqttDisconnect);
   client.onSubscribe(onMqttSubscribe);
   client.onMessage(callback);
-  client.setServer(ip, config.mqttport);
-  client.setMaxTopicLength(768); // 1024 -> 768 
+
+  client.setServer(ip, config.port);
+  // client.setMaxTopicLength(768); // 1024 -> 768 
   client.onConnect(onMqttConnect);
   logging.Set_log_init("MQTT topic for dimmer(s) : ",true);
   logging.Set_log_init(topic_Xlyric.c_str());
@@ -110,43 +113,154 @@ void async_mqtt_init() {
   }
 
 void connectToMqtt() {
-  DEBUG_PRINTLN("Connecting to MQTT...");
-  logging.Set_log_init("Connecting to MQTT... \r\n",true);
-  client.connect();
+  if (!client.connected() ) {
+    DEBUG_PRINTLN("Connecting to MQTT...");
+    logging.Set_log_init("Connecting to MQTT... \r\n",true);
+    client.connect();
+  }
+  
 }
 
 void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT.");
+  logging.Set_log_init("Connected to MQTT.\r\n",true);
   Serial.print("Session present: ");
   Serial.println(sessionPresent);
+  // topic_Xlyric = "Xlyric/" + String(node_id) +"/";
+  // command_switch = String(topic_Xlyric + "command/switch");
+  // command_number = String(topic_Xlyric + "command/number");
+  // command_select = String(topic_Xlyric + "command/select");
+  // command_button = String(topic_Xlyric + "command/button");
+  // command_save = String("Xlyric/sauvegarde/"+ node_id );
+
+
   client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
-  client.subscribe((command_switch + "/#").c_str(),1);
+  // if (strlen(config.SubscribePV) !=0 ) {client.subscribe(config.SubscribePV,1);}
+  // if (strlen(config.SubscribeTEMP) != 0 ) {client.subscribe(config.SubscribeTEMP,1);}
+  // client.subscribe((command_button + "/#").c_str(),1);
   client.subscribe((command_number + "/#").c_str(),1);
+  // client.subscribe((command_select + "/#").c_str(),1);
+  client.subscribe((command_switch + "/#").c_str(),1);
   client.subscribe((HA_status).c_str(),1);
-  if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
-  logging.Set_log_init("MQTT connected \r\n",true);
+  // Serial.println((command_button + "/#").c_str());
+  Serial.println((command_number + "/#").c_str());
+  // Serial.println((command_select + "/#").c_str());
+  Serial.println((command_switch + "/#").c_str());
+  logging.Set_log_init("MQTT callback started \r\n",true);
+ // mqttConnected = true;
+  HA_discover();
+  
 
 }
+void onMqttDisconnect(espMqttClientTypes::DisconnectReason reason)
+{    
+    lastDisconnect = millis();
+    Serial.println("Disconnected from MQTT.");
+    logging.Set_log_init("MQTT disconnected \r\n",true);
 
-void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
-  Serial.println("Disconnected from MQTT.");
-  logging.Set_log_init("MQTT disconnected \r\n",true);
-
-  // if (WiFi.isConnected()) {
-  //   connectToMqtt();
-    // delay(1000);
-    // HA_discover();
-  // }
+    logging.Set_log_init("Disconnect reason:",true);
+    switch (reason) {
+    case espMqttClientTypes::DisconnectReason::TCP_DISCONNECTED:
+        logging.Set_log_init("TCP_DISCONNECTED",true);
+        logging.Set_log_init("\r\n");
+        break;
+    case espMqttClientTypes::DisconnectReason::MQTT_UNACCEPTABLE_PROTOCOL_VERSION:
+        logging.Set_log_init("MQTT_UNACCEPTABLE_PROTOCOL_VERSION",true);
+        logging.Set_log_init("\r\n");
+        break;
+    case espMqttClientTypes::DisconnectReason::MQTT_IDENTIFIER_REJECTED:
+        logging.Set_log_init("MQTT_IDENTIFIER_REJECTED",true);
+        logging.Set_log_init("\r\n");
+        break;
+    case espMqttClientTypes::DisconnectReason::MQTT_SERVER_UNAVAILABLE:
+        logging.Set_log_init("MQTT_SERVER_UNAVAILABLE",true);
+        logging.Set_log_init("\r\n");
+        break;
+    case espMqttClientTypes::DisconnectReason::MQTT_MALFORMED_CREDENTIALS:
+        logging.Set_log_init("MQTT_MALFORMED_CREDENTIALS",true);
+        logging.Set_log_init("\r\n");
+        break;
+    case espMqttClientTypes::DisconnectReason::MQTT_NOT_AUTHORIZED:
+        logging.Set_log_init("MQTT_NOT_AUTHORIZED",true);
+        logging.Set_log_init("\r\n");
+        break;
+    default:
+        logging.Set_log_init("Unknown \r\n",true);
+    }
 }
 
-
-void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
+void onMqttSubscribe(uint16_t packetId, const espMqttClientTypes::SubscribeReturncode* codes, size_t len) {
   Serial.println("Subscribe acknowledged.");
   Serial.print("  packetId: ");
   Serial.println(packetId);
-  DEBUG_PRINTLN("  qos: ");
-  DEBUG_PRINTLN(qos);
+  for (size_t i = 0; i < len; ++i) {
+    Serial.print("  qos: ");
+    Serial.println(static_cast<uint8_t>(codes[i]));
+  }
 }
+
+// char arrayWill[64];
+
+// //#define MQTT_HOST IPAddress(192, 168, 1, 20)
+// void async_mqtt_init() {
+// 	const String LASTWILL_TOPIC = topic_Xlyric + "status";
+// 	LASTWILL_TOPIC.toCharArray(arrayWill, 64);
+//   IPAddress ip;
+//   ip.fromString(config.mqttserver);
+//   DEBUG_PRINTLN(ip);
+//   client.setClientId(node_id.c_str());
+//   client.setKeepAlive(60);
+//   client.setWill(arrayWill, 2, true, "offline");
+//   client.setCredentials(configmqtt.username, configmqtt.password);
+//   client.onDisconnect(onMqttDisconnect);
+//   client.onSubscribe(onMqttSubscribe);
+//   client.onMessage(callback);
+//   client.setServer(ip, config.mqttport);
+//   // client.setMaxTopicLength(768); // 1024 -> 768 
+//   client.onConnect(onMqttConnect);
+//   logging.Set_log_init("MQTT topic for dimmer(s) : ",true);
+//   logging.Set_log_init(topic_Xlyric.c_str());
+//   logging.Set_log_init("sensors/dimmer/state\r\n");
+//   }
+
+// void connectToMqtt() {
+//   DEBUG_PRINTLN("Connecting to MQTT...");
+//   logging.Set_log_init("Connecting to MQTT... \r\n",true);
+//   client.connect();
+// }
+
+// void onMqttConnect(bool sessionPresent) {
+//   Serial.println("Connected to MQTT.");
+//   Serial.print("Session present: ");
+//   Serial.println(sessionPresent);
+//   client.publish(String(topic_Xlyric +"status").c_str(),1,true, "online");         // Once connected, publish online to the availability topic
+//   client.subscribe((command_switch + "/#").c_str(),1);
+//   client.subscribe((command_number + "/#").c_str(),1);
+//   client.subscribe((HA_status).c_str(),1);
+//   if (strcmp(config.topic_Shelly,"") != 0) client.subscribe(config.topic_Shelly,1);
+//   logging.Set_log_init("MQTT connected \r\n",true);
+
+// }
+
+// void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
+//   Serial.println("Disconnected from MQTT.");
+//   logging.Set_log_init("MQTT disconnected \r\n",true);
+
+//   // if (WiFi.isConnected()) {
+//   //   connectToMqtt();
+//     // delay(1000);
+//     // HA_discover();
+//   // }
+// }
+
+
+// void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
+//   Serial.println("Subscribe acknowledged.");
+//   Serial.print("  packetId: ");
+//   Serial.println(packetId);
+//   DEBUG_PRINTLN("  qos: ");
+//   DEBUG_PRINTLN(qos);
+// }
 
 
 /*
@@ -191,12 +305,17 @@ Fonction MQTT callback
 
 
 // void callback(char* Subscribedtopic, byte* message, unsigned int length) {
-void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
+// void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
+void callback(const espMqttClientTypes::MessageProperties& properties, const char* Subscribedtopic, const uint8_t* payload, size_t len, size_t index, size_t total) {
+    char message[len + 1];
+    memcpy(message, payload, len);
+    message[len] = '\0';
+
   // logging.Set_log_init("Subscribedtopic : " + String(Subscribedtopic)+ "\r\n");
-  String fixedpayload = ((String)payload).substring(0,len);
+  String fixedpayload = ((String)message).substring(0,len);
   // logging.Set_log_init("Payload : " + String(fixedpayload)+ "\r\n");
-  StaticJsonDocument<64> doc2;
-  deserializeJson(doc2, payload);
+  JsonDocument doc2;
+  deserializeJson(doc2, message);
   // if (strcmp( Subscribedtopic, command_switch.c_str() ) == 0) { 
   if (strstr( Subscribedtopic, command_switch.c_str() ) != NULL) { 
     if (doc2.containsKey("relay1")) { 
@@ -256,7 +375,7 @@ void callback(char* Subscribedtopic, char* payload, AsyncMqttClientMessageProper
       //   device_alarm_temp.HA_discovery();
       //   logging.Set_log_init("MQTT resend HA temperature values \r\n");
       //   temperature.send(String(gDisplayValues.temperature));
-      //   device_alarm_temp.send(stringboolMQTT(dallas.security));
+      //   device_alarm_temp.send(stringBoolMQTT(dallas.security));
       // }
     }
   }

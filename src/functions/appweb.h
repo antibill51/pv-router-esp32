@@ -128,7 +128,7 @@ String getState() {
  
   const String fs_update = String("<br>!! FS pas à jour !!") ;
   const String pvname = String("PV ROUTER ") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
-  DynamicJsonDocument doc(256);
+  JsonDocument doc;
   doc["state"] = state;
   doc["watt"] = int(gDisplayValues.watt);
   doc["dimmer"] = gDisplayValues.puissance_route;
@@ -145,7 +145,7 @@ String getState() {
 }
 
 
-String stringbool(bool mybool){
+String stringBool(bool mybool){
   String truefalse = "true";
   if (mybool == false ) {truefalse = "";}
   return String(truefalse);
@@ -210,7 +210,7 @@ String getpuissance() {
 //***********************************
 String getconfig() {
   String configweb; 
-  DynamicJsonDocument doc(512);
+  JsonDocument doc;
   doc["Fusible"] = config.num_fuse;
   doc["version"] = String(VERSION);
   doc["delta"] = config.delta;
@@ -244,7 +244,7 @@ String getconfig() {
 
 // String getenvoy() {
 //   String VERSION_http = String(VERSION) + " " + String(COMPILE_NAME) ; 
-//   configweb = String(config.IDXdimmer) + ";" +  config.num_fuse + ";"  + String(config.IDX) + ";"  +  String(VERSION_http) +";" + "middle" +";"+ config.delta +";"+config.cycle+";"+config.dimmer+";"+config.cosphi+";"+config.readtime +";"+stringbool(config.UseDomoticz)+";"+stringbool(config.UseJeedom)+";"+stringbool(config.autonome)+";"+config.apiKey+";"+stringbool(config.dimmerlocal)+";"+config.facteur+";"+stringbool(config.mqtt)+";"+config.mqttserver+ ";"  + String(config.Publish)+";"+config.deltaneg+";"+config.resistance+";"+config.polarity+";"+config.ScreenTime+";"+config.localfuse+";"+config.tmax+";"+config.voltage+";"+config.offset+";"+stringbool(config.flip)+";"+stringbool(configmqtt.HA)+";"+config.relayon+";"+config.relayoff;
+//   configweb = String(config.IDXdimmer) + ";" +  config.num_fuse + ";"  + String(config.IDX) + ";"  +  String(VERSION_http) +";" + "middle" +";"+ config.delta +";"+config.cycle+";"+config.dimmer+";"+config.cosphi+";"+config.readtime +";"+stringBool(config.UseDomoticz)+";"+stringBool(config.UseJeedom)+";"+stringBool(config.autonome)+";"+config.apiKey+";"+stringBool(config.dimmerlocal)+";"+config.facteur+";"+stringBool(config.mqtt)+";"+config.mqttserver+ ";"  + String(config.Publish)+";"+config.deltaneg+";"+config.resistance+";"+config.polarity+";"+config.ScreenTime+";"+config.localfuse+";"+config.tmax+";"+config.voltage+";"+config.offset+";"+stringBool(config.flip)+";"+stringBool(configmqtt.HA)+";"+config.relayon+";"+config.relayoff;
 //   return String(configweb);
 // }
 //***********************************
@@ -265,7 +265,7 @@ String getwifi() {
 
 String getmqtt() {
   String retour; 
-  DynamicJsonDocument doc(512);
+  JsonDocument doc;
   doc["server"] = config.mqttserver;
   doc["topic"] = config.Publish;
   doc["user"] = configmqtt.username;

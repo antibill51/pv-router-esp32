@@ -42,6 +42,9 @@
 #define MQTT_USER ""
 #define MQTT_PASSWORD ""
 
+#define MQTT_LAST_CONNECT_DELAY 10 * 1000 // 10 secondes en ms
+#define MQTT_LAST_DISCONNECT_DELAY 5 * 1000 // 5 secondes en ms
+
 /**
  * Switch Screnn button and time on
  * 

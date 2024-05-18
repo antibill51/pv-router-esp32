@@ -54,7 +54,7 @@ struct Programme {
   /// @param programme_conf 
   public:void saveProgramme() {
 
-        DynamicJsonDocument doc(192);
+        JsonDocument doc;
 
               ////vérification cohérence des données
         if (check_data(heure_demarrage)) {strcpy(heure_demarrage, "00:00"); }
@@ -87,10 +87,7 @@ struct Programme {
   public:bool loadProgramme() {
         File configFile = SPIFFS.open(name_minuteur, "r");
 
-        // Allocate a temporary JsonDocument
-        // Don't forget to change the capacity to match your requirements.
-        // Use arduinojson.org/v6/assistant to compute the capacity.
-        DynamicJsonDocument doc(192);
+        JsonDocument doc;
 
         // Deserialize the JSON document
         DeserializationError error = deserializeJson(doc, configFile);

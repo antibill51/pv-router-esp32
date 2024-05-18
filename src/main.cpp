@@ -169,6 +169,10 @@ dimmerLamp dimmer_hard(outputPin, zerocross); //initialase port for dimmer for E
 
 gestion_puissance unified_dimmer;
 
+uint32_t lastDisconnect = 0;
+uint32_t lastConnectAttempt = 0;
+uint32_t currentMillis = 0;
+
 void setup()
 {
   #if DEBUG == true
@@ -548,8 +552,8 @@ ntpinit();
             // HA autoconf
             if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
             async_mqtt_init();
-            connectToMqtt();
-            delay(1000); 
+            // connectToMqtt();
+            // delay(1000); 
             // reconnect();
 
           }
@@ -575,6 +579,7 @@ ntpinit();
 esp_register_shutdown_handler( handler_before_reset );
 
 logging.power=true; logging.sct=true; logging.sinus=true; 
+lastDisconnect = millis();  
 
 /// affichage de l'heure  GMT +1 dans la log
 logging.Set_log_init("-- fin du demarrage  \r\n",true);
@@ -646,12 +651,26 @@ void loop()
     if (!AP) {
       #if WIFI_ACTIVE == true
           if (config.mqtt) {
-            if (!client.connected() && (WiFi.status() == WL_CONNECTED )) { 
-              connectToMqtt();
-              delay(1000);
-              HA_discover();
-              discovery_temp = false;
-              }
+
+            currentMillis = millis();
+            if (!client.connected() && currentMillis - lastDisconnect > MQTT_LAST_DISCONNECT_DELAY && currentMillis - lastConnectAttempt > MQTT_LAST_CONNECT_DELAY) { // 10 sec en millisecondes
+                lastConnectAttempt = millis();
+                logging.Set_log_init("Connexion MQTT (loop)\r\n",true);
+                async_mqtt_init();
+                delay(1000);
+                connectToMqtt();
+                delay(5000);
+                HA_discover();
+                discovery_temp = false;
+                // HA_send_all();
+            }
+
+            // if (!client.connected() && (WiFi.status() == WL_CONNECTED )) { 
+            //   connectToMqtt();
+            //   delay(1000);
+            //   HA_discover();
+            //   discovery_temp = false;
+            //   }
           // client.loop();
           
           }
@@ -659,6 +678,9 @@ void loop()
       #endif
     }
 #endif
+
+
+
 //// surveillance des fuites mémoires 
 #ifndef LIGHT_FIRMWARE
 //   client.publish(("memory/"+gDisplayValues.pvname).c_str(), String(esp_get_free_heap_size()).c_str()) ;

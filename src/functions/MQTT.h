@@ -4,7 +4,8 @@
 #include <Arduino.h>
 #ifndef LIGHT_FIRMWARE
 // #include <PubSubClient.h>
-#include <AsyncMqttClient.h>
+// #include <AsyncMqttClient.h>
+#include <espMqttClientAsync.h>
 #include "functions/ha.h"
 
 extern Configmodule configmodule; 
@@ -364,7 +365,7 @@ void init_HA_sensor(){
 
 }
 
-String stringboolMQTT(bool mybool){
+String stringBoolMQTT(bool mybool){
 String truefalse = "true";
 if (mybool == false ) {truefalse = "false";}
 return String(truefalse);

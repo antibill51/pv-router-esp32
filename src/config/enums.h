@@ -16,8 +16,11 @@
 #ifndef LIGHT_FIRMWARE
   // #include <PubSubClient.h>
   // extern PubSubClient client;
-  #include <AsyncMqttClient.h>
-  extern AsyncMqttClient client;
+  // #include <AsyncMqttClient.h>
+  // extern AsyncMqttClient  client;
+
+  #include <espMqttClientAsync.h>
+  extern espMqttClientAsync  client;
 
 #endif
 
@@ -147,10 +150,8 @@ public:
     // Open file for reading
     File configFile = SPIFFS.open(filename_conf, "r");
 
-    // Allocate a temporary JsonDocument
-    // Don't forget to change the capacity to match your requirements.
-    // Use arduinojson.org/v6/assistant to compute the capacity.
-    DynamicJsonDocument doc(1024);
+
+    JsonDocument doc;
 
     // Deserialize the JSON document
     DeserializationError error = deserializeJson(doc, configFile);
@@ -251,10 +252,8 @@ public:
       return message;
     } 
 
-    // Allocate a temporary JsonDocument
-    // Don't forget to change the capacity to match your requirements.
-    // Use arduinojson.org/assistant to compute the capacity.
-    DynamicJsonDocument doc(1024);
+
+    JsonDocument doc;
 
     // Set the values in the document
     // doc["hostname"] = hostname;
@@ -364,10 +363,8 @@ String loadmqtt() {
   // Open file for reading
   File configFile = SPIFFS.open(mqtt_conf, "r");
 
-  // Allocate a temporary JsonDocument
-  // Don't forget to change the capacity to match your requirements.
-  // Use arduinojson.org/v6/assistant to compute the capacity.
-  DynamicJsonDocument doc(512);
+
+  JsonDocument doc;
 
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, configFile);
@@ -410,10 +407,8 @@ String savemqtt() {
     return message;
   } 
 
-  // Allocate a temporary JsonDocument
-  // Don't forget to change the capacity to match your requirements.
-  // Use arduinojson.org/assistant to compute the capacity.
-  DynamicJsonDocument doc(512);
+
+  JsonDocument doc;
 
   // Set the values in the document
   doc["MQTT_USER"] = username;

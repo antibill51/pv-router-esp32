@@ -240,7 +240,7 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
     getLocalTime( &timeinfo );
     snprintf(raison, bufferSize, "reboot manuel: %s", asctime(&timeinfo) ); 
   
-   client.publish((topic_Xlyric+"panic").c_str(),1,true, raison, true);
+   client.publish((topic_Xlyric+"panic").c_str(),1,true, raison);
    #endif
    request->redirect("/");
    config.restart = true;
@@ -415,7 +415,7 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
 }
 
 String getMinuteur(const Programme& minuteur) {
-    DynamicJsonDocument doc(128);
+    JsonDocument doc;
     getLocalTime(&timeinfo);
     doc["heure_demarrage"] = minuteur.heure_demarrage;
     doc["heure_arret"] = minuteur.heure_arret;
@@ -429,7 +429,7 @@ String getMinuteur(const Programme& minuteur) {
 }
 
 String getMinuteur() {
-    DynamicJsonDocument doc(128);
+    JsonDocument doc;
     getLocalTime(&timeinfo);
     doc["heure"] = timeinfo.tm_hour;
     doc["minute"] = timeinfo.tm_min;
@@ -440,7 +440,7 @@ String getMinuteur() {
 }
 
 String return_Memory() {
-    DynamicJsonDocument doc(512);
+    JsonDocument doc;
     doc["task_GetDImmerTemp"] = task_mem.task_GetDImmerTemp;
     doc["task_dallas_read"] = task_mem.task_dallas_read;
     doc["task_keepWiFiAlive2"] = task_mem.task_keepWiFiAlive2;
