@@ -661,8 +661,6 @@ void loop()
                 connectToMqtt();
                 delay(5000);
                 HA_discover();
-                discovery_temp = false;
-                // HA_send_all();
             }
 
             // if (!client.connected() && (WiFi.status() == WL_CONNECTED )) { 

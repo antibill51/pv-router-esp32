@@ -148,7 +148,7 @@ void onMqttConnect(bool sessionPresent) {
   Serial.println((command_switch + "/#").c_str());
   logging.Set_log_init("MQTT callback started \r\n",true);
  // mqttConnected = true;
-  HA_discover();
+  // HA_discover();
   
 
 }

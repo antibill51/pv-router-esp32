@@ -144,6 +144,7 @@ void HA_discover(){
                 }
                 
         #endif
+        discovery_temp = false;
         }
 }
 
@@ -361,7 +362,7 @@ void init_HA_sensor(){
 
 
         // client.setBufferSize(1024);
-        HA_discover();
+        // HA_discover();
 
 }
 
