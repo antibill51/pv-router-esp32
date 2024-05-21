@@ -74,21 +74,21 @@ struct DisplayValues {
 
 struct Config {
 public:
-  char hostname[16];  // à vérifier si on peut pas le supprimer // NOSONAR
-  int port;  // idem  
-  char apiKey[64];  // clé pour jeedom // NOSONAR 
-  bool UseDomoticz;
-  bool UseJeedom;
+  // char hostname[16];  // à vérifier si on peut pas le supprimer // NOSONAR
+  // int port;  // idem  
+  // char apiKey[64];  // clé pour jeedom // NOSONAR 
+  // bool UseDomoticz;
+  // bool UseJeedom;
   int IDX;  // IDX pour domoticz
   int IDXdallas; // IDX pour domoticz
-  char otapassword[64]; // NOSONAR
+  // char otapassword[64]; // NOSONAR
   int delta; 
   int deltaneg;
   int cosphi; // plus utilisé
   int readtime;  // temps de lecture des capteurs
-  int cycle;  // cycle de lecture des capteurs
-  bool sending; 
-  bool autonome; // si dimmer en local 
+  // int cycle;  // cycle de lecture des capteurs
+  // bool sending; 
+  // bool autonome; // si dimmer en local 
   char dimmer[16];  // adresse IP du dimmer // NOSONAR
   bool dimmerlocal; // si dimmer en local
   double facteur; // facteur de correction de la puissance
@@ -179,9 +179,9 @@ public:
     IDX = doc["IDX"] | 100; 
     IDXdimmer = doc["IDXdimmer"] | 110; 
     IDXdallas = doc["IDXdallas"] | 900; 
-    strlcpy(otapassword,                  // <- destination
-            doc["otapassword"] | "Pvrouteur2", // <- source
-            sizeof(otapassword));         // <- destination's capacity
+    // strlcpy(otapassword,                  // <- destination
+    //         doc["otapassword"] | "Pvrouteur2", // <- source
+    //         sizeof(otapassword));         // <- destination's capacity
     
     facteur = doc["facteur"] | 0.86; 
     delta = doc["delta"] | 50; 
@@ -416,9 +416,9 @@ String savemqtt() {
   doc["MQTT_USER"] = username;
   doc["MQTT_PASSWORD"] = password;
   doc["HA"] = HA;
-  JEEDOM = doc["JEEDOM"];
-  DOMOTICZ = doc["DOMOTICZ"];
-  HTTP = doc["HTTP"];
+  doc["JEEDOM"] = JEEDOM;
+  doc["DOMOTICZ"]= DOMOTICZ;
+  doc["HTTP"] = HTTP;
   message = "MQTT config saved\r\n";
   // Serialize JSON to file
   if (serializeJson(doc, configFile) == 0) {

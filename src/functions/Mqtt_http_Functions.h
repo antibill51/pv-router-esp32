@@ -93,7 +93,7 @@ void async_mqtt_init() {
 	const String LASTWILL_TOPIC = topic_Xlyric + "status";
 	LASTWILL_TOPIC.toCharArray(arrayWill, 64);
   IPAddress ip;
-  ip.fromString(config.hostname);
+  ip.fromString(config.mqttserver);
   DEBUG_PRINTLN(ip);
   // node_id = String("Pv-") + WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17); 
   client.setClientId(node_id.c_str());
@@ -104,7 +104,7 @@ void async_mqtt_init() {
   client.onSubscribe(onMqttSubscribe);
   client.onMessage(callback);
 
-  client.setServer(ip, config.port);
+  client.setServer(ip, config.mqttport);
   // client.setMaxTopicLength(768); // 1024 -> 768 
   client.onConnect(onMqttConnect);
   logging.Set_log_init("MQTT topic for dimmer(s) : ",true);

@@ -550,8 +550,8 @@ ntpinit();
            /// connexion MQTT 
             init_MQTT_sensor(); // utile pour jeedom et HA
             // HA autoconf
-            if (configmqtt.HA) init_HA_sensor(); // complément de init_MQTT_sensor pour HA
-            async_mqtt_init();
+            if (configmqtt.HA) {init_HA_sensor();} // complément de init_MQTT_sensor pour HA
+            // async_mqtt_init();
             // connectToMqtt();
             // delay(1000); 
             // reconnect();
@@ -794,22 +794,22 @@ void connect_to_wifi() {
               
               logging.Set_log_init("timeout, go to AP mode \r\n",true);
               
-              logging.Set_log_init("Wifi State :",true);
-              logging.Set_log_init("",true);
+              logging.Set_log_init("Wifi State : ");
+              // logging.Set_log_init("",true);
               
               switch (WiFi.status()) {
                   case 1:
-                      logging.Set_log_init("SSID is not available");
+                      logging.Set_log_init("SSID is not available\r\n");
                       break;
                   case 4:
 
-                      logging.Set_log_init("The connection fails for all the attempts");
+                      logging.Set_log_init("The connection fails for all the attempts\r\n");
                       break;
                   case 5:
-                      logging.Set_log_init("The connection is lost");
+                      logging.Set_log_init("The connection is lost\r\n");
                       break;
                   case 6:
-                      logging.Set_log_init("Disconnected from the network");
+                      logging.Set_log_init("Disconnected from the network\r\n");
                       break;
                   default:
                       break;
