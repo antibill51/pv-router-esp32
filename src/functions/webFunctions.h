@@ -244,7 +244,7 @@ server.on("/cs", HTTP_ANY, [](AsyncWebServerRequest *request){
    #endif
    request->redirect("/");
    config.restart = true;
-   ESP.restart();
+  //  ESP.restart();
   });
 
 server.onNotFound(notFound);
@@ -347,7 +347,7 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
     if (request->hasParam("maxtemp")) { config.tmax = request->getParam("maxtemp")->value().toInt();}
 
    //reset
-   if (request->hasParam(PARAM_INPUT_reset)) {Serial.println("Resetting ESP");  ESP.restart();}
+   if (request->hasParam(PARAM_INPUT_reset)) {Serial.println("Resetting ESP");  config.restart == true;}
 
    //// for check boxs in web pages  
    if (request->hasParam(PARAM_INPUT_servermode)) { inputMessage = request->getParam( PARAM_INPUT_servermode)->value();

@@ -87,8 +87,9 @@ void WiFiEvent(WiFiEvent_t event) {
       Serial.println("Disconnected from WiFi access point");
       if (AP) {
         savelogs( "-- sortie du mode AP reboot dans 30s -- ");
-        delay (30000);
-        ESP.restart();
+        // delay (30000);
+        // ESP.restart();
+        config.restart = true;
       }
       WiFi.begin(ssid, passphrase);
       break;
@@ -271,8 +272,9 @@ void search_wifi_ssid(){
             Serial.println("WiFi connecté");
             WiFi.softAPdisconnect(true);
             savelogs("-- reboot dans 30s Wifi retrouvé -- ");
-            delay(30000);
-            ESP.restart();
+            // delay(30000);
+            // ESP.restart();
+            config.restart = true;
             }   
             
           }

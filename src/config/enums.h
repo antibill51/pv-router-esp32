@@ -205,7 +205,7 @@ public:
     flip = doc["flip"] | true;
     tmax = doc["tmax"] | 65;
     localfuse = doc["localfuse"] | 50;
-    voltage = doc["voltage"] | 233;
+    voltage = doc["voltage"] | 233.0;
     offset = doc["offset"] | -10;
     relayoff = doc["relayoff"] | 95;
     relayon = doc["relayon"] | 100;

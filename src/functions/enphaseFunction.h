@@ -356,7 +356,8 @@ bool Enphase_get_7_JWT(void) {
   nbErreurCtrlTocken++;
   if (  nbErreurCtrlTocken == 10 )  {
       Serial.println("Trop d'erreur  : redemmarrage");
-      ESP.restart();
+      // ESP.restart();
+      config.restart = true;
     }
   return retour;
 }

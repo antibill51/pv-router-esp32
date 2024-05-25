@@ -161,7 +161,9 @@ struct Programme {
       // protection fuite mémoire 
       if (temperature > 500) {
         savelogs("-- reboot problème de fuite memoire -- ");
-        ESP.restart(); 
+        // ESP.restart(); 
+        config.restart = true;
+
       }
 
     return false; 
@@ -224,7 +226,8 @@ void time_reboot() {
   if(getLocalTime( &timeinfo )) {
     if (timeinfo.tm_wday == 1 && timeinfo.tm_hour == 0 && timeinfo.tm_min == 0 && timeinfo.tm_sec <= 15) {
       savelogs("-- Reboot du Lundi matin -- ");
-      ESP.restart();
+      // ESP.restart();
+      config.restart = true;
     }
   }
 }

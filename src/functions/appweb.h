@@ -364,7 +364,8 @@ void serial_read() {
       if (index != -1 ){
         Serial.println("commande reboot reçue");
         savelogs("-- reboot Serial commande -- ");
-        ESP.restart();
+        // ESP.restart();
+        config.restart = true;
       }
 
 /// recupération du SSID

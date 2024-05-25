@@ -57,7 +57,8 @@ void watchdog_memory(void * parameter){ // NOSONAR
     // si need  reboot alors reboot
     if (need_reboot) {
       savelogs("-- reboot watchdog memoire -- ");
-      ESP.restart();
+      // ESP.restart();
+      config.restart = true;
     } 
     // Sleep for 10 seconds, avant de refaire une analyse
     vTaskDelay(pdMS_TO_TICKS(20000));

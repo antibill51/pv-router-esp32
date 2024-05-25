@@ -286,10 +286,6 @@ void setup()
   
 
   // // Setup the ADC
-  // adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11);
-  // adc1_config_channel_atten(ADC1_CHANNEL_4, ADC_ATTEN_DB_11);
-  // adc1_config_channel_atten(ADC1_CHANNEL_5, ADC_ATTEN_DB_11);
-
   pinMode(ADC_INPUT, INPUT);
 
   // déclaration switch
@@ -860,7 +856,7 @@ void handler_before_reset() {
 void reboot_after_lost_wifi(int timeafterlost) {
   uptime::calculateUptime();
   if ( uptime::getHours() > timeafterlost ) { 
-    delay(15000);  
+    // delay(15000);  
     config.restart = true; 
   }
 }
