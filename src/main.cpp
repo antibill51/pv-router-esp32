@@ -502,7 +502,7 @@ ntpinit();
   xTaskCreate(
     updateDimmer,
     "Update Dimmer",  // Task name
-    4000,                  // Stack size (bytes)
+    5000,                  // Stack size (bytes)
     NULL,                   // Parameter
     4,                      // Task priority
     NULL                    // Task handle

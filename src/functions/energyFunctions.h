@@ -65,7 +65,7 @@ int middle_count = 0;
 int start = 0 ;
 
 constexpr const int nbmesure = 72 ; /// nombre de mesure par ondulation
-constexpr const int nombre_cycle  = 4 ; /// nombre de cycle pour affiner la mesure
+constexpr const int nombre_cycle  = 8 ; /// nombre de cycle pour affiner la mesure
 const int freqmesure = nbmesure*(nombre_cycle+1) ;  // nombre total de mesures
 int tableau[freqmesure]; // mesure ADC Ampères // NOSONAR
 int porteuse[freqmesure]; // mesure ADC Volts // NOSONAR
