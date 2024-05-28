@@ -30,6 +30,7 @@
   
   #include "tasks/wifi-connection.h"
   #include "tasks/measure-electricity.h"
+  
   #include "tasks/Dimmer.h"
  
   #include "tasks/gettemp.h"
@@ -141,7 +142,10 @@ Dallas dallas;
   MQTT switch_1; // Relais 1
   MQTT switch_2; // Relais 2
 
-  MQTT device_resistance; // Puissance des résistances connectées
+  MQTT device_charge1; // Puissance des résistances connectées
+  MQTT device_charge2; // Puissance des résistances connectées
+  MQTT device_charge3; // Puissance des résistances connectées
+
   MQTT compteur_route; // Wh routés
 
 
@@ -160,13 +164,13 @@ Dallas dallas;
 /***************************
  *  Dimmer init
  **************************/
-
-dimmerLamp dimmer_hard(outputPin, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
-#ifdef ESP32D1MINI_FIRMWARE
+/// Déclaration des dimmers
+dimmerLamp dimmer1(outputPin, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
+#ifdef outputPin2
   dimmerLamp dimmer2(outputPin2, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
   dimmerLamp dimmer3(outputPin3, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
 #endif
-
+// déclaration de la gestion des dimmers
 gestion_puissance unified_dimmer;
 
 uint32_t lastDisconnect = 0;
@@ -285,7 +289,12 @@ void setup()
   dallas.detect = dallaspresent();
   
 
-  // // Setup the ADC
+  // Setup the ADC
+  // Déjà fait plus haut!
+  // adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_11);
+  // adc1_config_channel_atten(ADC1_CHANNEL_4, ADC_ATTEN_DB_11);
+  // adc1_config_channel_atten(ADC1_CHANNEL_5, ADC_ATTEN_DB_11);
+
   pinMode(ADC_INPUT, INPUT);
 
   // déclaration switch
@@ -695,18 +704,18 @@ if (config.dimmerlocal) {
     if (programme.run) { 
         //  minuteur en cours
         if (programme.stop_progr()) { 
-          dimmer_hard.setPower(0); 
+            //dimmer1.setPower(0); // plus forcément utile --> unified dimmer
             unified_dimmer.dimmer_off();
-            #ifdef ESP32D1MINI_FIRMWARE
             unified_dimmer.set_power(0);
-            #endif
+            dallas.security=true;
+
           DEBUG_PRINTLN("programme.run");
           Serial.println("stop minuteur dimmer");
           //arret du ventilateur
           digitalWrite(COOLER, LOW);
           /// retrait de la securité dallas
           
-          dallas.security=false;
+          // dallas.security=false;
           
           /// remonté MQTT
           #ifndef LIGHT_FIRMWARE
@@ -721,13 +730,7 @@ if (config.dimmerlocal) {
     else { 
       // minuteur à l'arret
       if (programme.start_progr()){ 
-            #ifndef ESP32D1MINI_FIRMWARE
-            dimmer_on();
-            dimmer_hard.setPower(config.localfuse); 
-            #endif
-            #ifdef ESP32D1MINI_FIRMWARE
-            unified_dimmer.set_power(config.localfuse);
-            #endif
+        unified_dimmer.set_power(config.localfuse);
         delay (50);
         Serial.println("start minuteur ");
         //demarrage du ventilateur 
@@ -772,6 +775,9 @@ void connect_to_wifi() {
   }
   else {
       #if WIFI_ACTIVE == true
+      const String node_mac = WiFi.macAddress().substring(12,14)+ WiFi.macAddress().substring(15,17);
+      const String node_id = String("PvRouter-") + node_mac; 
+      WiFi.setHostname(node_id.c_str());
       WiFi.mode(WIFI_STA);
       WiFi.setSleep(false);
       WiFi.begin(configwifi.SID, configwifi.passwd); 

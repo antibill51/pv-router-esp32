@@ -11,7 +11,7 @@ extern HTTPClient http;
 
 extern DisplayValues gDisplayValues;
 extern  Config config;
-extern dimmerLamp dimmer_hard; 
+extern dimmerLamp dimmer1; 
 
 
 /**
@@ -62,19 +62,18 @@ void updateDimmer(void * parameter){
   for (;;){
   gDisplayValues.task = true;
 #if WIFI_ACTIVE == true
-    dimmer();
+    /// application de la consigne de puissance uniquement si le minuteur n'est pas actif et que la dallas n'est pas perdu
+    if (!programme.run && !dallas.lost ) {
+        DEBUG_PRINTLN("------- dimmer.h " + String(__LINE__) + " -----------");
+        dimmer();
+    }
     
    
     #ifndef POURCENTAGE
         int local_power = 0 ;
         int child_power = 0 ;
     // si dimmer local alors calcul de puissance routée 
-    if (config.dimmerlocal && config.resistance > 0) { // Pour éviter le bootloop si config.resistance = 0 // Pas besoin de ce if, ça répond bien même si pas d'enfant configuré
-        local_power =  dimmer_hard.getPower() * config.resistance/100; // watts
-        }
-        else { 
-           local_power = 0 ; 
-        }
+        local_power =  unified_dimmer.get_power() * config.charge/100; // watts
     
     // si dimmer distant alors calcul de puissance routée
     if ( strcmp(config.dimmer,"") != 0 && strcmp(config.dimmer,"none") != 0 ) {  

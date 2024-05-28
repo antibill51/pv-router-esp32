@@ -99,7 +99,7 @@ public:
   char mqttserver[16]; // NOSONAR
   int mqttport; 
   int IDXdimmer;
-  int resistance;  // résistance de la charge
+  
   bool polarity; 
   char Publish[100]; // NOSONAR
   int  ScreenTime;
@@ -112,6 +112,7 @@ public:
   char topic_Shelly[100];  // NOSONAR
   bool Shelly_tri;
   int SCT_13=30;
+  int charge1;  // Puissance de la charge 1 déclarée dans la page web
 /// @brief  // Puissance de la charge 2 déclarée dans la page web
   int charge2; 
 /// @brief  // Puissance de la charge 3 déclarée dans la page web
@@ -138,7 +139,7 @@ public:
   }
   
   void calcul_charge() {
-    charge = resistance + charge2 + charge3;
+    charge = charge1 + charge2 + charge3;
   }
 
   //***********************************
@@ -149,6 +150,11 @@ public:
     String message = "";
     // Open file for reading
     File configFile = SPIFFS.open(filename_conf, "r");
+   if (!configFile) {
+      Serial.println(F("Failed to open config file for writing in function Save configuration"));
+      message = "Failed to open config file for writing in function Save configuration\r\n";
+      return message;
+    } 
 
 
     JsonDocument doc;
@@ -191,7 +197,7 @@ public:
     readtime = doc["readtime"] | 555;
     // cycle = doc["cycle"] | 72;
 
-    resistance = doc["resistance"] | 3000;
+    charge1 = doc["charge1"] | 3000;
     charge2 = doc["charge2"] | 0;
     charge3 = doc["charge3"] | 0;
     calcul_charge();
@@ -286,7 +292,7 @@ public:
     doc["mqttserver"] = mqttserver; 
     doc["mqttport"] = mqttport; 
     
-    doc["resistance"] = resistance;
+    doc["charge1"] = charge1;
     doc["charge2"] = charge2;
     doc["charge3"] = charge3;
 
@@ -352,7 +358,7 @@ public:
   bool HA;
   bool JEEDOM;
   bool DOMOTICZ;
-  bool HTTP;
+  // bool HTTP;
 
 ///////////////////////////////////
 ////////config MQTT
@@ -390,7 +396,7 @@ String loadmqtt() {
   HA = doc["HA"] | true;
   JEEDOM = doc["JEEDOM"] | true;
   DOMOTICZ = doc["DOMOTICZ"] | true;
-  HTTP = doc["HTTP"] | true;
+  // HTTP = doc["HTTP"] | true;
   configFile.close();
   
   message = "MQTT config loaded\r\n";
@@ -418,7 +424,7 @@ String savemqtt() {
   doc["HA"] = HA;
   doc["JEEDOM"] = JEEDOM;
   doc["DOMOTICZ"]= DOMOTICZ;
-  doc["HTTP"] = HTTP;
+  // doc["HTTP"] = HTTP;
   message = "MQTT config saved\r\n";
   // Serialize JSON to file
   if (serializeJson(doc, configFile) == 0) {
@@ -541,8 +547,9 @@ struct Dallas{
   byte data[12]; // NOSONAR
   byte addr[8]; // NOSONAR
   float celsius = 0.00 ;
-  byte security = 0;
-  bool detect = false; 
+  bool security = 0;
+  bool detect = false;
+  bool lost = false; 
   
 
 
@@ -573,14 +580,11 @@ struct Dallas{
 //     private:String stat_cla; 
 //     public:void Set_stat_cla(String setter) {stat_cla=setter; }
 
-//     private:String entity_category; 
-//     public:void Set_entity_category(String setter) {entity_category=setter; }
-    
-//     private:String entity_type; 
-//     public:void Set_entity_type(String setter) {entity_type=setter; }
+          // private:String entity_category; 
+          // public:void Set_entity_category(String setter) {entity_category=setter; }
 
-//     private:String icon; 
-//     public:void Set_icon(String setter) {icon = R"("ic": ")" + setter + R"(", )"; }
+          // private:String icon; 
+          // public:void Set_icon(String setter) {icon = R"("ic": ")" + setter + R"(", )"; }
 
 //           bool cmd_t; 
 

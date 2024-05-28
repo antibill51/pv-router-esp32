@@ -127,6 +127,8 @@ for(int i = 0; i < loop; i++)
 
 // int phi = config.cosphi ;
 // if (phi > start ) { phi = start ; }
+// 14 mesures de retard pour phi de 0.90 ( .451rad / (2Pi/72 ) ) 
+// 8 pour cosphi ) 
 
     for (int j = 0 ; j < nombre_cycle   ; j++) 
     {

@@ -201,19 +201,56 @@ void callback(const espMqttClientTypes::MessageProperties& properties, const cha
     }
   }
   // Je n'ai pas trouvé d'infos sur le shelly em pour valider ceci : 
-  if (strcmp(Subscribedtopic, config.topic_Shelly ) == 0 ) {
-      if (strcmp( doc2["state"] , "unavailable" ) == 0 ) { gDisplayValues.Shelly = -2; }
-      else { gDisplayValues.Shelly = doc2["state"];  }
-  }
+
+  
+    if (strcmp( Subscribedtopic, config.topic_Shelly ) == 0 ) {
+        if (strcmp( message , "unavailable" ) == 0 ) { 
+            gDisplayValues.Shelly = -2; 
+        }
+        else { 
+         DEBUG_PRINTLN("MQTT callback : Shelly = "+String(message));
+      // Utiliser strtol pour une conversion plus robuste
+          char* endPtr;
+          double shellyValue = strtod(message, &endPtr);
+
+          if (endPtr != message && *endPtr == '\0') {
+            // La conversion s'est déroulée avec succès
+            gDisplayValues.Shelly = shellyValue;
+          } else {
+            DEBUG_PRINTLN("Erreur : Conversion de la chaîne en virgule flottante a échoué");
+          } 
+        } 
+      }
+
+
+  // if (strcmp(Subscribedtopic, config.topic_Shelly ) == 0 ) {
+  //     if (strcmp( doc2["state"] , "unavailable" ) == 0 ) { gDisplayValues.Shelly = -2; }
+  //     else { gDisplayValues.Shelly = doc2["state"];  }
+  // }
   if (strstr( Subscribedtopic, command_number.c_str() ) != NULL) { 
-    if (doc2.containsKey("resistance")) { 
-      int resistance = doc2["resistance"]; 
-      if (config.resistance != resistance ) {
-        config.resistance = resistance;
-        device_resistance.send(String(resistance));
+    if (doc2.containsKey("charge1")) { 
+      int charge1 = doc2["charge1"]; 
+      if (config.charge1 != charge1 ) {
+        config.charge1 = charge1;
+        device_charge1.send(String(charge1));
+      }
+    }
+    if (doc2.containsKey("charge2")) { 
+      int charge2 = doc2["charge2"]; 
+      if (config.charge2 != charge2 ) {
+        config.charge2 = charge2;
+        device_charge2.send(String(charge2));
+      }
+    }
+    if (doc2.containsKey("charge3")) { 
+      int charge3 = doc2["charge3"]; 
+      if (config.charge3 != charge3 ) {
+        config.charge3 = charge3;
+        device_charge3.send(String(charge3));
       }
     }
   }
+  
   if (strcmp( Subscribedtopic, HA_status.c_str() ) == 0) { 
     logging.Set_log_init("MQTT HA_status ",true);
     logging.Set_log_init(fixedpayload);

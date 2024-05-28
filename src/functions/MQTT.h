@@ -23,7 +23,9 @@ extern MQTT switch_1;
 extern MQTT switch_2;
 extern MQTT temperature;
 extern MQTT device_alarm_temp;
-extern MQTT device_resistance;
+extern MQTT device_charge1;
+extern MQTT device_charge2;
+extern MQTT device_charge3;
 extern MQTT compteur_route;
 
 
@@ -74,12 +76,20 @@ void init_MQTT_sensor(){
         device_alarm_temp.Set_object_id("alarm_temp");
         device_alarm_temp.Set_retain_flag(true);
 
-        device_resistance.Set_object_id("resistance");
-        device_resistance.Set_retain_flag(true);
+        device_charge1.Set_object_id("charge1");
+        device_charge1.Set_retain_flag(true);
 
-        compteur_inject.send(String("0"));
-        compteur_grid.send(String("0"));
-        device_resistance.send(String(config.resistance));
+        device_charge2.Set_object_id("charge2");
+        device_charge2.Set_retain_flag(true);
+
+        device_charge3.Set_object_id("charge3");
+        device_charge3.Set_retain_flag(true);
+
+        // compteur_inject.send(String("0"));
+        // compteur_grid.send(String("0"));
+        // device_charge1.send(String(config.charge1));
+        // device_charge2.send(String(config.charge2));
+        // device_charge3.send(String(config.charge3));
 
         #ifdef HARDWARE_MOD
                 power_factor.Set_object_id("PowerFactor");
@@ -107,7 +117,9 @@ void HA_discover(){
         compteur_grid.HA_discovery();
         switch_1.HA_discovery(); 
         switch_2.HA_discovery(); 
-        device_resistance.HA_discovery(); 
+        device_charge1.HA_discovery(); 
+        device_charge2.HA_discovery(); 
+        device_charge3.HA_discovery(); 
         compteur_route.HA_discovery(); 
 
         if (config.dimmerlocal) {device_dimmer_power.HA_discovery();}
@@ -120,6 +132,13 @@ void HA_discover(){
                 }
                 
         #endif
+        
+        compteur_inject.send(String("0"));
+        compteur_grid.send(String("0"));
+        device_charge1.send(String(config.charge1));
+        device_charge2.send(String(config.charge2));
+        device_charge3.send(String(config.charge3));
+        
         discovery_temp = false;
         }
 }
@@ -233,15 +252,35 @@ void init_HA_sensor(){
         // device_alarm_temp.Set_expire_after(true);
 
 
-        device_resistance.Set_name("Résistance");
-        device_resistance.Set_entity_type("number");
-        device_resistance.Set_entity_category("config");
-        device_resistance.Set_entity_valuemin("0");
-        device_resistance.Set_entity_valuemax("5000"); 
-        device_resistance.Set_entity_valuestep("100");
-        device_resistance.Set_unit_of_meas("W");
-        device_resistance.Set_retain(true);
-        // device_resistance.Set_expire_after(true);
+        device_charge1.Set_name("Charge1");
+        device_charge1.Set_entity_type("number");
+        device_charge1.Set_entity_category("config");
+        device_charge1.Set_entity_valuemin("0");
+        device_charge1.Set_entity_valuemax("5000"); 
+        device_charge1.Set_entity_valuestep("100");
+        device_charge1.Set_unit_of_meas("W");
+        device_charge1.Set_retain(true);
+        // device_charge1.Set_expire_after(true);
+
+        device_charge2.Set_name("Charge2");
+        device_charge2.Set_entity_type("number");
+        device_charge2.Set_entity_category("config");
+        device_charge2.Set_entity_valuemin("0");
+        device_charge2.Set_entity_valuemax("5000"); 
+        device_charge2.Set_entity_valuestep("100");
+        device_charge2.Set_unit_of_meas("W");
+        device_charge2.Set_retain(true);
+        // device_charge2.Set_expire_after(true);
+
+        device_charge3.Set_name("Charge3");
+        device_charge3.Set_entity_type("number");
+        device_charge3.Set_entity_category("config");
+        device_charge3.Set_entity_valuemin("0");
+        device_charge3.Set_entity_valuemax("5000"); 
+        device_charge3.Set_entity_valuestep("100");
+        device_charge3.Set_unit_of_meas("W");
+        device_charge3.Set_retain(true);
+        // device_charge3.Set_expire_after(true);
         #ifdef HARDWARE_MOD
 
                 power_factor.Set_name("Facteur de puissance");
@@ -295,11 +334,12 @@ void init_HA_sensor(){
         }
 }
 
-String stringBoolMQTT(bool mybool){
-String truefalse = "true";
-if (mybool == false ) {truefalse = "false";}
-return String(truefalse);
-}
+// String stringBoolMQTT(bool mybool){
+// String truefalse = "true";
+// if (mybool == false ) {truefalse = "false";}
+// return String(truefalse);
+// }
+
 
 #endif
 #endif

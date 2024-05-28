@@ -101,7 +101,7 @@ void send_to_mqtt(void * parameter){ // NOSONAR
                         device_routeur.send(String(int(gDisplayValues.watt)));
                         device_routed.send(String(gDisplayValues.puissance_route));
                         if (config.dimmerlocal) {
-                              device_dimmer_power.send(String(int((dimmer_hard.getPower()) * config.resistance/100)));
+                              device_dimmer_power.send(String(int((unified_dimmer.get_power()) * config.charge/100)));
                         }
 
                         #ifdef HARDWARE_MOD
@@ -157,7 +157,7 @@ void send_to_mqtt(void * parameter){ // NOSONAR
                               if (configmqtt.DOMOTICZ) {Mqtt_send_DOMOTICZ(String(config.IDXdallas), String(gDisplayValues.temperature),"","Dallas" );} //  bug#11  remonté domoticz
                               if ((configmqtt.HA) || (configmqtt.JEEDOM)) {
                                     temperature.send(String(gDisplayValues.temperature));
-                                    device_alarm_temp.send(stringBoolMQTT(dallas.security));
+                                    device_alarm_temp.send(stringBool(dallas.security));
                               }
                         }
             #endif
