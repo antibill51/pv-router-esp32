@@ -24,7 +24,7 @@ extern Config config;
 extern Configmodule configmodule; 
 extern Logs Logging;
 extern Mqtt configmqtt;
-
+extern System sysvar;
 
 
 
@@ -63,6 +63,7 @@ extern Mqtt configmqtt;
 #endif
 
 int Pow_mqtt_send = 0;
+int Relays_mqtt_send = 0;
 float WHtempgrid=0;
 float WHtempinject=0;
 float WHrouted=0;
@@ -88,7 +89,13 @@ void send_to_mqtt(void * parameter){ // NOSONAR
     
       #if WIFI_ACTIVE == true
                   Pow_mqtt_send ++ ;
-                  if ( Pow_mqtt_send >= 2 ) { //5
+                  Relays_mqtt_send ++ ;
+                  if ( Relays_mqtt_send >= 20 ) { // Envoi apres 20 secondes, toutes les 20 secondes. 1er démarrage => récup valeur callback si existante, sinon false
+                       switch_1.send(String(sysvar.relay1));
+                       switch_2.send(String(sysvar.relay2)); 
+                       Relays_mqtt_send = 0 ;
+                  }
+                  if ( Pow_mqtt_send >= 5 ) { //5 ou 2? 
                   long timemesure = start-beforetime;
                   float wattheure = (timemesure * abs(gDisplayValues.watt) / timemilli) ;  
                   float wattrouted = (timemesure * abs(gDisplayValues.puissance_route) / timemilli) ;  
@@ -226,8 +233,8 @@ void send_to_mqtt(void * parameter){ // NOSONAR
       // #endif   
       } 
       task_mem.task_send_mqtt = uxTaskGetStackHighWaterMark(NULL);
-   // Sleep for 10 seconds
-    vTaskDelay(pdMS_TO_TICKS(5000));
+   // Sleep for 1 second
+    vTaskDelay(pdMS_TO_TICKS(1000));
   }
 }
 

@@ -14,7 +14,7 @@ extern Configwifi configwifi;
 extern Logs logging;
 extern Programme programme; 
 extern Memory task_mem; 
-
+extern System sysvar;
 
 String inputMessage;
 
@@ -362,20 +362,20 @@ server.on("/get", HTTP_ANY, [] (AsyncWebServerRequest *request) {
 
     /// relays : 0 : off , 1 : on , other : switch 
     if (request->hasParam("relay1")) { int relay = request->getParam("relay1")->value().toInt(); 
-        if ( relay == 0 ) { digitalWrite(RELAY1 , LOW); }
-        else if ( relay == 1 ) { digitalWrite(RELAY1 , HIGH); } 
-        else digitalWrite(RELAY1, !digitalRead(RELAY1));
+        if ( relay == 0 ) { digitalWrite(RELAY1 , LOW); sysvar.relay1 = false;}
+        else if ( relay == 1 ) { digitalWrite(RELAY1 , HIGH);sysvar.relay1 = true; } 
+        else {sysvar.relay1 = !digitalRead(RELAY1); digitalWrite(RELAY1, sysvar.relay1);}
         #ifndef LIGHT_FIRMWARE
-          switch_1.send(String(relay));
+          switch_1.send(String(sysvar.relay1));
         #endif
 
     }
     if (request->hasParam("relay2")) { int relay = request->getParam("relay2")->value().toInt(); 
-        if ( relay == 0) { digitalWrite(RELAY2 , LOW); }
-        else if ( relay == 1 ) { digitalWrite(RELAY2 , HIGH); } 
-        else digitalWrite(RELAY2, !digitalRead(RELAY2));
+        if ( relay == 0 ) { digitalWrite(RELAY2 , LOW); sysvar.relay2 = false;}
+        else if ( relay == 1 ) { digitalWrite(RELAY2 , HIGH);sysvar.relay2 = true; } 
+        else {sysvar.relay2 = !digitalRead(RELAY2); digitalWrite(RELAY2, sysvar.relay2);}
         #ifndef LIGHT_FIRMWARE
-          switch_2.send(String(relay));
+          switch_2.send(String(sysvar.relay2));
         #endif
 
     }

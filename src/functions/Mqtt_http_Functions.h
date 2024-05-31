@@ -12,6 +12,7 @@
 WiFiClient espClient;
 #ifndef LIGHT_FIRMWARE
 extern uint32_t lastDisconnect;
+extern System sysvar;
   // PubSubClient client(espClient);
   // AsyncMqttClient client;
   espMqttClientAsync  client;
@@ -189,14 +190,14 @@ void callback(const espMqttClientTypes::MessageProperties& properties, const cha
   if (strstr( Subscribedtopic, command_switch.c_str() ) != NULL) { 
     if (doc2.containsKey("relay1")) { 
         int relay = doc2["relay1"]; 
-        if ( relay == 0) { digitalWrite(RELAY1 , LOW); }
-        else { digitalWrite(RELAY1 , HIGH); } 
+        if ( relay == 0) { digitalWrite(RELAY1 , LOW); sysvar.relay1 = false; }
+        else { digitalWrite(RELAY1 , HIGH); sysvar.relay1 = true; } 
         switch_1.send(String(relay));
     }
     if (doc2.containsKey("relay2")) { 
         int relay = doc2["relay2"]; 
-        if ( relay == 0) { digitalWrite(RELAY2 , LOW); }
-        else { digitalWrite(RELAY2 , HIGH); } 
+        if ( relay == 0) { digitalWrite(RELAY2 , LOW);sysvar.relay2 = false; }
+        else { digitalWrite(RELAY2 , HIGH);sysvar.relay2 = true; } 
         switch_2.send(String(relay));
     }
   }

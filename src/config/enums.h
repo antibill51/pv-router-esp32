@@ -660,6 +660,15 @@ struct Dallas{
 //       };
 //   #endif
 
+
+struct System {
+bool relay1=false;
+/// @brief état du relais 2
+bool relay2=false;
+};
+
+
+
 struct epoc {
   public:
     int heure;

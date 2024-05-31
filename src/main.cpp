@@ -105,6 +105,8 @@ Mqtt configmqtt;
 /// surveillance mémoire
 Memory task_mem; 
 
+System sysvar;
+
 
 int retry_wifi = 0;
 void connect_to_wifi();

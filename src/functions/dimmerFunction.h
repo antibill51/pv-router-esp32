@@ -14,7 +14,7 @@
 
 extern Programme programme; 
 extern Dallas dallas ;
-
+extern System sysvar;
 
 
 
@@ -59,30 +59,7 @@ void dimmer_change(char dimmerurl[15], int dimmerIDX, int dimmervalue, int puiss
       #if WIFI_ACTIVE == true
       /// control dimmer 
 
-if ( strcmp(config.dimmer,"none") != 0 && strcmp(config.dimmer,"") != 0) {
-        #ifndef POURCENTAGE
-      const String  baseurl = "/?POWER=" + String(dimmervalue) +"&puissance=" + String(puissance_dispo) ; 
-        #else
-      const String baseurl = "/?POWER=" + String(dimmervalue) ;
-        #endif
-        // si la puissance routé est de 0 et que le dimmer est à 0 on ne fait rien
-        if ( dimmervalue == 0 && gDisplayValues.puissance_route == 0 ) { 
-          device_dimmer.send(String(dimmervalue)); 
-          return;
-        }
-        
-        http.begin(dimmerurl,80,baseurl);   
-        http.GET();
-        http.end(); 
-            if (logging.serial){
-            Serial.println(POWER_COMMAND + String(dimmervalue));
-            }
-        // if (logging.power) {    
-            
-            logging.Set_log_init(POWER_COMMAND,true);
-            logging.Set_log_init(String(dimmervalue).c_str());
-            logging.Set_log_init("% " + String(puissance_dispo) + "W\r\n");
-        }
+// Déplacé ici pour envoi même si ( dimmervalue == 0 && gDisplayValues.puissance_route == 0 )
       //// Mqtt send information
       #ifndef LIGHT_FIRMWARE
         if (!AP) {
@@ -97,8 +74,30 @@ if ( strcmp(config.dimmer,"none") != 0 && strcmp(config.dimmer,"") != 0) {
             }
         }
       #endif
-      // test suppression delay (500); peut être inutile avec la gestion par taches?
-      // delay (500); // delay de transmission réseau dimmer et application de la charge } 
+//
+
+if ( strcmp(config.dimmer,"none") != 0 && strcmp(config.dimmer,"") != 0) {
+        #ifndef POURCENTAGE
+      const String  baseurl = "/?POWER=" + String(dimmervalue) +"&puissance=" + String(puissance_dispo) ; 
+        #else
+      const String baseurl = "/?POWER=" + String(dimmervalue) ;
+        #endif
+        // si la puissance routé est de 0 et que le dimmer est à 0 on ne fait rien
+        if ( dimmervalue == 0 && gDisplayValues.puissance_route == 0 ) { return; }
+        
+        http.begin(dimmerurl,80,baseurl);   
+        http.GET();
+        http.end(); 
+            if (logging.serial){
+            Serial.println(POWER_COMMAND + String(dimmervalue));
+            }
+        // if (logging.power) {    
+            
+            logging.Set_log_init(POWER_COMMAND,true);
+            logging.Set_log_init(String(dimmervalue).c_str());
+            logging.Set_log_init("% " + String(puissance_dispo) + "W\r\n");
+        }
+      delay (500); // delay de transmission réseau dimmer et application de la charge } 
       /// 24/01/2023 passage de 1500 à 500ms 
 
       #endif
@@ -304,8 +303,8 @@ if ( !config.dimmerlocal && gDisplayValues.dimmer >= config.num_fuse) {
 
         /// Relay
 
-        if ( gDisplayValues.dimmer >= config.relayon ) {   digitalWrite(RELAY1, HIGH); }
-        if ( gDisplayValues.dimmer <= config.relayoff ) {   digitalWrite(RELAY1, LOW ); }
+        if ( gDisplayValues.dimmer >= config.relayon ) {   digitalWrite(RELAY1, HIGH); sysvar.relay1 = true; }
+        if ( gDisplayValues.dimmer <= config.relayoff ) {   digitalWrite(RELAY1, LOW ); sysvar.relay1 = false;}
 
     }
 
