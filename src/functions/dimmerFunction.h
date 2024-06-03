@@ -234,7 +234,7 @@ if ( !config.dimmerlocal && gDisplayValues.dimmer >= config.num_fuse) {
           
           }
           else {
-            unified_dimmer.set_power(0);
+            // unified_dimmer.set_power(0);
             unified_dimmer.dimmer_off();
             programme.run=false;
             ledcWrite(0, 0);
@@ -248,11 +248,11 @@ if ( !config.dimmerlocal && gDisplayValues.dimmer >= config.num_fuse) {
         else { 
 
           if ( config.tmax < dallas_int ) {
-            dimmer1.setPower(0); 
+            // dimmer1.setPower(0); 
             unified_dimmer.dimmer_off();
-              #ifdef ESP32D1MINI_FIRMWARE
-              unified_dimmer.set_power(0);
-              #endif
+              // #ifdef ESP32D1MINI_FIRMWARE
+              // unified_dimmer.set_power(0);
+              // #endif
             ledcWrite(0, 0);
 /// Modif RV - 20240219
             /// Ca fait aussi un cut de puissance transitoire pour le(s) dimmer(s) distant(s) quand on atteint la tempé

@@ -170,6 +170,8 @@ Dallas dallas;
 dimmerLamp dimmer1(outputPin, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
 #ifdef outputPin2
   dimmerLamp dimmer2(outputPin2, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
+#endif
+#ifdef outputPin3
   dimmerLamp dimmer3(outputPin3, zerocross); //initialase port for dimmer for ESP8266, ESP32, Arduino due boards
 #endif
 // déclaration de la gestion des dimmers
@@ -708,7 +710,7 @@ if (config.dimmerlocal) {
         if (programme.stop_progr()) { 
             //dimmer1.setPower(0); // plus forcément utile --> unified dimmer
             unified_dimmer.dimmer_off();
-            unified_dimmer.set_power(0);
+            // unified_dimmer.set_power(0);
             dallas.security=true;
 
           DEBUG_PRINTLN("programme.run");

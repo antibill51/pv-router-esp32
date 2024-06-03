@@ -94,8 +94,8 @@ void set_power(float unified_power){
      }
      else { dimmer2.setPower(dimmer2_pwr); }
     }
-    
-    // Dimmer3
+#endif
+#ifdef outputPin3    // Dimmer3
     if ( dimmer3_pwr != dimmer3.getPower() ) {  
      if (dimmer3_pwr == 0 && dimmer3.getState()==1) {  /// si puissance demandée = 0 et dimmer allumé alors on éteint
       dimmer3.setPower(0);
@@ -115,6 +115,8 @@ void set_power(float unified_power){
     logging.Set_log_init("dimmer 1: " + String(dimmer1_pwr) + "%\r\n" );
     #ifdef outputPin2
     logging.Set_log_init("dimmer 2: " + String(dimmer2_pwr) + "%\r\n" );
+    #endif
+    #ifdef outputPin3
     logging.Set_log_init("dimmer 3: " + String(dimmer3_pwr) + "%\r\n" );
     #endif
 }
@@ -154,6 +156,8 @@ float get_power(){
         logging.Set_log_init("Dimmer2 Off\r\n");
         delay(50);
   }
+      #endif
+      #ifdef outputPin3
         if (dimmer3.getState()) {
           dimmer3.setPower(0);
           dimmer3.setState(OFF);

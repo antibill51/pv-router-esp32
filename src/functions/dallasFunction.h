@@ -124,7 +124,7 @@ float CheckTemperature(String label, byte deviceAddress[12]){ // NOSONAR
     tempC = gDisplayValues.temperature; 
     /// mise en securité du dimmer local
         unified_dimmer.dimmer_off();
-        unified_dimmer.set_power(0);
+        // unified_dimmer.set_power(0);
         dallas.lost = true; // on est perdu donc on coupe le dimmer
     }
   return tempC; 

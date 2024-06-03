@@ -133,8 +133,8 @@ void HA_discover(){
                 
         #endif
         
-        compteur_inject.send(String("0"));
-        compteur_grid.send(String("0"));
+        // compteur_inject.send(String("0"));
+        // compteur_grid.send(String("0"));
         device_charge1.send(String(config.charge1));
         device_charge2.send(String(config.charge2));
         device_charge3.send(String(config.charge3));
