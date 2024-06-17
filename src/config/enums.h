@@ -353,8 +353,8 @@ struct Configwifi {
 
 struct Mqtt {
 public: 
-  char username[50]; // NOSONAR
-  char password[50]; // NOSONAR
+  char username[64]; // NOSONAR
+  char password[64]; // NOSONAR
   bool HA;
   bool JEEDOM;
   bool DOMOTICZ;
@@ -653,7 +653,16 @@ struct Dallas{
 
 
 //           public:void send(String value){
-//             String message = "  { \""+name+"\" : \"" + value.c_str() + "\"  } ";
+//             // vérification que value est un nombre
+            // String message ="";
+            // if (value.toFloat() == 0 && value != "0") { 
+            //   message = "  { \""+name+"\" : \"" + value.c_str() + "\"  } "; 
+            // }
+            // else {
+            //   message = "  { \""+name+"\" : "+ value.c_str() + "}"; 
+            // }
+
+
 //             client.publish((topic+"state"+name).c_str() , message.c_str(), false); // false for exp_aft in discovery
 //           }
       
