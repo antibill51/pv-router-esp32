@@ -3,7 +3,7 @@
 
 #include "../config/config.h"
 #include "../config/enums.h"
-
+#include "functions/ha.h"
 
     //***********************************
     //************* Test de la présence d'une 18b20 
@@ -15,22 +15,14 @@ OneWire ds(ONE_WIRE_BUS);
 DallasTemperature sensors(&ds);
 DeviceAddress insideThermometer;
 
- /* 
-  byte present = 0;
-  byte type_s;
-  byte data[12];
-  byte addr[8];
-  float celsius = 0.00 ;
-  
-  int refresh = 30;
-  int refreshcount = 0; 
-*/
 byte i;
 bool dallaspresent () {
+logging.clean_log_init();
 
 if ( !ds.search(dallas.addr)) {
     Serial.println("Dallas not connected");
-    logging.init += "Dallas not connected\r\n";
+    
+    logging.Set_log_init("Dallas not connected\r\n",true);
     Serial.println();
     ds.reset_search();
     delay(250);
@@ -48,15 +40,15 @@ if ( !ds.search(dallas.addr)) {
   // the first ROM byte indicates which chip
   switch (dallas.addr[0]) {
     case 0x10:
-      Serial.println("  Chip = DS18S20");  // or old DS1820
+      Serial.println(DALLAS_TEXT);  // or old DS1820
       dallas.type_s = 1;
       break;
     case 0x28:
-      Serial.println("  Chip = DS18B20");
+      Serial.println(DALLAS_TEXT);
       dallas.type_s = 0;
       break;
     case 0x22:
-      Serial.println("  Chip = DS1822");
+      Serial.println(DALLAS_TEXT);
       dallas.type_s = 0;
       break;
     default:
@@ -74,16 +66,21 @@ if ( !ds.search(dallas.addr)) {
   dallas.present = ds.reset();    ///  byte 0 > 1 si present
   ds.select(dallas.addr);    
   ds.write(0xBE);         // Read Scratchpad
-
+  
   Serial.print("  present = ");
   Serial.println(dallas.present, HEX);
-  logging.init += "Dallas present at address" + String(dallas.present, HEX) + "\r\n";
+      
+      logging.Set_log_init("Dallas present at address",true);
+      logging.Set_log_init(String(dallas.present, HEX).c_str());
+      logging.Set_log_init("\r\n");
 
+#ifndef LIGHT_FIRMWARE
   if (!discovery_temp) {
     discovery_temp = true;
-    temperature_HA.discovery();
+    temperature.HA_discovery();
+    device_alarm_temp.HA_discovery();
   }
-
+#endif
 
   return true;
    
@@ -92,23 +89,45 @@ if ( !ds.search(dallas.addr)) {
     //***********************************
     //************* récupération d'une température du 18b20
     //***********************************
+int dallas_error = 0;
 
-float CheckTemperature(String label, byte deviceAddress[12]){
+float CheckTemperature(String label, byte deviceAddress[12]){ // NOSONAR
   sensors.requestTemperatures(); 
-  float tempC = sensors.getTempC(deviceAddress);
-  Serial.print(label);
-  if (tempC == -127.00) {
-    Serial.print("Error getting temperature");
-    logging.start += "Error getting temperature\r\n";
-  } else {
-    Serial.print(" Temp C: ");
-    Serial.println(tempC);
-    logging.start += "temp :"+ String(tempC) +" \r\n";
-    return (tempC); 
    
+  delay(400); // conseillé 375 ms pour une 18b20
+
+  float tempC = sensors.getTempC(deviceAddress);
+
+    if ( (tempC == -127.0) || (tempC == -255.0) ) {
     
+    //// cas d'une sonde trop longue à préparer les valeurs 
+    delay(187); /// attente de 187ms ( temps de réponse de la sonde )
+    tempC = sensors.getTempC(deviceAddress);
+      if ( (tempC == -127.0) || (tempC == -255.0) ) {
+      Serial.print("Error getting temperature");
+      logging.Set_log_init("Local Dallas lost\r\n");
+       /// si erreur on reprends l'ancienne valeur
+       tempC = gDisplayValues.temperature; 
+       dallas_error++;
+      }
+  } else {
+    //réduction du retour à 1 décimale 
+    tempC = (int(tempC*10))/10.0;
+    dallas_error = 0;  
+    dallas.lost = false; // on a une valeur donc on est pas perdu
+    return tempC ; 
   }  
-  return (tempC); 
+
+  if (dallas_error > 5) {
+    Serial.print("Error getting temperature");
+    logging.Set_log_init("Local Dallas on error "+ String(dallas_error) + " times\r\n");
+    tempC = gDisplayValues.temperature; 
+    /// mise en securité du dimmer local
+        unified_dimmer.dimmer_off();
+        // unified_dimmer.set_power(0);
+        dallas.lost = true; // on est perdu donc on coupe le dimmer
+    }
+  return tempC; 
 }
 
 #endif

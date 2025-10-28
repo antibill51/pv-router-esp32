@@ -13,31 +13,34 @@
 
 HTTPClient httpfronius;  
 
-const char *fronius_conf = "/fronius.json";
+constexpr const char *fronius_conf = "/fronius.json";
 extern Configmodule configmodule; 
 extern Logs logging;
 
+
 void Fronius_get(void);
 
-bool loadfronius(const char *filename, Configmodule &configmodule) {
+bool loadfronius(const char *filename) {
   // Open file for reading
   File configFile = SPIFFS.open(fronius_conf, "r");
   if (!configFile) {
-    Serial.println(F("No Fronius used"));
-    logging.init += "--> No Fronius used\r\n";
+    Serial.println(NOT_FRONIUS);
+    
+    logging.Set_log_init(NOT_FRONIUS,true);
+
       return false;
     }
 
-  // Allocate a temporary JsonDocument
-  // Don't forget to change the capacity to match your requirements.
-  // Use arduinojson.org/v6/assistant to compute the capacity.
-  StaticJsonDocument<512> doc;
+
+  JsonDocument doc;
 
   // Deserialize the JSON document
   DeserializationError error = deserializeJson(doc, configFile);
   if (error) {
-    Serial.println(F("Failed to read Fronius config"));
-    logging.init += "--> Fronius not present\r\n";
+    Serial.println(NOT_FRONIUS);
+    
+    logging.Set_log_init(NOT_FRONIUS,true);
+
     return false;
   }
 
@@ -51,7 +54,8 @@ bool loadfronius(const char *filename, Configmodule &configmodule) {
   configFile.close();
 
 Serial.println(" Fronius config : " + String(configmodule.hostname));
-logging.init += "Fronius used\r\n";
+
+logging.Set_log_init("Fronius used\r\n",true);
 return true;
 }
 
@@ -59,8 +63,8 @@ return true;
 
 void Fronius_get(void) {
 
-String url = "/solar_api/v1/GetInverterRealtimeData.cgi?Scope=System";
-String url2 = "/solar_api/v1/GetMeterRealtimeData.cgi?Scope=System";
+const String url = "/solar_api/v1/GetInverterRealtimeData.cgi?Scope=System";
+const String url2 = "/solar_api/v1/GetMeterRealtimeData.cgi?Scope=System";
 httpfronius.begin(String(configmodule.hostname),80,url);
 int httpResponseCode = httpfronius.GET();
 // start connection and send HTTP header
@@ -71,9 +75,15 @@ Serial.println(httpResponseCode);
 #if(httpResponseCode == HTTP_CODE_OK)
 
     String payload = httpfronius.getString();
-    DynamicJsonDocument doc(900);
+    JsonDocument doc;
     DeserializationError error = deserializeJson(doc, payload);
-
+    if (error) {
+        Serial.print(F("Fronius_get() failed: "));
+        logging.Set_log_init("Fronius_get() failed: ",true);
+        Serial.println(error.c_str());
+        return;
+    }
+    
     int generatedPower = int(doc["Body"]["Data"]["PAC"]["Values"]["1"]);
     gDisplayValues.Fronius_prod = generatedPower;
 
@@ -88,18 +98,20 @@ httpResponseCode = httpfronius.GET();
 
 
     payload = http2.getString();
-    DynamicJsonDocument doc2(2048);
+    JsonDocument doc2;
     error = deserializeJson(doc2, payload);
+    if (error) {
+        Serial.print(F("Fronius_get() failed: "));
+        logging.Set_log_init("Fronius_get() failed: ",true);
+        Serial.println(error.c_str());
+        return;
+    }
     int generatedPower2 = int(doc2["Body"]["Data"]["0"]["PowerReal_P_Sum"]);
     gDisplayValues.Fronius_conso = generatedPower2;
 
 #endif
 
 httpfronius.end();
-
-//debug
-//Serial.print("prod : " + String(gDisplayValues.Fronius_prod));
-//Serial.print("conso: : "+ String(gDisplayValues.Fronius_conso) );
 
 
 }

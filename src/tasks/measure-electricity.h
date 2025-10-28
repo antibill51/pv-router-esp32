@@ -5,136 +5,189 @@
 
 #include "../config/config.h"
 #include "../config/enums.h"
-#include "mqtt-home-assistant.h"
+// #include "mqtt-home-assistant.h"
 #include "functions/energyFunctions.h"
 #include "functions/dimmerFunction.h"
 #include "functions/drawFunctions.h"
 #include "functions/enphaseFunction.h"
 #include "functions/froniusFunction.h"
+#include "functions/ha.h"
+#include "functions/shelly.h" 
 
 extern DisplayValues gDisplayValues;
 extern Configmodule configmodule; 
 extern Logs Logging;
-extern HA device_routeur; 
-extern HA device_grid; 
-extern HA device_inject; 
-extern HA compteur_inject;
-extern HA compteur_grid;
-extern HA temperature_HA;
 
-extern HA power_factor;
-extern HA power_vrms;
-extern HA power_irms;
-extern HA power_apparent;
+// #ifndef LIGHT_FIRMWARE
+//       extern MQTT device_routeur; 
+//       extern MQTT device_grid; 
+//       extern MQTT device_inject; 
+//       extern MQTT compteur_inject;
+//       extern MQTT compteur_grid;
+//       extern MQTT temperature;
+//       extern MQTT device_alarm_temp;
+//       extern MQTT compteur_route;
+      
+//       #ifdef HARDWARE_MOD
+//             extern MQTT power_factor;
+//             extern MQTT power_vrms;
+//             extern MQTT power_irms;
+//             extern MQTT power_apparent;
+//       #endif
+//       extern MQTT enphase_cons_whLifetime;
+//       extern MQTT enphase_prod_whLifetime;
+//       extern MQTT enphase_current_power_consumption;
+//       extern MQTT enphase_current_power_production;
 
+// #endif
 
 int slowlog = TEMPOLOG - 1 ; 
-long beforetime; 
-#define timemilli 3.6e+6 
-float WHtempgrid=0;
-float WHtempinject=0;
+// long beforetime; 
+// #define timemilli 3.6e+6 
+// float WHtempgrid=0;
+// float WHtempinject=0;
+// float WHrouted=0;
 
-int Pow_mqtt_send = 0;
+// int Pow_mqtt_send = 0;
+extern Memory task_mem; 
+int demoloop = 0;
 
-void measureElectricity(void * parameter)
+void measureElectricity(void * parameter) // NOSONAR
 {
     for(;;){
-    //  serial_println("[ENERGY] Measuring...");
+
        /// vérification qu'une autre task ne va pas fausser les valeurs
       long start = millis();
-      
-      
-      if ( configmodule.pilote == false ) {
-            injection3();
-            if ( gDisplayValues.porteuse == false ) {
-                  gDisplayValues.watt =0 ; 
-                  slowlog ++; 
-                  if (slowlog == TEMPOLOG) { logging.start += "--> No sinus, check 12AC power \r\n"; slowlog =0 ; }
+      int porteuse; 
 
-            }
-            serial_println(int(gDisplayValues.watt)) ;
+      //// recherche du mode de fonctionnement
+      int mode = 0;   /// 0 = porteuse  ; 1 = shelly , 2 = enphase 3 = fronius  , 4 = demo 
 
+      if (strcmp(config.topic_Shelly,"none") != 0 && strcmp(config.topic_Shelly,"") != 0) {
+            mode = 1; 
       }
-      else{
-            gDisplayValues.porteuse = true;
+      else if (configmodule.enphase_present && String(configmodule.envoy) == "S") {
+            mode = 2; 
       }
-     
-
-if (!AP) {
-      if (configmodule.enphase_present ) {
-            Enphase_get();
-            if ( configmodule.pilote ) { 
-                  //// inversion des valeurs pour enphase piloteur
-                  int tempo = gDisplayValues.watt; 
-                  gDisplayValues.watt = gDisplayValues.Fronius_conso ;
-                  gDisplayValues.Fronius_conso = tempo; 
-                  }
-            }
-
-      if (configmodule.Fronius_present ){
-            Fronius_get();
-            }           
-
-
-            #if WIFI_ACTIVE == true
-                  Pow_mqtt_send ++ ;
-                  if ( Pow_mqtt_send > 5 ) {
-                  long timemesure = start-beforetime;
-                  float wattheure = (timemesure * abs(gDisplayValues.watt) / timemilli) ;  
-
-                  if (config.IDX != 0) {Mqtt_send(String(config.IDX), String(int(gDisplayValues.watt)));  }
-                  if (configmqtt.HA) {
-                        device_routeur.send(String(int(gDisplayValues.watt)));
-                        power_apparent.send(String(int(PVA)));
-                        power_vrms.send(String(int(Vrms)));
-                        power_irms.send(String(Irms));
-                        power_factor.send(String(PowerFactor));
-                  }
-                  // send if injection
-                  if (gDisplayValues.watt < 0 ){
-                  if (config.IDX != 0) {
-                        Mqtt_send(String(config.IDX), String(int(-gDisplayValues.watt)),"injection");
-                        Mqtt_send(String(config.IDX), String("0") ,"grid");
-                  }
-                  if (configmqtt.HA) device_inject.send(String(int(-gDisplayValues.watt)));
-                  if (configmqtt.HA) device_grid.send(String("0"));
-                  WHtempgrid += wattheure; 
-                  if (configmqtt.HA) compteur_inject.send(String(WHtempgrid));
-                  
-                  
-                  // if (configmqtt.HA)compteur_grid.send(String("0"));
-                  }
-                  else {
-                        if (config.IDX != 0) {
-                              Mqtt_send(String(config.IDX), String("0"),"injection");
-                              Mqtt_send(String(config.IDX), String(int(gDisplayValues.watt)),"grid");
+      else if (configmodule.Fronius_present) {
+            mode = 3; 
+      }
+            /// SCT 013 
+      if (mode == 0 ) { 
+                  #ifndef HARDWARE_MOD
+                  injection2();
+                  #else
+                  injection3();
+                  #endif
+                  gDisplayValues.wattIsValid = true;
+            if ( gDisplayValues.porteuse == false  && configmodule.enphase_present == false && configmodule.Fronius_present == false) {
+                        gDisplayValues.watt = 0 ; 
+                        gDisplayValues.wattIsValid = false;
+                        slowlog ++; 
+                        if (slowlog == TEMPOLOG) {     
+                              logging.Set_log_init("--> No sinus, check 12AC power \r\n");
+                              slowlog =0 ; 
                         }
-                  if (configmqtt.HA) device_grid.send(String(int(gDisplayValues.watt)));
-                  if (configmqtt.HA) device_inject.send(String("0"));
-                  // if (configmqtt.HA) compteur_inject.send(String("0"));
-                  WHtempinject += wattheure;
-                  if (configmqtt.HA) compteur_grid.send(String(WHtempinject));
-                  //maj 202030209
-                  if (configmqtt.HA && discovery_temp) temperature_HA.send(String(gDisplayValues.temperature));
-                  if (config.IDX != 0 && discovery_temp) {Mqtt_send(String("temperature"), String(gDisplayValues.temperature) );}
+
+                  }
+                  if (logging.serial){
+                  serial_println(int(gDisplayValues.watt)) ;
+                
+                  }
+      }
+
+      if (mode == 4 ) {
+                        //// mode demo
+
+            gDisplayValues.porteuse = true;
+            gDisplayValues.wattIsValid = true;
+            
+            if (demoloop < TABLEAU_SIZE ) {
+                  gDisplayValues.watt = tableaudemo[demoloop];
+                  demoloop++;
+            } 
+            else {
+                  demoloop = 0;
+            }
+      }
+
+      /// que dans les cas sans mode AP
+      if (!AP) {
+            /// shelly
+            if (mode == 1 ) { 
+                  if (WiFi.status() == WL_CONNECTED )  {
+                        /// on vérifie si config.topic_Shelly est une IP ou un topic mqtt
+                        if (checkIP(config.topic_Shelly)) {
+                              int temp_shellyWatt = shelly_get_data(config.topic_Shelly);
+                              if ( temp_shellyWatt == 99999 ){ // 0 me posait problème pour ceux qui souhaitent avoir delta/deltaneg au dessus ou en dessous
+                                    gDisplayValues.wattIsValid = false;
+                                    gDisplayValues.watt = 0;
+                              }
+                              else {
+                                    gDisplayValues.wattIsValid = true;
+                                    gDisplayValues.watt = temp_shellyWatt;
+                              }
+
+                        }
+                        #ifdef NORMAL_FIRMWARE
+                        else {
+                              
+                              // client.loop();
+                              gDisplayValues.watt = gDisplayValues.Shelly ;
+                            gDisplayValues.wattIsValid = true;
+                        }
+                        #endif
+                        //  // on met à jour
+                        gDisplayValues.porteuse = true; // et c'est bon. 
+
+                  }
+            }
+
+            /// enphase
+            if (mode == 2 ) { 
+                  if (WiFi.status() == WL_CONNECTED )  {
+                        //// inversion des valeurs pour enphase piloteur
+                        Enphase_get();
+                        int tempo = gDisplayValues.watt; 
+                        gDisplayValues.watt = gDisplayValues.Fronius_conso ; 
+                        gDisplayValues.Fronius_conso = tempo; 
+                        gDisplayValues.wattIsValid = true;
                   }
 
-                  beforetime = start; 
-                  Pow_mqtt_send = 0 ;
-                  }             
-            #endif
-}
+            }
+
+
+            /// fronius
+            if (mode == 3 ) { 
+                  if (WiFi.status() == WL_CONNECTED )  {
+                        Fronius_get();
+                        gDisplayValues.wattIsValid = true;
+                  }
+            }
+      }
+
+
+
+
+
+// shelly quand c était en mqtt
+      #ifdef NORMAL_FIRMWARE
+
+      #endif
+
+
 
 long end = millis();
-
+      task_mem.task_measure_electricity = uxTaskGetStackHighWaterMark(NULL);
       // Schedule the task to run again in 1 second (while
-      // taking into account how long measurement took)
-      if (configmodule.enphase_present && configmodule.pilote) {
-            vTaskDelay(3000 / portTICK_PERIOD_MS);
+      // taking into account how long measurement took) ///&& configmodule.pilote
+      if (mode != 0 ) {
+            ///// le shelly et l'enphase sont plus lents et font des mesures à 1s ce qui peut créer des doublons de commandes
+            vTaskDelay(pdMS_TO_TICKS(4000));
       }
       else
       {      
-            vTaskDelay((1500-(end-start)) / portTICK_PERIOD_MS);
+            vTaskDelay(pdMS_TO_TICKS(2000));
       }
 
     }    

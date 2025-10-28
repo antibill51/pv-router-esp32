@@ -2,6 +2,26 @@
 #define CONFIG
 
 /**
+ * Modification matérielle du PV Routeur --> Très bon résultats, a tester dans le but de, pourquoi pas, lancer une V2?  
+ */
+#ifdef HARDWARE_MOD // si modification hardware du PV Router (bypass diode, ADC Middle sur GPIO 39, SCT centrée sur ADC MIDDLE )
+// ADC MIDDLE = 3.3V /2
+
+    float VrmsOLD = 225; // Valeur de référence, s'ajuste avec la tension mesurée en fonction du coef PHASECAL
+    float PHASECAL = 0.2; // Coefficient permettant le lissage des valeurs de tension.  Vrms = VrmsOLD + PHASECAL * (Vrms - VrmsOLD); 
+    int timeout = 22000; // 20ms , 1 * 50Hz + 2ms marge?
+    int value0=1840; // Valeur de référence, s'ajuste avec la tension mesurée en fonction du coef PHASECAL
+
+
+    float PVA =0 ;  //Puissance active en  VA
+    double PW = 0;   //Puissance en Watt
+    float PowerFactor = 0; // Facteur de puissance
+    int startV; // Mesure ADC AC en début de cycle
+    double Vrms = 225; // Tension secteur RMS
+    double Irms = 0; // Intensité secteur RMS
+#endif
+
+/**
  * Language 
  */
 #define LANG_FR true
@@ -15,24 +35,21 @@
  */
 #define WEBSSERVER true
 #define WIFI_ACTIVE  true
-//#define MQTT_CLIENT true --> option in the web menu
-
-#define WIFI_NETWORK "xxx"
-#define WIFI_PASSWORD "xxx"
 
 /**
- * WiFi credentials
+ * MQTT credentials
  */
 #define MQTT_USER ""
 #define MQTT_PASSWORD ""
-#define MQTT_INTERVAL 60
+
+#define MQTT_LAST_CONNECT_DELAY 10 * 1000 // 10 secondes en ms
+#define MQTT_LAST_DISCONNECT_DELAY 5 * 1000 // 5 secondes en ms
 
 /**
  * Switch Screnn button and time on
  * 
  */
 #define SWITCH 35
-//#define SWITCHTIMER 0   // 0 : always ON  / other : time in sec 
 #define BUTTON_LEFT 0 // bouton droit ttgo
 #define NB_PAGES 1 // nombre de pages d'affichages codées
 
@@ -40,10 +57,7 @@
  * Time between 2 mesure of dimmer temp
  */
 #define GETTEMPREFRESH 5
-/**
- * Set this to false to disable Serial logging
- */
-#define DEBUG true
+
 //#define configMAX_PRIORITIES 1024
 
 
@@ -65,62 +79,52 @@
 #ifdef  TTGO
 #define ADC_INPUT 32 // linky
 #define ADC_PORTEUSE 33 // porteuse
+#define ADC_MIDDLE 39 // 3.3V / 2
 #endif
 
 
-#define ADC_MIDDLE 1893  /// en dessous laquelle on considère une valeur négative
-
-
+// #define ADC_MIDDLE 1893  /// en dessous laquelle on considère une valeur négative
+int dimmer_getState_interval = 0; // On requête la puissance du dimmer régulièrement, mais pas trop souvent
 
 #define ADC_BITS    12
 #define ADC_COUNTS  (1<<ADC_BITS)
 int sigma_read;
-float VrmsOLD = 225; // Valeur de référence, s'ajuste avec la tension mesurée en fonction du coef PHASECAL
-float PHASECAL = 0.5;
+int half;
+// float VrmsOLD = 225; // Valeur de référence, s'ajuste avec la tension mesurée en fonction du coef PHASECAL
+// float PHASECAL = 0.5;
 
-// Valeurs théoriques pour PHASECAL.
-// En modifiant le logiciel pour signaler le temps qu'il faut pour terminer la boucle de mesure interne 
-// et le nombre d'échantillons enregistrés, le temps entre les échantillons a été mesuré à 377 μs.
-// Cela équivaut à 6,79° (à 50 Hz, un cycle complet, soit 360°, prend 20 ms)
-// Par conséquent, une valeur de 1 n'applique aucune correction, 
-// Zéro et 2 appliquent environ 7° de correction dans des directions opposées.
-// Une valeur de 1,28 corrigera l'erreur de 2° causée par le retard entre la tension d'échantillonnage et le courant.
+// // Valeurs théoriques pour PHASECAL.
+// // En modifiant le logiciel pour signaler le temps qu'il faut pour terminer la boucle de mesure interne 
+// // et le nombre d'échantillons enregistrés, le temps entre les échantillons a été mesuré à 377 μs.
+// // Cela équivaut à 6,79° (à 50 Hz, un cycle complet, soit 360°, prend 20 ms)
+// // Par conséquent, une valeur de 1 n'applique aucune correction, 
+// // Zéro et 2 appliquent environ 7° de correction dans des directions opposées.
+// // Une valeur de 1,28 corrigera l'erreur de 2° causée par le retard entre la tension d'échantillonnage et le courant.
 
-float PVA;  //Power in VA
-double PW;   //Power in Watt
-float PowerFactor; // 
-
-
-/**
- * The voltage of your home, used to calculate the wattage.
- * Try setting this as accurately as possible.
- */
-// #define HOME_VOLTAGE 225.0
+// float PVA;  //Power in VA
+// double PW;   //Power in Watt
+// float PowerFactor; // 
 
 /**
  *  Dimmer 
  */
 
 #define DIMMER true
-#define DIMMERLOCAL true
-#define DALLAS true
 #define TRIGGER 10   /// 
 
 ///// PVROUTER false dans le cas d'un enphase en pilote full 
 #define PVROUTER true
 
-#if DIMMERLOCAL 
+
     #define outputPin  26 // PSM on board
     #define zerocross  27 // for boards with CHANGEBLE input pins // ZC on board
-    #define cooler 12 // Pin for cooler. (switch on dimmer)
+    #define COOLER 12 // Pin for COOLER. (switch on dimmer)
 
-#endif
 
-#if DALLAS
+
     #define ONE_WIRE_BUS  25
     #define TEMPERATURE_PRECISION 10
     #define TRIGGER 10   /// Trigger % for max temp protection. max temp configuration is in config.json 
- #endif
 bool discovery_temp = false;
 
 
@@ -130,13 +134,13 @@ bool discovery_temp = false;
  * the ESP goes into deep sleep for 30seconds to try and
  * recover.
  */
-#define WIFI_TIMEOUT 30000 // 20 seconds
+#define WIFI_TIMEOUT 30000 // 30 seconds
 
 /**
  * How long should we wait after a failed WiFi connection
  * before trying to set one up again.
  */
-#define WIFI_RECOVER_TIME_MS 30000 // 20 seconds
+#define WIFI_RECOVER_TIME_MS 30000 // 30 seconds
 
 /**
  * Dimensions of the OLED display attached to the ESP
@@ -151,14 +155,15 @@ bool discovery_temp = false;
 /**
  * Force Emonlib to assume a 3.3V supply to the CT sensor
  */
-#define emonTxV3 1
+// #define emonTxV3 1
 
 
 /**
  * Local measurements
  */
 #define LOCAL_MEASUREMENTS 30
-#define COMPENSATION 60 ///  % d'asservissement pour l'envoie de puissance au dimmer.
+// #define FACTEURPUISSANCE 10.50 // remplacé par la valeur configurable sur l'interface web
+#define COMPENSATION 100 ///  % d'asservissement pour l'envoie de puissance au dimmer.
 
 /**
  * Syncing time with an NTP server
@@ -168,39 +173,24 @@ bool discovery_temp = false;
 #define NTP_OFFSET_SECONDS 3600
 #define NTP_UPDATE_INTERVAL_MS 3600000 /// synch de l'heure toute les heures
 
-
-//*************not implemented /tested **********
-/**
- * Wether or not you want to enable Home Assistant integration
- */
-//#define HA_ENABLED false
-//#define HA_ADDRESS "*** YOUR HOME ASSISTANT IP ADDRESSS ***"
-//#define HA_PORT 8883
-//#define HA_USER ""
-//#define HA_PASSWORD ""
-//*************not implemented /tested **********
-/**
- * The MQTT endpoint of the service we should connect to and receive messages
- * from.
- */
-//#define AWS_ENABLED false
-//#define AWS_IOT_ENDPOINT "**** YOUR AWS IOT ENDPOINT ****"
-//#define AWS_IOT_TOPIC "**** YOUR AWS IOT RULE ARN ****"
-
-//#define MQTT_CONNECT_DELAY 200
-//#define MQTT_CONNECT_TIMEOUT 20000 // 20 seconds
-//*************END not implemented /tested **********
-
 // Check which core Arduino is running on. This is done because updating the 
 // display only works from the Arduino core.
 #if CONFIG_FREERTOS_UNICORE
     #define ARDUINO_RUNNING_CORE 0
 #else
-    #define ARDUINO_RUNNING_CORE 1
+  //  #define ARDUINO_RUNNING_CORE 1
 #endif
 
-#define VERSION "version 3.20230209"
+#define RELEASE "Version 20240606"
+constexpr const int FS_RELEASE= 20240601 ;
 
+    #ifdef LIGHT_FIRMWARE
+        #define VERSION "Light " RELEASE
+        #else
+        #define VERSION RELEASE
+    #endif
+
+#define EnvoyJ "/auth/check_jwt"
 #define EnvoyR "/api/v1/production"
 #define EnvoyS "/production.json"
 
@@ -213,8 +203,52 @@ bool AP=true;
 #define RELAY1 13
 #define RELAY2 15
 
+/// taille max des logs stockée
+#define LOG_MAX_STRING_LENGTH 1500 
 
+
+#ifdef S3
+    #define ADC_INPUT 10
+    #define INPUT 3
+    #define RELAY1 43
+    #define RELAY2 44
+    #define SWITCH 14
+    #define BUTTON_LEFT 0 // bouton droit ttgo
+    #define outputPin  1 // PSM on board
+    #define zerocross  2 // for boards with CHANGEBLE input pins // ZC on board
+    #define COOLER 18 // Pin for COOLER. (switch on dimmer)
+#endif
+
+/**
+ * Set this to false to disable Serial logging
+ */
+#define DEBUG true
+//#define DEBUGLEVEL1 false
+  #ifdef DEBUGLEVEL1
+    #define DEBUG_PRINTLN(x) Serial.println(x)
+  #else
+    #define DEBUG_PRINTLN(x)
+  #endif
+
+/// Configuration pour ESP32D1MINI sur carte dimmer + récupération Shelly
+#ifdef ESP32D1MINI_FIRMWARE
+
+      #define outputPin  18 // PSM on board
+      #define zerocross  19 // for boards with CHANGEBLE input pins // ZC on board
+      #define COOLER 5 // Pin for COOLER. (switch on dimmer)
+      #define outputPin2 22 // use JOTTA/SSR2 (SSR2) output for 2nd Robotdyn/Random SSR
+      #define outputPin3 21  // (SSR3) use RELAY2/SSR3 output for 3rd Robotdyn/Random SSR ( for old boards )
+
+
+
+      #define ONE_WIRE_BUS  23
+      #define TEMPERATURE_PRECISION 10
+      #define TRIGGER 5   /// Trigger % for max temp protection. max temp configuration is in config.json
+   
+  #define OLED_ON false
+  #define RELAY1 17
+  #define RELAY2 26
 #endif
 
 
-///
+#endif
