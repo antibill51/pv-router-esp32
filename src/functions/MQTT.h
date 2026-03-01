@@ -37,52 +37,52 @@ extern MQTT compteur_route;
 #endif
 
 void init_MQTT_sensor(){
-        device_dimmer.Set_object_id("dimmer");
+        device_dimmer.Set_default_entity_id("dimmer");
         device_dimmer.Set_retain_flag(true);
 
-        device_routed.Set_object_id("dimmer_power");
+        device_routed.Set_default_entity_id("dimmer_power");
         device_routed.Set_retain_flag(true);
 
-        device_dimmer_power.Set_object_id("device_dimmer_power");
+        device_dimmer_power.Set_default_entity_id("device_dimmer_power");
         device_dimmer_power.Set_retain_flag(true);
 
-        device_routeur.Set_object_id("power");
+        device_routeur.Set_default_entity_id("power");
         device_routeur.Set_retain_flag(true);
 
-        device_grid.Set_object_id("grid");
+        device_grid.Set_default_entity_id("grid");
         device_grid.Set_retain_flag(true);
 
-        device_inject.Set_object_id("inject");
+        device_inject.Set_default_entity_id("inject");
         device_inject.Set_retain_flag(true);
 
-        compteur_grid.Set_object_id("grid_Wh");
+        compteur_grid.Set_default_entity_id("grid_Wh");
         compteur_grid.Set_retain_flag(true);
 
-        compteur_inject.Set_object_id("inject_Wh");
+        compteur_inject.Set_default_entity_id("inject_Wh");
         compteur_inject.Set_retain_flag(true);
 
-        compteur_route.Set_object_id("route_Wh");
+        compteur_route.Set_default_entity_id("route_Wh");
         compteur_route.Set_retain_flag(true);
 
-        temperature.Set_object_id("temperature");
+        temperature.Set_default_entity_id("temperature");
         temperature.Set_retain_flag(true);
 
-        switch_1.Set_object_id("relay1");
+        switch_1.Set_default_entity_id("relay1");
         switch_1.Set_retain_flag(true);
 
-        switch_2.Set_object_id("relay2");
+        switch_2.Set_default_entity_id("relay2");
         switch_2.Set_retain_flag(true);
 
-        device_alarm_temp.Set_object_id("alarm_temp");
+        device_alarm_temp.Set_default_entity_id("alarm_temp");
         device_alarm_temp.Set_retain_flag(true);
 
-        device_charge1.Set_object_id("charge1");
+        device_charge1.Set_default_entity_id("charge1");
         device_charge1.Set_retain_flag(true);
 
-        device_charge2.Set_object_id("charge2");
+        device_charge2.Set_default_entity_id("charge2");
         device_charge2.Set_retain_flag(true);
 
-        device_charge3.Set_object_id("charge3");
+        device_charge3.Set_default_entity_id("charge3");
         device_charge3.Set_retain_flag(true);
 
         // compteur_inject.send(String("0"));
@@ -92,13 +92,13 @@ void init_MQTT_sensor(){
         // device_charge3.send(String(config.charge3));
 
         #ifdef HARDWARE_MOD
-                power_factor.Set_object_id("PowerFactor");
+                power_factor.Set_default_entity_id("PowerFactor");
                 power_factor.Set_retain_flag(true);
-                power_vrms.Set_object_id("Vrms");
+                power_vrms.Set_default_entity_id("Vrms");
                 power_vrms.Set_retain_flag(true);
-                power_irms.Set_object_id("Irms");
+                power_irms.Set_default_entity_id("Irms");
                 power_irms.Set_retain_flag(true);
-                power_apparent.Set_object_id("ApparentPower");
+                power_apparent.Set_default_entity_id("ApparentPower");
                 power_apparent.Set_retain_flag(true);
         #endif
 
@@ -146,7 +146,7 @@ void HA_discover(){
 void init_HA_sensor(){
         // init_MQTT_sensor();
         device_dimmer.Set_name("Consigne");
-        // device_dimmer.Set_object_id("dimmer");
+        // device_dimmer.Set_default_entity_id("dimmer");
         device_dimmer.Set_unit_of_meas("%");
         device_dimmer.Set_stat_cla("measurement");
         device_dimmer.Set_dev_cla("power_factor"); // fix is using native unit of measurement '%' which is not a valid unit for the device class ('power') it is using
@@ -156,7 +156,7 @@ void init_HA_sensor(){
         // device_dimmer.Set_expire_after(true);
         
         device_routed.Set_name("Puissance routée");
-        // device_routed.Set_object_id("dimmer_power");
+        // device_routed.Set_default_entity_id("dimmer_power");
         device_routed.Set_unit_of_meas("W");
         device_routed.Set_stat_cla("measurement");
         device_routed.Set_dev_cla("power"); // fix is using native unit of measurement '%' which is not a valid unit for the device class ('power') it is using
@@ -166,7 +166,7 @@ void init_HA_sensor(){
         // device_routed.Set_expire_after(true);
 
         device_routeur.Set_name("Puissance");
-        // device_routeur.Set_object_id("power");
+        // device_routeur.Set_default_entity_id("power");
         device_routeur.Set_unit_of_meas("W");
         device_routeur.Set_stat_cla("measurement");
         device_routeur.Set_dev_cla("power");
@@ -175,7 +175,7 @@ void init_HA_sensor(){
         // device_routeur.Set_expire_after(true);
 
         device_grid.Set_name("Soutirage");
-        // device_grid.Set_object_id("grid");
+        // device_grid.Set_default_entity_id("grid");
         device_grid.Set_unit_of_meas("W");
         device_grid.Set_stat_cla("measurement");
         device_grid.Set_dev_cla("power");
@@ -185,7 +185,7 @@ void init_HA_sensor(){
 
 
         device_inject.Set_name("Injection");
-        // device_inject.Set_object_id("inject");
+        // device_inject.Set_default_entity_id("inject");
         device_inject.Set_unit_of_meas("W");
         device_inject.Set_stat_cla("measurement");
         device_inject.Set_dev_cla("power");
@@ -194,7 +194,7 @@ void init_HA_sensor(){
         // device_inject.Set_expire_after(true);
 
         compteur_grid.Set_name("Compteur soutirage");
-        // compteur_grid.Set_object_id("grid_Wh");
+        // compteur_grid.Set_default_entity_id("grid_Wh");
         compteur_grid.Set_unit_of_meas("Wh");
         compteur_grid.Set_stat_cla("total_increasing");
         compteur_grid.Set_dev_cla("energy");
@@ -203,7 +203,7 @@ void init_HA_sensor(){
         // compteur_grid.Set_expire_after(true);
 
         compteur_inject.Set_name("Compteur injection");
-        // compteur_inject.Set_object_id("inject_Wh");
+        // compteur_inject.Set_default_entity_id("inject_Wh");
         compteur_inject.Set_unit_of_meas("Wh");
         compteur_inject.Set_stat_cla("total_increasing");
         compteur_inject.Set_dev_cla("energy");      
@@ -212,7 +212,7 @@ void init_HA_sensor(){
         // compteur_inject.Set_expire_after(true);
 
         compteur_route.Set_name("Compteur routage");
-        // compteur_route.Set_object_id("grid_Wh");
+        // compteur_route.Set_default_entity_id("grid_Wh");
         compteur_route.Set_unit_of_meas("Wh");
         compteur_route.Set_stat_cla("total_increasing");
         compteur_route.Set_dev_cla("energy");
@@ -221,7 +221,7 @@ void init_HA_sensor(){
         // compteur_grid.Set_expire_after(true);
         
         temperature.Set_name("Température");
-        // temperature.Set_object_id("temperature");
+        // temperature.Set_default_entity_id("temperature");
         temperature.Set_dev_cla("temperature"); 
         temperature.Set_unit_of_meas("°C");
         temperature.Set_stat_cla("measurement");
@@ -230,7 +230,7 @@ void init_HA_sensor(){
         // temperature.Set_expire_after(true);
 
         switch_1.Set_name("Relais 1");
-        // switch_1.Set_object_id("relay1");
+        // switch_1.Set_default_entity_id("relay1");
         switch_1.Set_entity_type("switch");
         switch_1.Set_retain_flag(true);
         switch_1.Set_retain(true);
@@ -238,14 +238,14 @@ void init_HA_sensor(){
 
 
         switch_2.Set_name("Relais 2");
-        // switch_2.Set_object_id("relay2");
+        // switch_2.Set_default_entity_id("relay2");
         switch_2.Set_entity_type("switch");
         switch_2.Set_retain_flag(true);
         switch_2.Set_retain(true);
         // switch_2.Set_expire_after(true);
 
         device_alarm_temp.Set_name("Surchauffe");
-        // device_alarm_temp.Set_object_id("alarm_temp");
+        // device_alarm_temp.Set_default_entity_id("alarm_temp");
         device_alarm_temp.Set_entity_type("binary_sensor");
         device_alarm_temp.Set_dev_cla("problem");
         device_alarm_temp.Set_retain_flag(true);
@@ -284,7 +284,7 @@ void init_HA_sensor(){
         #ifdef HARDWARE_MOD
 
                 power_factor.Set_name("Facteur de puissance");
-                // power_factor.Set_object_id("PowerFactor");
+                // power_factor.Set_default_entity_id("PowerFactor");
                 power_factor.Set_unit_of_meas("%");
                 power_factor.Set_stat_cla("measurement");
                 power_factor.Set_dev_cla("power_factor");
@@ -294,7 +294,7 @@ void init_HA_sensor(){
                 // power_factor.Set_expire_after(true);
 
                 power_vrms.Set_name("Tension RMS");
-                // power_vrms.Set_object_id("Vrms");
+                // power_vrms.Set_default_entity_id("Vrms");
                 power_vrms.Set_unit_of_meas("V");
                 power_vrms.Set_stat_cla("measurement");
                 power_vrms.Set_dev_cla("voltage");
@@ -303,7 +303,7 @@ void init_HA_sensor(){
                 // power_vrms.Set_expire_after(true);
 
                 power_irms.Set_name("Intensité RMS");
-                // power_irms.Set_object_id("Irms");
+                // power_irms.Set_default_entity_id("Irms");
                 power_irms.Set_unit_of_meas("A");
                 power_irms.Set_stat_cla("measurement");
                 power_irms.Set_dev_cla("current");
@@ -312,7 +312,7 @@ void init_HA_sensor(){
                 // power_irms.Set_expire_after(true);
 
                 power_apparent.Set_name("Puissance apparente");
-                // power_apparent.Set_object_id("ApparentPower");
+                // power_apparent.Set_default_entity_id("ApparentPower");
                 power_apparent.Set_unit_of_meas("VA");
                 power_apparent.Set_stat_cla("measurement");
                 power_apparent.Set_dev_cla("apparent_power");
@@ -323,7 +323,7 @@ void init_HA_sensor(){
 
         if (config.dimmerlocal) {
                 device_dimmer_power.Set_name("Puissance dimmer local");
-                // device_dimmer_power.Set_object_id("dimmer_power");
+                // device_dimmer_power.Set_default_entity_id("dimmer_power");
                 device_dimmer_power.Set_unit_of_meas("W");
                 device_dimmer_power.Set_stat_cla("measurement");
                 device_dimmer_power.Set_dev_cla("power"); // fix is using native unit of measurement '%' which is not a valid unit for the device class ('power') it is using

@@ -20,9 +20,9 @@ struct MQTT
   private:String name; 
   public:void Set_name(String setter) {name=setter; }
 
-  private:char object_id[30]; 
-  public:void Set_object_id(String setter) {
-    snprintf(object_id, sizeof(object_id), "%s", setter.c_str());}
+  private:char default_entity_id[30]; 
+  public:void Set_default_entity_id(String setter) {
+    snprintf(default_entity_id, sizeof(default_entity_id), "%s", setter.c_str());}
 
   private:String dev_cla; 
   public:void Set_dev_cla(String setter) {dev_cla=setter; }
@@ -77,33 +77,36 @@ private:char node_id[21];
 private:
   void createHA_sensor_type(JsonObject& root) {
 
-
-
-char obj_id[62]; // node_id + object_id + 1 -1
-// char uniq_id[51]; // node_id + object_id -1
+char uniq_id[62]; // (MODIFIE) Pour garder l'ID unique sans préfixe
+char def_ent_id[80]; // (MODIFIE) Taille augmentée pour "domaine.id"
 char topic_Xlyric[40]; // 8 + node_id
-char stat_t[83]; // 14 + topic_Xlyric + object_id -1 
+char stat_t[100]; // (MODIFIE) augmentation pour la sécurité
 char avty_t[46]; // 6 + topic_Xlyric
-char value_template[47]; // 17 + object_id
+char value_template[47]; // 17 + default_entity_id
 
-char cmd_t[93]; //9+topic_Xlyric + entity_type + object_id -2
-      // snprintf(node_mac, sizeof(node_mac), "%s%s", (WiFi.macAddress().substring(12,14)).c_str(), (WiFi.macAddress().substring(15,17)).c_str());
-      // snprintf(uniq_id, sizeof(uniq_id), "%s-%s", node_mac, object_id);
-      snprintf(obj_id, sizeof(obj_id), "%s-%s", node_id, object_id);
+char cmd_t[93]; //9+topic_Xlyric + entity_type + default_entity_id -2
+
+      // MODIFICATION ICI : Séparation de uniq_id et construction du default_entity_id avec son domaine
+      snprintf(uniq_id, sizeof(uniq_id), "%s-%s", node_id, default_entity_id);
+      snprintf(def_ent_id, sizeof(def_ent_id), "%s.%s", entity_type, uniq_id);
+      
       snprintf(topic_Xlyric, sizeof(topic_Xlyric), "Xlyric/%s/", node_id);
-      snprintf(stat_t, sizeof(stat_t), "%ssensors/%s/state", topic_Xlyric,object_id );
+      
+      // MODIFICATION ICI : remplacement de "sensors" en dur
+      snprintf(stat_t, sizeof(stat_t), "%s%s/%s/state", topic_Xlyric, entity_type, default_entity_id );
+      
       snprintf(avty_t, sizeof(avty_t), "%sstatus", topic_Xlyric);
 
       root["name"] = name;
-      root["obj_id"] = obj_id;
-      root["uniq_id"] = obj_id;
+      root["def_ent_id"] = def_ent_id;
+      root["uniq_id"] = uniq_id; // On passe la variable uniq_id propre
       root["stat_t"] =  stat_t;
       root["avty_t"] = avty_t;
       if (!strcmp(entity_type, "button") == 0) {
-        snprintf(value_template, sizeof(value_template), "{{ value_json.%s }}", object_id);
+        snprintf(value_template, sizeof(value_template), "{{ value_json.%s }}", default_entity_id);
       }
       if (!strcmp(entity_type, "sensor") == 0 && !strcmp(entity_type, "binary_sensor") == 0) {
-      snprintf(cmd_t, sizeof(cmd_t), "%scommand/%s/%s", topic_Xlyric,entity_type,object_id );
+      snprintf(cmd_t, sizeof(cmd_t), "%scommand/%s/%s", topic_Xlyric,entity_type,default_entity_id );
       }
       
       if (strcmp(entity_type, "sensor") == 0) {
@@ -113,10 +116,10 @@ char cmd_t[93]; //9+topic_Xlyric + entity_type + object_id -2
           root["val_tpl"] = value_template;
       }
       else if (strcmp(entity_type, "switch") == 0) {
-          char pl_on[44]; //14+object_id
-          char pl_off[44]; //14+object_id
-          snprintf(pl_on, sizeof(pl_on), "{ \"%s\" : \"1\"  } ", object_id);
-          snprintf(pl_off, sizeof(pl_off), "{ \"%s\" : \"0\"  } ", object_id);
+          char pl_on[44]; //14+default_entity_id
+          char pl_off[44]; //14+default_entity_id
+          snprintf(pl_on, sizeof(pl_on), "{ \"%s\" : \"1\"  } ", default_entity_id);
+          snprintf(pl_off, sizeof(pl_off), "{ \"%s\" : \"0\"  } ", default_entity_id);
 
           root["val_tpl"] = value_template;
           root["pl"] = value_template;
@@ -128,8 +131,8 @@ char cmd_t[93]; //9+topic_Xlyric + entity_type + object_id -2
           root["cmd_t"] = cmd_t;
       } 
       else if (strcmp(entity_type, "number") == 0 || strcmp(entity_type, "select") == 0) {
-          char cmd_tpl[50]; //20+object_id
-          snprintf(cmd_tpl, sizeof(cmd_tpl), "{\"%s\": {{ value }} }", object_id );
+          char cmd_tpl[50]; //20+default_entity_id
+          snprintf(cmd_tpl, sizeof(cmd_tpl), "{\"%s\": {{ value }} }", default_entity_id );
           root["val_tpl"] = value_template;
           root["cmd_t"] = cmd_t;
           root["cmd_tpl"] = cmd_tpl;
@@ -155,8 +158,8 @@ char cmd_t[93]; //9+topic_Xlyric + entity_type + object_id -2
           root["val_tpl"] = value_template;
       }
       else if (strcmp(entity_type, "button") == 0) {
-        char pl_prs[44]; //14+object_id    
-          snprintf(pl_prs, sizeof(pl_prs), "{\"%s\": \"1\" }", object_id );
+        char pl_prs[44]; //14+default_entity_id    
+          snprintf(pl_prs, sizeof(pl_prs), "{\"%s\": \"1\" }", default_entity_id );
           root["entity_category"] = entity_category;
           root["cmd_t"] = cmd_t;
           root["pl_prs"] = pl_prs;
@@ -192,8 +195,8 @@ public:
       JsonDocument device;
       JsonObject root = device.to<JsonObject>();
 
-      char topic[97]; // 23 + entity_type + node_id + object_id -2
-      snprintf(topic, sizeof(topic), "homeassistant/%s/%s/%s/config", entity_type,node_id,object_id );
+      char topic[97]; // 23 + entity_type + node_id + default_entity_id -2
+      snprintf(topic, sizeof(topic), "homeassistant/%s/%s/%s/config", entity_type,node_id,default_entity_id );
 
       JsonObject deviceObj = root["device"].to<JsonObject>(); // Création d'un objet JSON imbriqué pour "device"
       createHA_device_declare(deviceObj);
@@ -214,7 +217,7 @@ public:
 
       if (status == 0) {
         logging.Set_log_init("MQTT ERROR : discovery not sended for ",true);
-        logging.Set_log_init(object_id);
+        logging.Set_log_init(default_entity_id);
         logging.Set_log_init("\r\n");
       }
     }
@@ -224,17 +227,19 @@ public:
       if (client.connected()){
     if (configmqtt.JEEDOM || configmqtt.HA) {
 
-      char topic[84]; // 22 +  node_id  + object_id
-      snprintf(topic, sizeof(topic), "Xlyric/%s/sensors/%s/state",node_id,object_id );
+      // MODIFICATION ICI: taille augmentée et remplacement de "sensors" par %s et entity_type
+      char topic[100]; 
+      snprintf(topic, sizeof(topic), "Xlyric/%s/%s/%s/state",node_id, entity_type, default_entity_id );
 
-      char message[50]; // 11 +  object_id + value?
-      snprintf(message, sizeof(message),"{\"%s\":\"%s\"}" ,object_id, value.c_str());
+      // MODIFICATION ICI: taille augmentée de sécurité
+      char message[100]; 
+      snprintf(message, sizeof(message),"{\"%s\":\"%s\"}" ,default_entity_id, value.c_str());
       int status;
-      // String message = R"({")" + object_id + R"(" : ")" + value.c_str() + R"("} )";
+      // String message = R"({")" + default_entity_id + R"(" : ")" + value.c_str() + R"("} )";
       status = client.publish(topic ,qos, retain_flag , message);  
       if (status == 0) {
         logging.Set_log_init("MQTT ERROR : discovery not sended for ",true);
-        logging.Set_log_init(object_id);
+        logging.Set_log_init(default_entity_id);
         logging.Set_log_init("\r\n");
       }
     }
